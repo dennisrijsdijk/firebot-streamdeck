@@ -5,14 +5,14 @@ import typescript from "@rollup/plugin-typescript";
 import path from "node:path";
 import url from "node:url";
 
-const isWatching = !!process.env.ROLLUP_WATCH;
+const isWatching = !!process.env.ROLLUP_WATCH || process.env.BUILD === "DEBUG";
 const sdPlugin = "gg.dennis.firebot.sdPlugin";
 
 /**
  * @type {import('rollup').RollupOptions}
  */
-const config = {
-	input: "src/plugin.ts",
+const plugin = {
+	input: "src/plugin/index.ts",
 	output: {
 		file: `${sdPlugin}/bin/plugin.js`,
 		sourcemap: isWatching,
@@ -28,6 +28,7 @@ const config = {
 			},
 		},
 		typescript({
+			tsconfig: "src/plugin/tsconfig.json",
 			mapRoot: isWatching ? "./" : undefined
 		}),
 		nodeResolve({
@@ -46,4 +47,6 @@ const config = {
 	]
 };
 
-export default config;
+export default [
+	plugin
+];

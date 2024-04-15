@@ -4,9 +4,11 @@ import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 import path from "node:path";
 import url from "node:url";
+import generatePi from "./rollup-plugin-gen-pi.mjs";
 
 const isWatching = !!process.env.ROLLUP_WATCH || process.env.BUILD === "DEBUG";
-const sdPlugin = "gg.dennis.firebot.sdPlugin";
+const pluginId = "gg.dennis.firebot";
+const sdPlugin = `${pluginId}.sdPlugin`;
 
 /**
  * @type {import('rollup').RollupOptions}
@@ -47,6 +49,49 @@ const plugin = {
 	]
 };
 
+const pi = {
+	input: "src/pi/index.ts",
+	output: {
+		file: `${sdPlugin}/bin/pi.js`,
+		format: 'iife',
+		sourcemap: isWatching,
+		sourcemapPathTransform: (relativeSourcePath, sourcemapPath) => {
+			return url.pathToFileURL(path.resolve(path.dirname(sourcemapPath), relativeSourcePath)).href;
+		}
+	},
+	plugins: [
+		generatePi({
+			base: "src/pi/template.html",
+			actions: "src/pi/templates",
+			pluginId: pluginId,
+			titleRows: {
+				default: 2,
+				map: {
+					display: 6
+				}
+			}
+		}),
+		{
+			name: "watch-externals",
+			buildStart: function () {
+				this.addWatchFile(`${sdPlugin}/manifest.json`);
+			},
+		},
+		typescript({
+			tsconfig: "src/pi/tsconfig.json",
+			mapRoot: isWatching ? "./" : undefined
+		}),
+		nodeResolve({
+			jsnext: true,
+			browser: true,
+			main: true
+		}),
+		commonjs(),
+		!isWatching && terser()
+	]
+};
+
 export default [
-	plugin
+	plugin,
+	pi
 ];

@@ -4,7 +4,8 @@ import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
 import path from "node:path";
 import url from "node:url";
-import generatePi from "./rollup-plugin-gen-pi.mjs";
+import generatePi from "./rollup-plugin-gen-pi";
+import {RollupOptions} from "rollup";
 
 const isWatching = !!process.env.ROLLUP_WATCH || process.env.BUILD === "DEBUG";
 const pluginId = "gg.dennis.firebot";
@@ -13,7 +14,7 @@ const sdPlugin = `${pluginId}.sdPlugin`;
 /**
  * @type {import('rollup').RollupOptions}
  */
-const plugin = {
+const plugin: RollupOptions = {
 	input: "src/plugin/index.ts",
 	output: {
 		file: `${sdPlugin}/bin/plugin.js`,
@@ -49,7 +50,7 @@ const plugin = {
 	]
 };
 
-const pi = {
+const pi: RollupOptions = {
 	input: "src/pi/index.ts",
 	output: {
 		file: `${sdPlugin}/bin/pi.js`,
@@ -62,7 +63,7 @@ const pi = {
 	plugins: [
 		generatePi({
 			base: "src/pi/template.html",
-			actions: "src/pi/templates",
+			actionsDir: "src/pi/templates",
 			pluginId: pluginId,
 			titleRows: {
 				default: 2,
@@ -82,9 +83,7 @@ const pi = {
 			mapRoot: isWatching ? "./" : undefined
 		}),
 		nodeResolve({
-			jsnext: true,
-			browser: true,
-			main: true
+			browser: true
 		}),
 		commonjs(),
 		!isWatching && terser()

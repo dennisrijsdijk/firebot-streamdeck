@@ -6,7 +6,7 @@
 		{
 			"Name": "Counter",
 			"UUID": "gg.dennis.firebot.increment",
-			"Icon": "imgs/actions/counter/icon",
+			"Icon": "imgs/actions/counter/action",
 			"Tooltip": "Displays a count, which increments by one on press.",
 			"Controllers": [
 				"Keypad"

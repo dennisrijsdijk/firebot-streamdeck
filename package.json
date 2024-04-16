@@ -16,6 +16,7 @@
 		"@types/node": "20.8.10",
 		"html-formatter": "^0.1.9",
 		"rollup": "^4.0.2",
+		"rollup-plugin-copy": "^3.5.0",
 		"tslib": "^2.6.2",
 		"typescript": "^5.2.2"
 	},

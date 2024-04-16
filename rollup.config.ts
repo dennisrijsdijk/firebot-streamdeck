@@ -1,4 +1,5 @@
 import commonjs from "@rollup/plugin-commonjs";
+import copy from "rollup-plugin-copy";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
@@ -86,6 +87,12 @@ const pi: RollupOptions = {
 			browser: true
 		}),
 		commonjs(),
+		copy({
+			targets: [
+				{ src: "src/pi/assets", dest: `${sdPlugin}/bin` },
+				{ src: "src/pi/sdpi.css", dest: `${sdPlugin}/bin` }
+			]
+		}),
 		!isWatching && terser()
 	]
 };

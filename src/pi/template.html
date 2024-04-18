@@ -18,24 +18,22 @@
     <hr class="tab-separator" />
 
     <div id="sdpi-tab-action-settings" class="tab-container" style="display: block">
-        <div class="sdpi-item">
-            <div id="sd-base-settings-container">
-                <div class="sdpi-item" id="sdpi-action-instance-div">
-                    <div class="sdpi-item-label">Firebot Instance</div>
-                    <select class="sdpi-item-value select" id="sdpi-action-instance-select">
-                    </select>
-                </div>
-                <div type="textarea" class="sdpi-item" id="sd-title-format-div">
-                    <div class="sdpi-item-label">Title</div>
-                    <span class="sdpi-item-value textarea">
-                <textarea type="textarea" id="sd-title-format" rows="{{TITLE_ROWS}}"></textarea>
-            </span>
-                </div>
+        <div id="sd-base-settings-container">
+            <div class="sdpi-item" id="sdpi-action-instance-div">
+                <div class="sdpi-item-label">Firebot Instance</div>
+                <select class="sdpi-item-value select" id="sdpi-action-instance-select">
+                </select>
             </div>
+            <div type="textarea" class="sdpi-item" id="sd-title-format-div">
+                <div class="sdpi-item-label">Title</div>
+                <span class="sdpi-item-value textarea">
+            <textarea type="textarea" id="sd-title-format" rows="{{TITLE_ROWS}}"></textarea>
+        </span>
+            </div>
+        </div>
 
-            <div id="sd-action-settings-container">
-                {{ACTION_HTML_TEMPLATE}}
-            </div>
+        <div id="sd-action-settings-container">
+            {{ACTION_HTML_TEMPLATE}}
         </div>
     </div>
 

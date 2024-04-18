@@ -88,10 +88,7 @@ const pi: RollupOptions = {
 		}),
 		commonjs(),
 		copy({
-			targets: [
-				{ src: "src/pi/assets", dest: `${sdPlugin}/bin` },
-				{ src: "src/pi/sdpi.css", dest: `${sdPlugin}/bin` }
-			]
+			targets: [ { src: "src/pi/sdpi.css", dest: `${sdPlugin}/bin` } ]
 		}),
 		!isWatching && terser()
 	]

@@ -67,9 +67,11 @@ class PiCounter implements PiAction {
     }
 
     async populateElements(): Promise<void> {
+        const counterRadio = $('input[type=radio][name=counter-radio]');
         const counterSet = $('#counter-set');
         const counterUpdate = $('#counter-update');
         const counterValue = $('#counter-value');
+        const counterSelect = $('#counter-id-select');
 
         counterValue.val(this.settings.action.value);
         if (this.settings.action.action === "set") {
@@ -77,6 +79,27 @@ class PiCounter implements PiAction {
         } else {
             counterUpdate.attr('checked', 'checked');
         }
+
+        counterValue.on('change', async () => {
+            const value = counterValue.val() as string;
+            if (isNaN(parseInt(value, 10))) {
+                return;
+            }
+
+            this.settings.action.value = parseInt(value);
+            await settingsCache.saveAction();
+        });
+
+        counterRadio.on('change', async () => {
+            this.settings.action.action = $('input[name=counter-radio]:checked').val() as CounterSettings["action"];
+            await settingsCache.saveAction();
+        });
+
+        counterSelect.on('change', async () => {
+            this.settings.action.id = counterSelect.find("option:selected").val() as string;
+            await settingsCache.saveAction();
+        });
+
         await this.populateCounters();
     }
 

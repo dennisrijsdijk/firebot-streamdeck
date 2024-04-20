@@ -1,7 +1,7 @@
 {
 	"scripts": {
 		"build": "rollup --config rollup.config.ts --configPlugin typescript",
-		"build:dev": "npm run build -- --environment BUILD:DEBUG",
+		"build:dev": "npm run build -- --environment BUILD:DEBUG && npm run restart",
 		"watch": "npm run build -- -w --watch.onEnd=\"npm run restart\"",
 		"restart": "streamdeck restart gg.dennis.firebot"
 	},

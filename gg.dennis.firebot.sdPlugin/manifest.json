@@ -5,8 +5,10 @@
 	"Actions": [
 		{
 			"Name": "Counter",
-			"UUID": "gg.dennis.firebot.increment",
+			"UUID": "gg.dennis.firebot.counter",
 			"Icon": "imgs/actions/counter/action",
+			"PropertyInspectorPath": "bin/counter.html",
+			"UserTitleEnabled": false,
 			"Tooltip": "Displays a count, which increments by one on press.",
 			"Controllers": [
 				"Keypad"
@@ -40,7 +42,7 @@
 	],
 	"Nodejs": {
 		"Version": "20",
-		"Debug": "enabled"
+		"Debug": "--inspect=19229"
 	},
 	"UUID": "gg.dennis.firebot"
 }

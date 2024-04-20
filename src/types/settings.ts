@@ -17,7 +17,7 @@ export type ActionBaseSettings<TAction> = {
 } & JsonObject;
 
 export type CounterSettings = {
-    id: string;
+    id: string | null;
     value: number;
     action: "update" | "set";
 }

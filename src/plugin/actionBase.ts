@@ -15,8 +15,9 @@ export class ActionBase<T> extends SingletonAction<ActionBaseSettings<T>> {
         this.actions = [];
     }
 
-    onWillAppear(ev: WillAppearEvent<ActionBaseSettings<T>>): Promise<void> | void {
+    async onWillAppear(ev: WillAppearEvent<ActionBaseSettings<T>>): Promise<void> {
         this.actions.push(ev.action.id);
+        return this.update(ev.action, ev.payload.settings);
     }
 
     onWillDisappear(ev: WillDisappearEvent<ActionBaseSettings<T>>): Promise<void> | void {
@@ -27,10 +28,17 @@ export class ActionBase<T> extends SingletonAction<ActionBaseSettings<T>> {
     }
 
     async onDidReceiveSettings(ev: DidReceiveSettingsEvent<ActionBaseSettings<T>>) {
-        return this.update(ev.action);
+        return this.update(ev.action, ev.payload.settings);
     }
 
-    async update(action: Omit<Action<ActionBaseSettings<T>>, "manifestId">) {
-        // Key drawing logic here with expressionish and firebot
+    async update(action: Omit<Action<ActionBaseSettings<T>>, "manifestId">, newSettings?: ActionBaseSettings<T>): Promise<void> {
+        if (newSettings == null) {
+            newSettings = await action.getSettings<ActionBaseSettings<T>>();
+        }
+        if (newSettings.endpoint == null || newSettings.title == null) {
+            return;
+        }
+        // Key drawing logic here with expressionish and firebot. For now, just draw title.
+        return action.setTitle(newSettings.title);
     }
 }

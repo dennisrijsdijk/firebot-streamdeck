@@ -1,6 +1,6 @@
 {
 	"Name": "Firebot",
-	"Version": "0.1.0",
+	"Version": "0.1.0.0",
 	"Author": "DennisOnTheInternet",
 	"Actions": [
 		{
@@ -9,7 +9,7 @@
 			"Icon": "imgs/actions/counter/action",
 			"PropertyInspectorPath": "bin/counter.html",
 			"UserTitleEnabled": false,
-			"Tooltip": "Displays a count, which increments by one on press.",
+			"Tooltip": "Update a Firebot Counter",
 			"Controllers": [
 				"Keypad"
 			],
@@ -24,7 +24,7 @@
 	"Category": "Firebot",
 	"CategoryIcon": "imgs/plugin/category-icon",
 	"CodePath": "bin/plugin.js",
-	"Description": "A powerful all-in-one bot for Twitch streamers",
+	"Description": "Control Firebot using your Stream Deck",
 	"Icon": "imgs/plugin/marketplace",
 	"SDKVersion": 2,
 	"Software": {

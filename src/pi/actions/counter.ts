@@ -64,6 +64,13 @@ class PiCounter implements PiAction {
                 counter.id === this.settings.action.id
             ));
         }
+
+        const id = counterSelect.find("option:selected").val() as string;
+
+        if (id !== this.settings.action.id) {
+            this.settings.action.id = id;
+            await settingsCache.saveAction();
+        }
     }
 
     async populateElements(): Promise<void> {

@@ -53,8 +53,12 @@ export class ActionBase<T> extends SingletonAction<ActionBaseSettings<T>> {
 
     async update(action: Omit<Action<ActionBaseSettings<T>>, "manifestId">, manifestId: string, newSettings?: ActionBaseSettings<T>): Promise<void> {
         if (newSettings == null) {
-            newSettings = await action.getSettings<ActionBaseSettings<T>>();
+            // TODO: This is a hack and I don't like it
+            // getSettings fires an onDidReceiveSettings event, causing the key to trigger twice otherwise.
+            await action.getSettings<ActionBaseSettings<T>>();
+            return;
         }
+
         if (newSettings.endpoint == null || newSettings.title == null) {
             return;
         }

@@ -6,32 +6,38 @@ import streamDeck, {
     WillDisappearEvent
 } from "@elgato/streamdeck";
 import {ActionBaseSettings} from "../types/settings";
+import firebotService from "./firebot-api/service";
 
 export class ActionBase<T> extends SingletonAction<ActionBaseSettings<T>> {
-    private readonly actions: string[];
+    // "context": "manifestId"
+    private readonly actions: Record<string, string>;
     
     constructor() {
         super();
-        this.actions = [];
+        this.actions = {};
+        firebotService.on('data_updated', async () => {
+            await Promise.all(Object.keys(this.actions).map(async context => {
+                const action = streamDeck.actions.createController(context);
+                const manifestId = this.actions[context];
+                return this.update(action, manifestId);
+            }));
+        });
     }
 
     async onWillAppear(ev: WillAppearEvent<ActionBaseSettings<T>>): Promise<void> {
-        this.actions.push(ev.action.id);
-        return this.update(ev.action, ev.payload.settings);
+        this.actions[ev.action.id] = ev.action.manifestId;
+        return this.update(ev.action, ev.action.manifestId, ev.payload.settings);
     }
 
     onWillDisappear(ev: WillDisappearEvent<ActionBaseSettings<T>>): Promise<void> | void {
-        const index = this.actions.indexOf(ev.action.id);
-        if (index != -1) {
-            this.actions.splice(index, 1);
-        }
+        delete this.actions[ev.action.id];
     }
 
     async onDidReceiveSettings(ev: DidReceiveSettingsEvent<ActionBaseSettings<T>>) {
-        return this.update(ev.action, ev.payload.settings);
+        return this.update(ev.action, ev.action.manifestId, ev.payload.settings);
     }
 
-    async update(action: Omit<Action<ActionBaseSettings<T>>, "manifestId">, newSettings?: ActionBaseSettings<T>): Promise<void> {
+    async update(action: Omit<Action<ActionBaseSettings<T>>, "manifestId">, manifestId: string, newSettings?: ActionBaseSettings<T>): Promise<void> {
         if (newSettings == null) {
             newSettings = await action.getSettings<ActionBaseSettings<T>>();
         }

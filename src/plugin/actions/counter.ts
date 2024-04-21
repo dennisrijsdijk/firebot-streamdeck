@@ -57,6 +57,6 @@ export class Counter extends ActionBase<CounterSettings> {
 
 		await maybeCounter.updateByMode(ev.payload.settings.action.value, ev.payload.settings.action.action == "set");
 
-		return this.update(ev.action, ev.payload.settings);
+		return this.update(ev.action, ev.action.manifestId, ev.payload.settings);
 	}
 }

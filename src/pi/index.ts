@@ -5,6 +5,8 @@ import $ from 'jquery';
 import PiAction from "./piAction";
 import settingsCache from "./settingsCache";
 import {getAction} from "./actions";
+import {ROUTE} from "../constants";
+import {PiReplaceVariable} from "../types/replaceVariable";
 
 let titleUpdateDebounce: ReturnType<typeof setTimeout>;
 
@@ -156,6 +158,19 @@ streamDeck.onDidConnect(async (registration: RegistrationInfo, actionInfo: Actio
 
     populateGlobalElements(action);
     await action.populateElements();
+
+    const replaceVariables = await streamDeck.plugin.fetch<PiReplaceVariable[]>({
+        path: ROUTE.REPLACEVARIABLES
+    });
+
+    if (!replaceVariables.ok || !replaceVariables.body) {
+        return [];
+    }
+
+    replaceVariables.body.forEach(replaceVariable => {
+        console.log(JSON.stringify(replaceVariable, null, 4));
+    });
+    // TODO: Work out how to display variables in the PI
 
     activateTabs(null);
 });

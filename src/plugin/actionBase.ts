@@ -1,14 +1,28 @@
 import streamDeck, {
     Action,
     DidReceiveSettingsEvent,
+    route,
     SingletonAction,
     WillAppearEvent,
     WillDisappearEvent
 } from "@elgato/streamdeck";
 import {ActionBaseSettings} from "../types/settings";
+import ReplaceVariablesManager from "./replaceVariablesManager";
 import firebotService from "./firebot-api/service";
+import {ROUTE} from "../constants";
+import replaceVariables from "../variables";
+import {PiReplaceVariable} from "../types/replaceVariable";
 
 export class ActionBase<T> extends SingletonAction<ActionBaseSettings<T>> {
+
+    @route(ROUTE.REPLACEVARIABLES)
+    getReplaceVariables(): PiReplaceVariable[] {
+        return replaceVariables.map(replaceVariable => ({
+            handle: replaceVariable.handle,
+            usages: replaceVariable.usages
+        }));
+    }
+
     // "context": "manifestId"
     private readonly actions: Record<string, string>;
     
@@ -44,7 +58,13 @@ export class ActionBase<T> extends SingletonAction<ActionBaseSettings<T>> {
         if (newSettings.endpoint == null || newSettings.title == null) {
             return;
         }
-        // Key drawing logic here with expressionish and firebot. For now, just draw title.
-        return action.setTitle(newSettings.title);
+
+        const meta = {
+            actionId: manifestId,
+            settings: newSettings,
+        };
+
+        const title = await ReplaceVariablesManager.evaluate(newSettings.title, meta);
+        return action.setTitle(title);
     }
 }

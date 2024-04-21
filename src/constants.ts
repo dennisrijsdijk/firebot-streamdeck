@@ -10,6 +10,10 @@ export enum ACTION {
     TIMER = "timer"
 }
 
+export function fullActionId(action: ACTION) {
+    return `${PLUGIN}.${action}`;
+}
+
 export enum ROUTE {
     COMMAND = "/command",
     COUNTER = "/counter",
@@ -17,5 +21,6 @@ export enum ROUTE {
     CUSTOMVARIABLE = "/customvariable",
     PRESETLIST = "/presetlist",
     QUEUE = "/queue",
-    TIMER = "/timer"
+    TIMER = "/timer",
+    REPLACEVARIABLES = "/replacevariables"
 }

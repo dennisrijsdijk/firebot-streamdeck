@@ -1,18 +1,12 @@
-import {
-	action,
-	KeyDownEvent,
-	MessageRequest,
-	MessageResponder,
-	route,
-} from "@elgato/streamdeck";
-import { ActionBase } from "../actionBase";
-import { ActionBaseSettings, CounterSettings } from "../../types/settings";
+import {action, KeyDownEvent, MessageRequest, MessageResponder, route,} from "@elgato/streamdeck";
+import {ActionBase} from "../actionBase";
+import {ActionBaseSettings, CounterSettings} from "../../types/settings";
 
 import firebotService from "../firebot-api/service";
-import {ACTION, PLUGIN, ROUTE} from "../../constants";
+import {ACTION, fullActionId, ROUTE} from "../../constants";
 import {EndpointBody} from "../../types/routing";
 
-@action({ UUID: `${PLUGIN}.${ACTION.COUNTER}` })
+@action({ UUID: fullActionId(ACTION.COUNTER) })
 export class Counter extends ActionBase<CounterSettings> {
 
 	@route(ROUTE.COUNTER)

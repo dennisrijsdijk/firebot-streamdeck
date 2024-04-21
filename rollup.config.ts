@@ -69,7 +69,7 @@ const pi: RollupOptions = {
 			titleRows: {
 				default: 2,
 				map: {
-					display: 6
+					display: 5
 				}
 			}
 		}),

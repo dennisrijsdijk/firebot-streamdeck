@@ -5,6 +5,7 @@ export enum ACTION {
     COUNTER = "counter",
     CUSTOMROLE = "customrole",
     CUSTOMVARIABLE = "customvariable",
+    DISPLAY = "display",
     PRESETLIST = "presetlist",
     QUEUE = "queue",
     TIMER = "timer"

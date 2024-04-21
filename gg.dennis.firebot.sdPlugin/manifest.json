@@ -4,7 +4,7 @@
 	"Author": "DennisOnTheInternet",
 	"Actions": [
 		{
-			"Name": "Counter",
+			"Name": "Update Counter",
 			"UUID": "gg.dennis.firebot.counter",
 			"Icon": "imgs/actions/counter/action",
 			"PropertyInspectorPath": "bin/counter.html",
@@ -16,7 +16,24 @@
 			"States": [
 				{
 					"Image": "imgs/actions/counter/key",
-					"TitleAlignment": "middle"
+					"TitleAlignment": "top"
+				}
+			]
+		},
+		{
+			"Name": "Display Variables",
+			"UUID": "gg.dennis.firebot.display",
+			"Icon": "imgs/actions/display/action",
+			"PropertyInspectorPath": "bin/display.html",
+			"UserTitleEnabled": false,
+			"Tooltip": "Display data from variables on your Stream Deck",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/display/key",
+					"TitleAlignment": "top"
 				}
 			]
 		}

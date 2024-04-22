@@ -21,3 +21,8 @@ export type CounterSettings = {
     value: number;
     action: "update" | "set";
 }
+
+export type QueueSettings = {
+    id: string | null;
+    action: "pause" | "resume" | "toggle" | "clear";
+}

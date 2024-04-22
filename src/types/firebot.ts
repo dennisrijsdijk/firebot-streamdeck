@@ -13,3 +13,8 @@ export type FirebotCounterData = {
     id: string;
     name: string;
 }
+
+export type FirebotQueueData = {
+    id: string;
+    name: string;
+}

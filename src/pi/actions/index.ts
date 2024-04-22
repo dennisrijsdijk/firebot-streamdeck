@@ -2,6 +2,7 @@ import PiAction from "../piAction";
 import {ACTION, PLUGIN} from "../../constants";
 import PiCounter from "./counter";
 import PiDisplay from "./display";
+import PiQueue from "./queue";
 
 export function getAction(uuid: string): PiAction | undefined {
     const actionIdShort = uuid.substring(PLUGIN.length + 1) as ACTION;
@@ -20,7 +21,7 @@ export function getAction(uuid: string): PiAction | undefined {
         case ACTION.PRESETLIST:
             break;
         case ACTION.QUEUE:
-            break;
+            return PiQueue
         case ACTION.TIMER:
             break;
     }

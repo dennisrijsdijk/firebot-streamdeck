@@ -22,6 +22,10 @@ export type CounterSettings = {
     action: "update" | "set";
 }
 
+export type CustomRoleSettings = {
+    id: string | null;
+}
+
 export type QueueSettings = {
     id: string | null;
     action: "pause" | "resume" | "toggle" | "clear";

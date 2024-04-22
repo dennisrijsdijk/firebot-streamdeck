@@ -21,6 +21,23 @@
 			]
 		},
 		{
+			"Name": "Clear Custom Role",
+			"UUID": "gg.dennis.firebot.customrole",
+			"Icon": "imgs/actions/role/action",
+			"PropertyInspectorPath": "bin/customrole.html",
+			"UserTitleEnabled": false,
+			"Tooltip": "Remove all viewers from a Firebot Custom Role",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/role/key",
+					"TitleAlignment": "top"
+				}
+			]
+		},
+		{
 			"Name": "Display Variables",
 			"UUID": "gg.dennis.firebot.display",
 			"Icon": "imgs/actions/display/action",

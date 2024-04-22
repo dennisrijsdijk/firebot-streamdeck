@@ -17,3 +17,9 @@ export type ApiQueueUpdateResponse = {
     queue: object[];
     active: boolean;
 }
+
+export type ApiCustomRole = {
+    id: string;
+    name: string;
+    viewers: object[];
+}

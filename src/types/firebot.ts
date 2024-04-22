@@ -14,6 +14,11 @@ export type FirebotCounterData = {
     name: string;
 }
 
+export type FirebotCustomRoleData = {
+    id: string;
+    name: string;
+}
+
 export type FirebotQueueData = {
     id: string;
     name: string;

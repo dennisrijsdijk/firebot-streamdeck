@@ -1,11 +1,12 @@
 import ApiBase from "../apiBase";
 import {FirebotCounterData} from "../../../types/firebot";
+import {ApiCounter} from "../../../types/api";
 
 export default class FirebotCounter extends ApiBase {
     private readonly _data: FirebotCounterData;
     private _value: number;
     private readonly _endpoint: string;
-    constructor(apiCounter: { id: string, name: string, value: number }, endpoint: string) {
+    constructor(apiCounter: ApiCounter, endpoint: string) {
         super();
         this._data = { id: apiCounter.id, name: apiCounter.name };
         this._value = apiCounter.value;

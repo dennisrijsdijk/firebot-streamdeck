@@ -2,6 +2,7 @@ import ApiBase from "./apiBase";
 import {FirebotInstanceData, FirebotInstanceStatus} from "../../types/firebot";
 import FirebotCounter from "./routes/counter";
 import FirebotQueue from "./routes/queue";
+import {ApiCounter, ApiQueue} from "../../types/api";
 
 export class FirebotInstance extends ApiBase {
     private readonly _data: FirebotInstanceData;
@@ -35,7 +36,7 @@ export class FirebotInstance extends ApiBase {
         const result = await fetch(`http://${this._data.endpoint}:7472/api/v1/counters`, this.abortSignal);
         const resultObject = await result.json();
         if (Array.isArray(resultObject)) {
-            (resultObject as any[]).forEach(counter => counters.push(new FirebotCounter(counter, this._data.endpoint)));
+            (resultObject as any[]).forEach((counter: ApiCounter) => counters.push(new FirebotCounter(counter, this._data.endpoint)));
         }
         return counters;
     }
@@ -45,7 +46,7 @@ export class FirebotInstance extends ApiBase {
         const result = await fetch(`http://${this._data.endpoint}:7472/api/v1/queues`, this.abortSignal);
         const resultObject = await result.json();
         if (Array.isArray(resultObject)) {
-            (resultObject as any[]).forEach(queue => queues.push(new FirebotQueue(queue, this._data.endpoint)));
+            (resultObject as any[]).forEach((queue: ApiQueue) => queues.push(new FirebotQueue(queue, this._data.endpoint)));
         }
         return queues;
     }

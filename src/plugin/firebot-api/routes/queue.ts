@@ -1,13 +1,14 @@
 import ApiBase from "../apiBase";
 import {FirebotQueueData} from "../../../types/firebot";
 import {QueueSettings} from "../../../types/settings";
+import {ApiQueue, ApiQueueUpdateResponse} from "../../../types/api";
 
 export default class FirebotQueue extends ApiBase {
     private readonly _data: FirebotQueueData;
     private _length: number;
     private _active: boolean;
     private readonly _endpoint: string;
-    constructor(apiQueue: { id: string, name: string, length: number, active: boolean }, endpoint: string) {
+    constructor(apiQueue: ApiQueue, endpoint: string) {
         super();
         this._data = { id: apiQueue.id, name: apiQueue.name };
         this._active = apiQueue.active;
@@ -33,12 +34,7 @@ export default class FirebotQueue extends ApiBase {
             this.abortSignal
         );
 
-        const resultObject = await result.json() as {
-            id: string,
-            name: string,
-            queue: object[],
-            active: boolean
-        };
+        const resultObject = await result.json() as ApiQueueUpdateResponse;
 
         this._active = resultObject.active;
         this._length = resultObject.queue.length;

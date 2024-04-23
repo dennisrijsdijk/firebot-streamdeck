@@ -1,6 +1,7 @@
 import streamDeck, {
     Action,
     DidReceiveSettingsEvent,
+    JsonObject,
     route,
     SingletonAction,
     WillAppearEvent,
@@ -13,7 +14,7 @@ import {ROUTE} from "../constants";
 import replaceVariables from "../variables";
 import {PiReplaceVariable} from "../types/replaceVariable";
 
-export class ActionBase<T> extends SingletonAction<ActionBaseSettings<T>> {
+export class ActionBase<T extends JsonObject> extends SingletonAction<ActionBaseSettings<T>> {
 
     @route(ROUTE.REPLACEVARIABLES)
     getReplaceVariables(): PiReplaceVariable[] {

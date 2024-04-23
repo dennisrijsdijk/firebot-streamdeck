@@ -5,14 +5,14 @@ import {ACTION, fullActionId} from "../../constants";
 import FirebotCustomRole from "../../plugin/firebot-api/routes/customRole";
 
 const model: ReplaceVariable = {
-    handle: "customRole",
+    handle: "customRoleUserCount",
     usages: [
         {
-            handle: "customRole",
+            handle: "customRoleUserCount",
             description: "Shows the amount of users in the role attached to a Clear Custom Role action.",
         },
         {
-            handle: "customRole[name]",
+            handle: "customRoleUserCount[name]",
             description: "Shows the amount of users in the given Custom Role"
         }
     ],

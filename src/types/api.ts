@@ -1,3 +1,5 @@
+import {FirebotPresetEffectListData} from "./firebot";
+
 export type ApiCounter = {
     id: string;
     name: string;
@@ -23,3 +25,5 @@ export type ApiCustomRole = {
     name: string;
     viewers: object[];
 }
+
+export type ApiPresetEffectList = FirebotPresetEffectListData;

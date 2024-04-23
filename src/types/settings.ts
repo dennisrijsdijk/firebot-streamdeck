@@ -28,3 +28,8 @@ export type QueueSettings = {
     id: string | null;
     action: "pause" | "resume" | "toggle" | "clear";
 }
+
+export type PresetEffectListSettings = {
+    id: string | null;
+    arguments: Record<string, string>;
+}

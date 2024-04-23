@@ -1,6 +1,6 @@
 {
 	"Name": "Firebot",
-	"Version": "0.1.0.0",
+	"Version": "0.1.0.1",
 	"Author": "DennisOnTheInternet",
 	"Actions": [
 		{
@@ -39,6 +39,7 @@
 		},
 		{
 			"Name": "Display Variables",
+			"SupportedInMultiActions": false,
 			"UUID": "gg.dennis.firebot.display",
 			"Icon": "imgs/actions/display/action",
 			"PropertyInspectorPath": "bin/display.html",
@@ -51,6 +52,23 @@
 				{
 					"Image": "imgs/actions/display/key",
 					"TitleAlignment": "top"
+				}
+			]
+		},
+		{
+			"Name": "Run Preset Effect List",
+			"UUID": "gg.dennis.firebot.presetlist",
+			"Icon": "imgs/actions/preset/action",
+			"PropertyInspectorPath": "bin/presetEffectList.html",
+			"UserTitleEnabled": false,
+			"Tooltip": "Run a Preset Effect List with arguments",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"TitleAlignment": "top",
+					"Image": "imgs/actions/preset/key"
 				}
 			]
 		},

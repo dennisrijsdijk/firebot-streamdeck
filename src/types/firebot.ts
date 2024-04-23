@@ -23,3 +23,9 @@ export type FirebotQueueData = {
     id: string;
     name: string;
 }
+
+export type FirebotPresetEffectListData = {
+    id: string;
+    name: string;
+    args: string[];
+}

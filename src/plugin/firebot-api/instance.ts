@@ -2,14 +2,16 @@ import ApiBase from "./apiBase";
 import {FirebotInstanceData, FirebotInstanceStatus} from "../../types/firebot";
 import FirebotCounter from "./routes/counter";
 import FirebotQueue from "./routes/queue";
-import {ApiCounter, ApiCustomRole, ApiQueue} from "../../types/api";
+import {ApiCounter, ApiCustomRole, ApiPresetEffectList, ApiQueue} from "../../types/api";
 import FirebotCustomRole from "./routes/customRole";
+import FirebotPresetEffectList from "./routes/presetEffectList";
 
 export class FirebotInstance extends ApiBase {
     private readonly _data: FirebotInstanceData;
     private _counters: FirebotCounter[];
     private _customRoles: FirebotCustomRole[];
     private _queues: FirebotQueue[];
+    private _presetEffectLists: FirebotPresetEffectList[];
     constructor(endpoint: string, name: string) {
         super();
         this._data = {
@@ -20,6 +22,7 @@ export class FirebotInstance extends ApiBase {
         this._counters = [];
         this._customRoles = [];
         this._queues = [];
+        this._presetEffectLists = [];
     }
 
     get counters() {
@@ -32,6 +35,10 @@ export class FirebotInstance extends ApiBase {
 
     get queues() {
         return this._queues;
+    }
+
+    get presetEffectLists() {
+        return this._presetEffectLists;
     }
 
     get data() {
@@ -69,16 +76,24 @@ export class FirebotInstance extends ApiBase {
         });
     }
 
+    private async fetchPresetEffectLists(): Promise<FirebotPresetEffectList[]> {
+        return this.arrayFetch<ApiPresetEffectList, FirebotPresetEffectList>("effects/preset", list => {
+            return new FirebotPresetEffectList(list, this._data.endpoint);
+        });
+    }
+
     async update() {
         try {
             [
                 this._counters,
                 this._queues,
-                this._customRoles
+                this._customRoles,
+                this._presetEffectLists
             ] = await Promise.all([
                 this.fetchCounters(),
                 this.fetchQueues(),
-                this.fetchCustomRoles()
+                this.fetchCustomRoles(),
+                this.fetchPresetEffectLists()
             ]);
             this._data.status = FirebotInstanceStatus.ONLINE;
         } catch (err) {

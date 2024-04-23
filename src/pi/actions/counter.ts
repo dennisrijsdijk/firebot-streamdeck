@@ -87,7 +87,7 @@ class PiCounter implements PiAction {
             counterUpdate.attr('checked', 'checked');
         }
 
-        counterValue.on('change', async () => {
+        counterValue.on('input', async () => {
             const value = counterValue.val() as string;
             if (isNaN(parseInt(value, 10))) {
                 return;

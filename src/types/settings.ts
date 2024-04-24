@@ -38,3 +38,8 @@ export type PresetEffectListSettings = {
     id: string | null;
     arguments: Record<string, string>;
 }
+
+export type TimerSettings = {
+    id: string | null;
+    action: "pause" | "resume" | "toggle" | "clear";
+}

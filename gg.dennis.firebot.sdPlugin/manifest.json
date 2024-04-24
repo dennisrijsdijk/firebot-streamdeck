@@ -1,6 +1,6 @@
 {
 	"Name": "Firebot",
-	"Version": "0.1.0.2",
+	"Version": "0.1.0.3",
 	"Author": "DennisOnTheInternet",
 	"Actions": [
 		{
@@ -102,6 +102,23 @@
 			"States": [
 				{
 					"Image": "imgs/actions/queue/key",
+					"TitleAlignment": "top"
+				}
+			]
+		},
+		{
+			"Name": "Update Timer",
+			"UUID": "gg.dennis.firebot.timer",
+			"Icon": "imgs/actions/timer/action",
+			"PropertyInspectorPath": "bin/timer.html",
+			"UserTitleEnabled": false,
+			"Tooltip": "Pause, Resume, Toggle or Clear a Firebot Timer",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/timer/key",
 					"TitleAlignment": "top"
 				}
 			]

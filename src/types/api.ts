@@ -1,4 +1,4 @@
-import {FirebotCommandData, FirebotPresetEffectListData} from "./firebot";
+import {FirebotCommandData, FirebotPresetEffectListData, FirebotTimerData} from "./firebot";
 
 export type ApiCounter = {
     id: string;
@@ -25,6 +25,8 @@ export type ApiCustomRole = {
     name: string;
     viewers: object[];
 }
+
+export type ApiTimer = FirebotTimerData;
 
 export type ApiCommand = Omit<FirebotCommandData, "type">;
 

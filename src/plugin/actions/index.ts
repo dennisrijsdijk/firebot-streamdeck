@@ -4,6 +4,7 @@ import {Queue} from "./queue";
 import {CustomRole} from "./customRole";
 import {PresetEffectList} from "./presetEffectList";
 import {Command} from "./command";
+import {Timer} from "./timer";
 
 export default [
     new Command(),
@@ -11,5 +12,6 @@ export default [
     new CustomRole(),
     new Display(),
     new PresetEffectList(),
-    new Queue()
+    new Queue(),
+    new Timer()
 ];

@@ -30,6 +30,12 @@ export type FirebotCommandData = {
     type: "custom" | "system";
 }
 
+export type FirebotTimerData = {
+    id: string;
+    name: string;
+    active: boolean;
+}
+
 export type FirebotPresetEffectListData = {
     id: string;
     name: string;

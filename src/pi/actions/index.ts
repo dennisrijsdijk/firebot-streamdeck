@@ -6,6 +6,7 @@ import PiCustomRole from './customRole';
 import PiDisplay from "./display";
 import PiPresetEffectList from "./presetEffectList";
 import PiQueue from "./queue";
+import PiTimer from "./timer";
 
 export function getAction(uuid: string): PiAction | undefined {
     const actionIdShort = uuid.substring(PLUGIN.length + 1) as ACTION;
@@ -26,7 +27,7 @@ export function getAction(uuid: string): PiAction | undefined {
         case ACTION.QUEUE:
             return PiQueue
         case ACTION.TIMER:
-            break;
+            return PiTimer;
     }
     return undefined;
 }

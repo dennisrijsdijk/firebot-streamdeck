@@ -3,8 +3,10 @@ import {Display} from "./display";
 import {Queue} from "./queue";
 import {CustomRole} from "./customRole";
 import {PresetEffectList} from "./presetEffectList";
+import {Command} from "./command";
 
 export default [
+    new Command(),
     new Counter(),
     new CustomRole(),
     new Display(),

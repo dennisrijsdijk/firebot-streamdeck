@@ -1,13 +1,15 @@
 import ApiBase from "./apiBase";
-import {FirebotInstanceData, FirebotInstanceStatus} from "../../types/firebot";
+import {FirebotCommandData, FirebotInstanceData, FirebotInstanceStatus} from "../../types/firebot";
 import FirebotCounter from "./routes/counter";
 import FirebotQueue from "./routes/queue";
-import {ApiCounter, ApiCustomRole, ApiPresetEffectList, ApiQueue} from "../../types/api";
+import {ApiCommand, ApiCounter, ApiCustomRole, ApiPresetEffectList, ApiQueue} from "../../types/api";
 import FirebotCustomRole from "./routes/customRole";
 import FirebotPresetEffectList from "./routes/presetEffectList";
+import FirebotCommand from "./routes/command";
 
 export class FirebotInstance extends ApiBase {
     private readonly _data: FirebotInstanceData;
+    private _commands: FirebotCommand[];
     private _counters: FirebotCounter[];
     private _customRoles: FirebotCustomRole[];
     private _queues: FirebotQueue[];
@@ -19,10 +21,15 @@ export class FirebotInstance extends ApiBase {
             name,
             status: FirebotInstanceStatus.OFFLINE
         }
+        this._commands = [];
         this._counters = [];
         this._customRoles = [];
         this._queues = [];
         this._presetEffectLists = [];
+    }
+
+    get commands() {
+        return this._commands;
     }
 
     get counters() {
@@ -82,14 +89,37 @@ export class FirebotInstance extends ApiBase {
         });
     }
 
+    private async fetchCommandsByType(type: FirebotCommandData["type"]): Promise<FirebotCommand[]> {
+        return this.arrayFetch<ApiCommand, FirebotCommand>(`commands/${type}`, command => {
+            return new FirebotCommand(command, type, this._data.endpoint);
+        });
+    }
+
+    private async fetchCommands() {
+        const [
+            systemCommands,
+            customCommands
+        ] = await Promise.all([
+            this.fetchCommandsByType("system"),
+            this.fetchCommandsByType("custom")
+        ]);
+
+        return [
+            ...systemCommands,
+            ...customCommands
+        ]
+    }
+
     async update() {
         try {
             [
+                this._commands,
                 this._counters,
                 this._queues,
                 this._customRoles,
                 this._presetEffectLists
             ] = await Promise.all([
+                this.fetchCommands(),
                 this.fetchCounters(),
                 this.fetchQueues(),
                 this.fetchCustomRoles(),

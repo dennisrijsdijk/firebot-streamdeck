@@ -24,6 +24,12 @@ export type FirebotQueueData = {
     name: string;
 }
 
+export type FirebotCommandData = {
+    id: string;
+    trigger: string;
+    type: "custom" | "system";
+}
+
 export type FirebotPresetEffectListData = {
     id: string;
     name: string;

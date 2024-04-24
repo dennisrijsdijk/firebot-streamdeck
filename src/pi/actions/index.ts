@@ -1,5 +1,6 @@
 import PiAction from "../piAction";
 import {ACTION, PLUGIN} from "../../constants";
+import PiCommand from "./command";
 import PiCounter from "./counter";
 import PiCustomRole from './customRole';
 import PiDisplay from "./display";
@@ -11,7 +12,7 @@ export function getAction(uuid: string): PiAction | undefined {
 
     switch (actionIdShort) {
         case ACTION.COMMAND:
-            break;
+            return PiCommand;
         case ACTION.COUNTER:
             return PiCounter;
         case ACTION.CUSTOMROLE:

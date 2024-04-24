@@ -4,6 +4,23 @@
 	"Author": "DennisOnTheInternet",
 	"Actions": [
 		{
+			"Name": "Run Command",
+			"UUID": "gg.dennis.firebot.command",
+			"Icon": "imgs/actions/command/action",
+			"PropertyInspectorPath": "bin/command.html",
+			"UserTitleEnabled": false,
+			"Tooltip": "Run a Firebot command",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/command/key",
+					"TitleAlignment": "top"
+				}
+			]
+		},
+		{
 			"Name": "Update Counter",
 			"UUID": "gg.dennis.firebot.counter",
 			"Icon": "imgs/actions/counter/action",

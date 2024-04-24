@@ -19,7 +19,6 @@ export enum ROUTE {
     COMMAND = "/command",
     COUNTER = "/counter",
     CUSTOMROLE = "/customrole",
-    CUSTOMVARIABLE = "/customvariable",
     PRESETLIST = "/presetlist",
     QUEUE = "/queue",
     TIMER = "/timer",

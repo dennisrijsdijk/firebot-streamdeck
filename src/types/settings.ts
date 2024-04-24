@@ -14,6 +14,11 @@ export type ActionBaseSettings<TAction> = {
     action: TAction;
 };
 
+export type CommandSettings = {
+    id: string | null;
+    args: string;
+}
+
 export type CounterSettings = {
     id: string | null;
     value: number;

@@ -4,14 +4,14 @@ import rawQueue from "./rawQueue";
 import FirebotQueue from "../../plugin/firebot-api/routes/queue";
 
 const model: ReplaceVariable = {
-    handle: "queue",
+    handle: "queueLength",
     usages: [
         {
-            handle: "queue",
+            handle: "queueLength",
             description: "Displays the length of the queue attached to an update queue action",
         },
         {
-            handle: "queue[name]",
+            handle: "queueLength[name]",
             description: "Displays the length of the given queue."
         }
     ],

@@ -1,7 +1,6 @@
 import counter from "./counter";
-import queue from "./queue";
+import queueLength from "./queueLength";
 import queueActive from "./queueActive";
-import rawQueue from "./rawQueue";
 import customRoleUserCount from "./customRoleUserCount";
 import timerActive from "./timerActive";
 import customVariable from "./customVariable";
@@ -10,8 +9,7 @@ export default [
     counter,
     customRoleUserCount,
     customVariable,
-    queue,
+    queueLength,
     queueActive,
-    rawQueue,
     timerActive
 ]

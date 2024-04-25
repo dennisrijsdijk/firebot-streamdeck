@@ -3,6 +3,7 @@ import {ACTION, PLUGIN} from "../../constants";
 import PiCommand from "./command";
 import PiCounter from "./counter";
 import PiCustomRole from './customRole';
+import PiCustomVariable from './customVariable';
 import PiDisplay from "./display";
 import PiPresetEffectList from "./presetEffectList";
 import PiQueue from "./queue";
@@ -19,7 +20,7 @@ export function getAction(uuid: string): PiAction | undefined {
         case ACTION.CUSTOMROLE:
             return PiCustomRole;
         case ACTION.CUSTOMVARIABLE:
-            break;
+            return PiCustomVariable;
         case ACTION.DISPLAY:
             return PiDisplay;
         case ACTION.PRESETLIST:

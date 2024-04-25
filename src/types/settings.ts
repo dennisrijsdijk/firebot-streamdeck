@@ -43,3 +43,8 @@ export type TimerSettings = {
     id: string | null;
     action: "pause" | "resume" | "toggle" | "clear";
 }
+
+export type CustomVariableSettings = {
+    name: string;
+    value: string;
+}

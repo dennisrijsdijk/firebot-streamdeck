@@ -3,7 +3,7 @@
 		"build": "rollup --config rollup.config.ts --configPlugin typescript",
 		"build:dev": "npm run build -- --environment BUILD:DEBUG && npm run restart",
 		"watch": "npm run build -- -w --watch.onEnd=\"npm run restart\"",
-		"pack": "npm run build && streamdeck pack gg.dennis.firebot.sdPlugin",
+		"pack": "npm run build && streamdeck pack gg.dennis.firebot.sdPlugin --force",
 		"restart": "streamdeck restart gg.dennis.firebot"
 	},
 	"type": "module",

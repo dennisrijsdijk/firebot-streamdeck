@@ -1,4 +1,5 @@
 import {FirebotCommandData, FirebotPresetEffectListData, FirebotTimerData} from "./firebot";
+import {JsonValue} from "@elgato/streamdeck";
 
 export type ApiCounter = {
     id: string;
@@ -24,6 +25,11 @@ export type ApiCustomRole = {
     id: string;
     name: string;
     viewers: object[];
+}
+
+export type ApiCustomVariableBody = {
+    t: number;
+    v: JsonValue;
 }
 
 export type ApiTimer = FirebotTimerData;

@@ -55,6 +55,23 @@
 			]
 		},
 		{
+			"Name": "Set Custom Variable",
+			"UUID": "gg.dennis.firebot.customvariable",
+			"Icon": "imgs/actions/variable/action",
+			"PropertyInspectorPath": "bin/customVariable.html",
+			"UserTitleEnabled": false,
+			"Tooltip": "Set the value of a Firebot Custom Variable",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/variable/key",
+					"TitleAlignment": "top"
+				}
+			]
+		},
+		{
 			"Name": "Display Variables",
 			"SupportedInMultiActions": false,
 			"UUID": "gg.dennis.firebot.display",

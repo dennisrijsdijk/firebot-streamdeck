@@ -2,11 +2,20 @@ import ApiBase from "./apiBase";
 import {FirebotCommandData, FirebotInstanceData, FirebotInstanceStatus} from "../../types/firebot";
 import FirebotCounter from "./routes/counter";
 import FirebotQueue from "./routes/queue";
-import {ApiCommand, ApiCounter, ApiCustomRole, ApiPresetEffectList, ApiQueue, ApiTimer} from "../../types/api";
+import {
+    ApiCommand,
+    ApiCounter,
+    ApiCustomRole,
+    ApiCustomVariableBody,
+    ApiPresetEffectList,
+    ApiQueue,
+    ApiTimer
+} from "../../types/api";
 import FirebotCustomRole from "./routes/customRole";
 import FirebotPresetEffectList from "./routes/presetEffectList";
 import FirebotCommand from "./routes/command";
 import FirebotTimer from "./routes/timer";
+import {JsonValue} from "@elgato/streamdeck";
 
 export class FirebotInstance extends ApiBase {
     private readonly _data: FirebotInstanceData;
@@ -16,6 +25,7 @@ export class FirebotInstance extends ApiBase {
     private _queues: FirebotQueue[];
     private _presetEffectLists: FirebotPresetEffectList[];
     private _timers: FirebotTimer[];
+    private _customVariables: Record<string, ApiCustomVariableBody>;
     constructor(endpoint: string, name: string) {
         super();
         this._data = {
@@ -29,6 +39,7 @@ export class FirebotInstance extends ApiBase {
         this._queues = [];
         this._presetEffectLists = [];
         this._timers = [];
+        this._customVariables = { };
     }
 
     get commands() {
@@ -41,6 +52,10 @@ export class FirebotInstance extends ApiBase {
 
     get customRoles() {
         return this._customRoles;
+    }
+
+    get customVariables() {
+        return this._customVariables;
     }
 
     get queues() {
@@ -102,6 +117,15 @@ export class FirebotInstance extends ApiBase {
         });
     }
 
+    private async fetchCustomVariables() {
+        const result = await fetch(`http://${this._data.endpoint}:7472/api/v1/custom-variables`, this.abortSignal);
+        const variables = await result.json() as Record<string, ApiCustomVariableBody>;
+        if (typeof variables === "object" && variables != null) {
+            return variables;
+        }
+        return { };
+    }
+
     private async fetchCommands() {
         const [
             systemCommands,
@@ -127,11 +151,32 @@ export class FirebotInstance extends ApiBase {
         this._timers = await this.fetchTimers();
     }
 
+    async setCustomVariable(name: string, data: JsonValue, ttl: number = 0) {
+        await fetch(`http://${this._data.endpoint}:7472/api/v1/custom-variables/${encodeURIComponent(name)}`, {
+            ...this.abortSignal,
+            method: "POST",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                data,
+                ttl
+            })
+        });
+
+        this._customVariables[name] = {
+            t: 0,
+            v: data
+        };
+    }
+
     async update() {
         try {
             [
                 this._commands,
                 this._counters,
+                this._customVariables,
                 this._queues,
                 this._customRoles,
                 this._presetEffectLists,
@@ -139,6 +184,7 @@ export class FirebotInstance extends ApiBase {
             ] = await Promise.all([
                 this.fetchCommands(),
                 this.fetchCounters(),
+                this.fetchCustomVariables(),
                 this.fetchQueues(),
                 this.fetchCustomRoles(),
                 this.fetchPresetEffectLists(),

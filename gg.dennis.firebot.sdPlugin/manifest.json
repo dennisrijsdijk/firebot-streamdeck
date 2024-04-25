@@ -138,9 +138,14 @@
 			"Controllers": [
 				"Keypad"
 			],
+			"DisableAutomaticStates": true,
 			"States": [
 				{
-					"Image": "imgs/actions/timer/key",
+					"Image": "imgs/actions/timer/keyActive",
+					"TitleAlignment": "top"
+				},
+				{
+					"Image": "imgs/actions/timer/keyPause",
 					"TitleAlignment": "top"
 				}
 			]

@@ -1,6 +1,6 @@
-import {action, KeyDownEvent, MessageRequest, MessageResponder, route,} from "@elgato/streamdeck";
+import {Action, action, KeyDownEvent, MessageRequest, MessageResponder, route,} from "@elgato/streamdeck";
 import {ActionBase} from "../actionBase";
-import {ActionBaseSettings, TimerSettings} from "../../types/settings";
+import {ActionBaseSettings, QueueSettings, TimerSettings} from "../../types/settings";
 
 import firebotService from "../firebot-api/service";
 import {ACTION, fullActionId, ROUTE} from "../../constants";
@@ -51,5 +51,31 @@ export class Timer extends ActionBase<TimerSettings> {
 		await maybeTimer.update(ev.payload.settings.action.action);
 
 		return this.update(ev.action, ev.action.manifestId, ev.payload.settings);
+	}
+
+	async update(action: Omit<Action<ActionBaseSettings<QueueSettings>>, "manifestId">, manifestId: string, newSettings?: ActionBaseSettings<QueueSettings>): Promise<void> {
+		await super.update(action, manifestId, newSettings);
+
+		if (!newSettings) {
+			return;
+		}
+
+		const maybeInstance = firebotService.instances.find(instance => {
+			return instance.data.endpoint === newSettings.endpoint;
+		});
+
+		if (!maybeInstance) {
+			return;
+		}
+
+		const maybeTimer = maybeInstance.timers.find(timer => {
+			return timer.data.id === newSettings.action.id;
+		});
+
+		if (!maybeTimer) {
+			return;
+		}
+
+		await action.setState(maybeTimer.data.active ? 0 : 1);
 	}
 }

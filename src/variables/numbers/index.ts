@@ -1,3 +1,5 @@
-export default [
+import math from './math';
 
+export default [
+    math
 ]

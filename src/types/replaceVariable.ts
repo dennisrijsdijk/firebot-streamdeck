@@ -5,8 +5,6 @@ export type ReplaceVariable = {
     handle: string;
 }
 
-export type PiReplaceVariable = Omit<ReplaceVariable, "evaluator">;
-
 export type ReplaceVariableTrigger<T> = {
     actionId: string;
     settings: ActionBaseSettings<T>;

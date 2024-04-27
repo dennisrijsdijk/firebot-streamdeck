@@ -2,7 +2,6 @@ import streamDeck, {
     Action,
     DidReceiveSettingsEvent,
     JsonObject,
-    route,
     SingletonAction,
     WillAppearEvent,
     WillDisappearEvent
@@ -10,19 +9,8 @@ import streamDeck, {
 import {ActionBaseSettings} from "../types/settings";
 import ReplaceVariablesManager from "./replaceVariablesManager";
 import firebotService from "./firebot-api/service";
-import {ROUTE} from "../constants";
-import replaceVariables from "../variables";
-import {PiReplaceVariable} from "../types/replaceVariable";
 
 export class ActionBase<T extends JsonObject> extends SingletonAction<ActionBaseSettings<T>> {
-
-    @route(ROUTE.REPLACEVARIABLES)
-    getReplaceVariables(): PiReplaceVariable[] {
-        return replaceVariables.map(replaceVariable => ({
-            handle: replaceVariable.handle
-        }));
-    }
-
     // "context": "manifestId"
     private readonly actions: Record<string, string>;
     

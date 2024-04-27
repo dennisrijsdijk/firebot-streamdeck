@@ -19,8 +19,7 @@ export class ActionBase<T extends JsonObject> extends SingletonAction<ActionBase
     @route(ROUTE.REPLACEVARIABLES)
     getReplaceVariables(): PiReplaceVariable[] {
         return replaceVariables.map(replaceVariable => ({
-            handle: replaceVariable.handle,
-            usages: replaceVariable.usages
+            handle: replaceVariable.handle
         }));
     }
 

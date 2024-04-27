@@ -6,16 +6,6 @@ import {ACTION, fullActionId} from "../../constants";
 
 const model: ReplaceVariable = {
     handle: "rawQueue",
-    usages: [
-        {
-            handle: "rawQueue",
-            description: "Returns the raw queue attached to an update queue action",
-        },
-        {
-            handle: "rawQueue[name]",
-            description: "Returns the raw given queue."
-        }
-    ],
     evaluator: async (trigger: ReplaceVariableTrigger<QueueSettings>, queueName?: string) => {
         const endpoint = trigger.settings.endpoint;
         const instance = firebotService.instances.find(inst => inst.data.endpoint === endpoint);

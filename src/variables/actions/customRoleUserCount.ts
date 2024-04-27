@@ -6,16 +6,6 @@ import FirebotCustomRole from "../../plugin/firebot-api/routes/customRole";
 
 const model: ReplaceVariable = {
     handle: "customRoleUserCount",
-    usages: [
-        {
-            handle: "customRoleUserCount",
-            description: "Shows the amount of users in the role attached to a Clear Custom Role action.",
-        },
-        {
-            handle: "customRoleUserCount[name]",
-            description: "Shows the amount of users in the given Custom Role"
-        }
-    ],
     evaluator: async (trigger: ReplaceVariableTrigger<CustomRoleSettings>, roleName?: string) => {
         const endpoint = trigger.settings.endpoint;
         const instance = firebotService.instances.find(inst => inst.data.endpoint === endpoint);

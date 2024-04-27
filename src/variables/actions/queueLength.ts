@@ -5,16 +5,6 @@ import FirebotQueue from "../../plugin/firebot-api/routes/queue";
 
 const model: ReplaceVariable = {
     handle: "queueLength",
-    usages: [
-        {
-            handle: "queueLength",
-            description: "Displays the length of the queue attached to an update queue action",
-        },
-        {
-            handle: "queueLength[name]",
-            description: "Displays the length of the given queue."
-        }
-    ],
     evaluator: async (trigger: ReplaceVariableTrigger<QueueSettings>, queueName?: string) => {
         const queue: FirebotQueue | undefined = await rawQueue.evaluator(trigger, queueName);
         if (!queue) {

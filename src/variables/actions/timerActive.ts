@@ -6,16 +6,6 @@ import {ACTION, fullActionId} from "../../constants";
 
 const model: ReplaceVariable = {
     handle: "timerActive",
-    usages: [
-        {
-            handle: "timerActive",
-            description: "Returns $true when the attached timer is active, $false otherwise",
-        },
-        {
-            handle: "timerActive[name]",
-            description: "Returns $true when the specified timer is active, $false otherwise"
-        }
-    ],
     evaluator: async (trigger: ReplaceVariableTrigger<TimerSettings>, timerName?: string) => {
         const endpoint = trigger.settings.endpoint;
         const instance = firebotService.instances.find(inst => inst.data.endpoint === endpoint);

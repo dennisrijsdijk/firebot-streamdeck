@@ -5,12 +5,6 @@ import {JsonValue} from "@elgato/streamdeck";
 
 const model: ReplaceVariable = {
     handle: "customVariable",
-    usages: [
-        {
-            handle: "customVariable[name]",
-            description: "Displays the value of the given custom variable."
-        }
-    ],
     evaluator: async (trigger: ReplaceVariableTrigger<never>, name?: string, propertyPath?: string, defaultData?: JsonValue) => {
         const endpoint = trigger.settings.endpoint;
         const instance = firebotService.instances.find(inst => inst.data.endpoint === endpoint);

@@ -3,8 +3,6 @@ import {ReplaceVariable} from "../../types/replaceVariable";
 
 const model: ReplaceVariable = {
     handle: "math",
-    usages: [
-    ],
     evaluator: async (_, expression: string) => {
         if (!expression || expression.length === 0) {
             return null;

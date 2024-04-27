@@ -6,16 +6,6 @@ import {ACTION, fullActionId} from "../../constants";
 
 const model: ReplaceVariable = {
     handle: "counter",
-    usages: [
-        {
-            handle: "counter",
-            description: "Displays the value of the counter attached to a counter action",
-        },
-        {
-            handle: "counter[name]",
-            description: "Displays the value of the given counter."
-        }
-    ],
     evaluator: async (trigger: ReplaceVariableTrigger<CounterSettings>, counterName?: string) => {
         const endpoint = trigger.settings.endpoint;
         const instance = firebotService.instances.find(inst => inst.data.endpoint === endpoint);

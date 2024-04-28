@@ -12,6 +12,26 @@ const isWatching = !!process.env.ROLLUP_WATCH || process.env.BUILD === "DEBUG";
 const pluginId = "gg.dennis.firebot";
 const sdPlugin = `${pluginId}.sdPlugin`;
 
+const banner = `/**!
+ * @author Dennis Rijsdijk
+ * @module gg.dennis.firebot
+ * @license GPLv3
+ * @copyright Copyright (c) 2024 Dennis Rijsdijk
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */`;
+
 /**
  * @type {import('rollup').RollupOptions}
  */
@@ -19,6 +39,7 @@ const plugin: RollupOptions = {
 	input: "src/plugin/index.ts",
 	output: {
 		file: `${sdPlugin}/bin/plugin.js`,
+		banner,
 		sourcemap: isWatching,
 		sourcemapPathTransform: (relativeSourcePath, sourcemapPath) => {
 			return url.pathToFileURL(path.resolve(path.dirname(sourcemapPath), relativeSourcePath)).href;
@@ -55,6 +76,7 @@ const pi: RollupOptions = {
 	input: "src/pi/index.ts",
 	output: {
 		file: `${sdPlugin}/bin/pi.js`,
+		banner,
 		format: 'iife',
 		sourcemap: isWatching,
 		sourcemapPathTransform: (relativeSourcePath, sourcemapPath) => {

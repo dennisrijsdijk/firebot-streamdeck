@@ -1,7 +1,7 @@
 import ApiBase from "../apiBase";
-import {FirebotPresetEffectListData} from "../../../types/firebot";
-import {ApiPresetEffectList} from "../../../types/api";
-import {PresetEffectListSettings} from "../../../types/settings";
+import { FirebotPresetEffectListData } from "../../../types/firebot";
+import { ApiPresetEffectList } from "../../../types/api";
+import { PresetEffectListSettings } from "../../../types/settings";
 
 export default class FirebotPresetEffectList extends ApiBase {
     private readonly _data: FirebotPresetEffectListData;
@@ -28,12 +28,12 @@ export default class FirebotPresetEffectList extends ApiBase {
         const args: Record<string, string> = {};
         const allowedArgs = await this.updateArgs();
         allowedArgs.forEach((arg) => {
-            if (!rawArgs[arg] || rawArgs[arg] == "") {
+            if (!rawArgs[arg] || rawArgs[arg] === "") {
                 return;
             }
             args[arg] = rawArgs[arg];
         });
-        const result = await fetch(`http://${this._endpoint}:7472/api/v1/effects/preset/${this._data.id}/run`, {
+        await fetch(`http://${this._endpoint}:7472/api/v1/effects/preset/${this._data.id}/run`, {
             ...this.abortSignal,
             method: "POST",
             headers: {

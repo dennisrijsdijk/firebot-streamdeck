@@ -1,7 +1,7 @@
 import ApiBase from "../apiBase";
-import {FirebotTimerData} from "../../../types/firebot";
-import {ApiTimer} from "../../../types/api";
-import {TimerSettings} from "../../../types/settings";
+import { FirebotTimerData } from "../../../types/firebot";
+import { ApiTimer } from "../../../types/api";
+import { TimerSettings } from "../../../types/settings";
 import firebotService from "../service";
 
 export default class FirebotTimer extends ApiBase {
@@ -18,7 +18,7 @@ export default class FirebotTimer extends ApiBase {
     }
 
     async update(mode: TimerSettings["action"]) {
-        const result = await fetch(`http://${this._endpoint}:7472/api/v1/timers/${this._data.id}/${mode}`, this.abortSignal);
+        await fetch(`http://${this._endpoint}:7472/api/v1/timers/${this._data.id}/${mode}`, this.abortSignal);
         const instance = firebotService.instances.find(instance => instance.data.endpoint === this._endpoint);
         if (instance != null) {
             await instance.updateTimers();

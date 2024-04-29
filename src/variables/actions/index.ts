@@ -12,4 +12,4 @@ export default [
     queueLength,
     queueActive,
     timerActive
-]
+];

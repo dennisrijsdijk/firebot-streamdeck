@@ -1,5 +1,5 @@
-import {FirebotCommandData, FirebotPresetEffectListData, FirebotTimerData} from "./firebot";
-import {JsonValue} from "@elgato/streamdeck";
+import { FirebotCommandData, FirebotPresetEffectListData, FirebotTimerData } from "./firebot";
+import { JsonValue } from "@elgato/streamdeck";
 
 export type ApiCounter = {
     id: string;

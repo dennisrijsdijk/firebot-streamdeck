@@ -1,5 +1,5 @@
 import ApiBase from "./apiBase";
-import {FirebotCommandData, FirebotInstanceData, FirebotInstanceStatus} from "../../types/firebot";
+import { FirebotCommandData, FirebotInstanceData, FirebotInstanceStatus } from "../../types/firebot";
 import FirebotCounter from "./routes/counter";
 import FirebotQueue from "./routes/queue";
 import {
@@ -15,7 +15,7 @@ import FirebotCustomRole from "./routes/customRole";
 import FirebotPresetEffectList from "./routes/presetEffectList";
 import FirebotCommand from "./routes/command";
 import FirebotTimer from "./routes/timer";
-import {JsonValue} from "@elgato/streamdeck";
+import { JsonValue } from "@elgato/streamdeck";
 
 export class FirebotInstance extends ApiBase {
     private readonly _data: FirebotInstanceData;
@@ -30,7 +30,7 @@ export class FirebotInstance extends ApiBase {
             endpoint,
             name,
             status: FirebotInstanceStatus.OFFLINE
-        }
+        };
         this._counters = [];
         this._customRoles = [];
         this._queues = [];
@@ -69,38 +69,38 @@ export class FirebotInstance extends ApiBase {
         if (!Array.isArray(inputs)) {
             return [];
         }
-        for (let input of inputs) {
+        for (const input of inputs) {
             outputs.push(transformer(input));
         }
         return outputs;
     }
 
     private async fetchCounters(): Promise<FirebotCounter[]> {
-        return this.arrayFetch<ApiCounter, FirebotCounter>("counters", counter => {
+        return this.arrayFetch<ApiCounter, FirebotCounter>("counters", (counter) => {
             return new FirebotCounter(counter, this._data.endpoint);
         });
     }
 
     private async fetchQueues(): Promise<FirebotQueue[]> {
-        return this.arrayFetch<ApiQueue, FirebotQueue>("queues", queue => {
+        return this.arrayFetch<ApiQueue, FirebotQueue>("queues", (queue) => {
             return new FirebotQueue(queue, this._data.endpoint);
         });
     }
 
     private async fetchCustomRoles(): Promise<FirebotCustomRole[]> {
-        return this.arrayFetch<ApiCustomRole, FirebotCustomRole>("customRoles", role => {
+        return this.arrayFetch<ApiCustomRole, FirebotCustomRole>("customRoles", (role) => {
             return new FirebotCustomRole(role, this._data.endpoint);
         });
     }
 
     async getPresetEffectLists(): Promise<FirebotPresetEffectList[]> {
-        return this.arrayFetch<ApiPresetEffectList, FirebotPresetEffectList>("effects/preset", list => {
+        return this.arrayFetch<ApiPresetEffectList, FirebotPresetEffectList>("effects/preset", (list) => {
             return new FirebotPresetEffectList(list, this._data.endpoint);
         });
     }
 
     private async fetchCommandsByType(type: FirebotCommandData["type"]): Promise<FirebotCommand[]> {
-        return this.arrayFetch<ApiCommand, FirebotCommand>(`commands/${type}`, command => {
+        return this.arrayFetch<ApiCommand, FirebotCommand>(`commands/${type}`, (command) => {
             return new FirebotCommand(command, type, this._data.endpoint);
         });
     }
@@ -126,11 +126,11 @@ export class FirebotInstance extends ApiBase {
         return [
             ...systemCommands,
             ...customCommands
-        ]
+        ];
     }
 
     private async fetchTimers() {
-        return this.arrayFetch<ApiTimer, FirebotTimer>("timers", timer => {
+        return this.arrayFetch<ApiTimer, FirebotTimer>("timers", (timer) => {
             return new FirebotTimer(timer, this._data.endpoint);
         });
     }
@@ -139,7 +139,7 @@ export class FirebotInstance extends ApiBase {
         this._timers = await this.fetchTimers();
     }
 
-    async setCustomVariable(name: string, data: JsonValue, ttl: number = 0) {
+    async setCustomVariable(name: string, data: JsonValue, ttl = 0) {
         await fetch(`http://${this._data.endpoint}:7472/api/v1/custom-variables/${encodeURIComponent(name)}`, {
             ...this.abortSignal,
             method: "POST",

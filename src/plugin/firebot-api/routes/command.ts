@@ -1,6 +1,6 @@
 import ApiBase from "../apiBase";
-import {FirebotCommandData} from "../../../types/firebot";
-import {ApiCommand} from "../../../types/api";
+import { FirebotCommandData } from "../../../types/firebot";
+import { ApiCommand } from "../../../types/api";
 
 export default class FirebotCommand extends ApiBase {
     private readonly _data: FirebotCommandData;
@@ -20,7 +20,7 @@ export default class FirebotCommand extends ApiBase {
     }
 
     async run(args: string) {
-        const result = await fetch(`http://${this._endpoint}:7472/api/v1/commands/${this.data.type}/${this._data.id}/run`, {
+        await fetch(`http://${this._endpoint}:7472/api/v1/commands/${this.data.type}/${this._data.id}/run`, {
             ...this.abortSignal,
             method: "POST",
             headers: {

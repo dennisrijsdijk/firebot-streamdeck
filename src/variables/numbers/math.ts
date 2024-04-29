@@ -1,5 +1,5 @@
 import { evaluate } from 'mathjs';
-import {ReplaceVariable} from "../../types/replaceVariable";
+import { ReplaceVariable } from "../../types/replaceVariable";
 
 const model: ReplaceVariable = {
     handle: "math",
@@ -14,6 +14,6 @@ const model: ReplaceVariable = {
             return null;
         }
     }
-}
+};
 
 export default model;

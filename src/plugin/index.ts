@@ -30,6 +30,6 @@ if (Object.keys(globalSettings).length === 0) {
 
 await firebotService.updateInstances(globalSettings.instances);
 
-streamDeck.settings.onDidReceiveGlobalSettings<GlobalSettings>(async ev => {
+streamDeck.settings.onDidReceiveGlobalSettings<GlobalSettings>(async (ev) => {
     await firebotService.updateInstances(ev.settings.instances);
 });

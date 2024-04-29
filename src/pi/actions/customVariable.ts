@@ -1,6 +1,6 @@
 import PiAction from "../piAction";
 import settingsCache from "../settingsCache";
-import {ActionBaseSettings, CustomVariableSettings} from "../../types/settings";
+import { ActionBaseSettings, CustomVariableSettings } from "../../types/settings";
 import $ from 'jquery';
 
 class PiCustomVariable implements PiAction {

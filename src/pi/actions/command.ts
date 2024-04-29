@@ -1,8 +1,8 @@
 import PiAction from "../piAction";
-import {ActionBaseSettings, CommandSettings} from "../../types/settings";
+import { ActionBaseSettings, CommandSettings } from "../../types/settings";
 import streamDeck from "@elgato/streamdeck";
-import {ROUTE} from "../../constants";
-import {FirebotCommandData} from "../../types/firebot";
+import { ROUTE } from "../../constants";
+import { FirebotCommandData } from "../../types/firebot";
 import $ from 'jquery';
 import settingsCache from "../settingsCache";
 
@@ -15,7 +15,7 @@ class PiCommand implements PiAction {
         const commands = await streamDeck.plugin.fetch<FirebotCommandData[]>({
             path: ROUTE.COMMAND,
             body: {
-                endpoint: endpoint,
+                endpoint: endpoint
             }
         });
 
@@ -40,7 +40,7 @@ class PiCommand implements PiAction {
             endpoint: settingsCache.global.defaultEndpoint,
             action: {
                 id: command?.id ?? null,
-                args: "",
+                args: ""
             }
         };
 

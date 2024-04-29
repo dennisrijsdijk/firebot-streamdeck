@@ -1,7 +1,7 @@
-import {ReplaceVariable, ReplaceVariableTrigger} from "../../types/replaceVariable";
-import {CustomRoleSettings} from "../../types/settings";
+import { ReplaceVariable, ReplaceVariableTrigger } from "../../types/replaceVariable";
+import { CustomRoleSettings } from "../../types/settings";
 import firebotService from '../../plugin/firebot-api/service';
-import {ACTION, fullActionId} from "../../constants";
+import { ACTION, fullActionId } from "../../constants";
 import FirebotCustomRole from "../../plugin/firebot-api/routes/customRole";
 
 const model: ReplaceVariable = {
@@ -19,7 +19,7 @@ const model: ReplaceVariable = {
             role = instance.customRoles.find(instanceRole => instanceRole.data.name === roleName);
         } else {
             if (trigger.actionId !== fullActionId(ACTION.CUSTOMROLE)) {
-                return null
+                return null;
             }
 
             role = instance.customRoles.find(instanceRole => instanceRole.data.id === trigger.settings.action.id);
@@ -31,6 +31,6 @@ const model: ReplaceVariable = {
 
         return role.length;
     }
-}
+};
 
 export default model;

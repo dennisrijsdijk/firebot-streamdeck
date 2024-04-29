@@ -12,7 +12,6 @@
     "module": "es2022",
     "moduleResolution": "Bundler",
     "skipLibCheck": true,
-    "strict": true,
     "target": "es2022",
   },
   "include": [

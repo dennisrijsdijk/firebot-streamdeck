@@ -1,5 +1,5 @@
 import PiAction from "../piAction";
-import {ACTION, PLUGIN} from "../../constants";
+import { ACTION, PLUGIN } from "../../constants";
 import PiCommand from "./command";
 import PiCounter from "./counter";
 import PiCustomRole from './customRole';
@@ -26,7 +26,7 @@ export function getAction(uuid: string): PiAction | undefined {
         case ACTION.PRESETLIST:
             return PiPresetEffectList;
         case ACTION.QUEUE:
-            return PiQueue
+            return PiQueue;
         case ACTION.TIMER:
             return PiTimer;
     }

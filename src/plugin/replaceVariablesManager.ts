@@ -1,9 +1,9 @@
 import evaluate from "./expressionish";
 import variables from "../variables";
-import {ReplaceVariable} from "../types/replaceVariable";
+import { ReplaceVariable } from "../types/replaceVariable";
 
 class ReplaceVariablesManager {
-    private readonly _handlers: Map<string, ReplaceVariable>
+    private readonly _handlers: Map<string, ReplaceVariable>;
 
     constructor() {
         this._handlers = new Map<string, ReplaceVariable>();

@@ -6,19 +6,19 @@ import streamDeck, {
     WillAppearEvent,
     WillDisappearEvent
 } from "@elgato/streamdeck";
-import {ActionBaseSettings} from "../types/settings";
+import { ActionBaseSettings } from "../types/settings";
 import ReplaceVariablesManager from "./replaceVariablesManager";
 import firebotService from "./firebot-api/service";
 
 export class ActionBase<T extends JsonObject> extends SingletonAction<ActionBaseSettings<T>> {
     // "context": "manifestId"
     private readonly actions: Record<string, string>;
-    
+
     constructor() {
         super();
         this.actions = {};
         firebotService.on('data_updated', async () => {
-            await Promise.all(Object.keys(this.actions).map(async context => {
+            await Promise.all(Object.keys(this.actions).map(async (context) => {
                 const action = streamDeck.actions.createController(context);
                 const manifestId = this.actions[context];
                 return this.update(action, manifestId);
@@ -41,8 +41,7 @@ export class ActionBase<T extends JsonObject> extends SingletonAction<ActionBase
 
     async update(action: Omit<Action<ActionBaseSettings<T>>, "manifestId">, manifestId: string, newSettings?: ActionBaseSettings<T>): Promise<void> {
         if (newSettings == null) {
-            // TODO: This is a hack and I don't like it
-            // getSettings fires an onDidReceiveSettings event, causing the key to trigger twice otherwise.
+            // getSettings fires an onDidReceiveSettings event, causing the key to trigger twice if we don't return here
             await action.getSettings<ActionBaseSettings<T>>();
             return;
         }
@@ -53,7 +52,7 @@ export class ActionBase<T extends JsonObject> extends SingletonAction<ActionBase
 
         const meta = {
             actionId: manifestId,
-            settings: newSettings,
+            settings: newSettings
         };
 
         const title = await ReplaceVariablesManager.evaluate(newSettings.title, meta);

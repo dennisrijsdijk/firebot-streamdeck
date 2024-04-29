@@ -17,7 +17,7 @@ class FirebotService extends EventEmitter {
     }
 
     public async updateInstances(instances: SettingsInstance[]): Promise<void> {
-        clearTimeout(this._timeout)
+        clearTimeout(this._timeout);
         this._instances = [];
 
         instances.map(instance => this.registerInstance(instance.endpoint, instance.name));

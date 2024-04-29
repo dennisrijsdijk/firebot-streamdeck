@@ -1,8 +1,8 @@
 import PiAction from "../piAction";
-import {ActionBaseSettings, CustomRoleSettings} from "../../types/settings";
+import { ActionBaseSettings, CustomRoleSettings } from "../../types/settings";
 import streamDeck from "@elgato/streamdeck";
-import {ROUTE} from "../../constants";
-import {FirebotCustomRoleData} from "../../types/firebot";
+import { ROUTE } from "../../constants";
+import { FirebotCustomRoleData } from "../../types/firebot";
 import $ from 'jquery';
 import settingsCache from "../settingsCache";
 
@@ -15,7 +15,7 @@ class PiCustomRole implements PiAction {
         const roles = await streamDeck.plugin.fetch<FirebotCustomRoleData[]>({
             path: ROUTE.CUSTOMROLE,
             body: {
-                endpoint: endpoint,
+                endpoint: endpoint
             }
         });
 
@@ -39,7 +39,7 @@ class PiCustomRole implements PiAction {
             title: "",
             endpoint: settingsCache.global.defaultEndpoint,
             action: {
-                id: queue?.id ?? null,
+                id: queue?.id ?? null
             }
         };
 

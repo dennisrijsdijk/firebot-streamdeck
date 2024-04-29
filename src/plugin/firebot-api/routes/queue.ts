@@ -1,7 +1,7 @@
 import ApiBase from "../apiBase";
-import {FirebotQueueData} from "../../../types/firebot";
-import {QueueSettings} from "../../../types/settings";
-import {ApiQueue, ApiQueueUpdateResponse} from "../../../types/api";
+import { FirebotQueueData } from "../../../types/firebot";
+import { QueueSettings } from "../../../types/settings";
+import { ApiQueue, ApiQueueUpdateResponse } from "../../../types/api";
 
 export default class FirebotQueue extends ApiBase {
     private readonly _data: FirebotQueueData;

@@ -1,16 +1,16 @@
-import {action, KeyDownEvent, MessageRequest, MessageResponder, route,} from "@elgato/streamdeck";
-import {ActionBase} from "../actionBase";
-import {ActionBaseSettings, PresetEffectListSettings} from "../../types/settings";
+import { action, KeyDownEvent, MessageRequest, route } from "@elgato/streamdeck";
+import { ActionBase } from "../actionBase";
+import { ActionBaseSettings, PresetEffectListSettings } from "../../types/settings";
 
 import firebotService from "../firebot-api/service";
-import {ACTION, fullActionId, ROUTE} from "../../constants";
-import {EndpointBody} from "../../types/routing";
+import { ACTION, fullActionId, ROUTE } from "../../constants";
+import { EndpointBody } from "../../types/routing";
 
 @action({ UUID: fullActionId(ACTION.PRESETLIST) })
 export class PresetEffectList extends ActionBase<PresetEffectListSettings> {
 
     @route(ROUTE.PRESETLIST)
-    async getPresetLists(request?: MessageRequest<EndpointBody, ActionBaseSettings<PresetEffectListSettings>>, responder?: MessageResponder) {
+    async getPresetLists(request?: MessageRequest<EndpointBody, ActionBaseSettings<PresetEffectListSettings>>) {
         let endpoint = request?.body?.endpoint;
         if (endpoint == null) {
             endpoint = "127.0.0.1";
@@ -31,7 +31,7 @@ export class PresetEffectList extends ActionBase<PresetEffectListSettings> {
             return ev.action.showAlert();
         }
 
-        const maybeInstance = firebotService.instances.find(instance => {
+        const maybeInstance = firebotService.instances.find((instance) => {
             return instance.data.endpoint === ev.payload.settings.endpoint;
         });
 
@@ -39,7 +39,7 @@ export class PresetEffectList extends ActionBase<PresetEffectListSettings> {
             return ev.action.showAlert();
         }
 
-        const maybePresetList = (await maybeInstance.getPresetEffectLists()).find(presetList => {
+        const maybePresetList = (await maybeInstance.getPresetEffectLists()).find((presetList) => {
             return presetList.data.id === ev.payload.settings.action.id;
         });
 

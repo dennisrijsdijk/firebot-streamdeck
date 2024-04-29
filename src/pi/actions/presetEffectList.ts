@@ -1,8 +1,8 @@
 import PiAction from "../piAction";
-import {ActionBaseSettings, PresetEffectListSettings} from "../../types/settings";
+import { ActionBaseSettings, PresetEffectListSettings } from "../../types/settings";
 import streamDeck from "@elgato/streamdeck";
-import {ROUTE} from "../../constants";
-import {FirebotPresetEffectListData} from "../../types/firebot";
+import { ROUTE } from "../../constants";
+import { FirebotPresetEffectListData } from "../../types/firebot";
 import $ from 'jquery';
 import settingsCache from "../settingsCache";
 
@@ -15,7 +15,7 @@ class PiPresetEffectList implements PiAction {
         const presetLists = await streamDeck.plugin.fetch<FirebotPresetEffectListData[]>({
             path: ROUTE.PRESETLIST,
             body: {
-                endpoint: endpoint,
+                endpoint: endpoint
             }
         });
 
@@ -40,7 +40,7 @@ class PiPresetEffectList implements PiAction {
             endpoint: settingsCache.global.defaultEndpoint,
             action: {
                 id: presetList?.id ?? null,
-                arguments: {},
+                arguments: {}
             }
         };
 
@@ -73,30 +73,30 @@ class PiPresetEffectList implements PiAction {
 
         const maybeList = presetLists.find(list => list.id === this.settings.action.id);
 
-        this.populatePresetListArgs(maybeList?.args ?? [ ]);
+        this.populatePresetListArgs(maybeList?.args ?? []);
     }
 
     populatePresetListArgs(args: string[]) {
         const presetListArgsContainer = $('#preset-list-arg-container');
         presetListArgsContainer.find('div').remove();
 
-        for (let arg of args) {
+        for (const arg of args) {
             //language=HTML
-            const sdpi_item = $(`
+            const sdpiItem = $(`
                 <div class="sdpi-item">
                     <div class="sdpi-item-label">${arg}</div>
                 </div>
             `);
-            const sdpi_item_value = $(`<input class="sdpi-item-value" placeholder="Argument Value">`);
+            const sdpiItemValue = $(`<input class="sdpi-item-value" placeholder="Argument Value">`);
 
-            sdpi_item_value.val(this.settings.action.arguments[arg] ?? "");
-            sdpi_item_value.on('input', async () => {
-                this.settings.action.arguments[arg] = sdpi_item_value.val() as string;
+            sdpiItemValue.val(this.settings.action.arguments[arg] ?? "");
+            sdpiItemValue.on('input', async () => {
+                this.settings.action.arguments[arg] = sdpiItemValue.val() as string;
                 await settingsCache.saveAction();
             });
 
-            sdpi_item.append(sdpi_item_value);
-            presetListArgsContainer.append(sdpi_item);
+            sdpiItem.append(sdpiItemValue);
+            presetListArgsContainer.append(sdpiItem);
         }
     }
 
@@ -107,7 +107,7 @@ class PiPresetEffectList implements PiAction {
             this.settings.action.id = presetListSelect.find("option:selected").val() as string;
             const lists = await this.getPresetLists(this.settings.endpoint);
             const maybeList = lists.find(list => list.id === this.settings.action.id);
-            this.populatePresetListArgs(maybeList?.args || [ ]);
+            this.populatePresetListArgs(maybeList?.args || []);
             await settingsCache.saveAction();
         });
 

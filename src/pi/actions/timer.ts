@@ -1,8 +1,8 @@
 import PiAction from "../piAction";
-import {ActionBaseSettings, TimerSettings} from "../../types/settings";
+import { ActionBaseSettings, TimerSettings } from "../../types/settings";
 import streamDeck from "@elgato/streamdeck";
-import {ROUTE} from "../../constants";
-import {FirebotTimerData} from "../../types/firebot";
+import { ROUTE } from "../../constants";
+import { FirebotTimerData } from "../../types/firebot";
 import $ from 'jquery';
 import settingsCache from "../settingsCache";
 
@@ -15,7 +15,7 @@ class PiTimer implements PiAction {
         const timers = await streamDeck.plugin.fetch<FirebotTimerData[]>({
             path: ROUTE.TIMER,
             body: {
-                endpoint: endpoint,
+                endpoint: endpoint
             }
         });
 
@@ -40,7 +40,7 @@ class PiTimer implements PiAction {
             endpoint: settingsCache.global.defaultEndpoint,
             action: {
                 id: timer?.id ?? null,
-                action: "toggle",
+                action: "toggle"
             }
         };
 

@@ -1,6 +1,6 @@
 import ApiBase from "../apiBase";
-import {FirebotCustomRoleData} from "../../../types/firebot";
-import {ApiCustomRole} from "../../../types/api";
+import { FirebotCustomRoleData } from "../../../types/firebot";
+import { ApiCustomRole } from "../../../types/api";
 
 export default class FirebotCustomRole extends ApiBase {
     private readonly _data: FirebotCustomRoleData;
@@ -24,7 +24,7 @@ export default class FirebotCustomRole extends ApiBase {
     // This is a hack as Firebot doesn't directly expose an API function to clear queues.
     // https://github.com/crowbartools/Firebot/issues/2483
     async clear() {
-        const result = await fetch(`http://${this._endpoint}:7472/api/v1/effects`, {
+        await fetch(`http://${this._endpoint}:7472/api/v1/effects`, {
             ...this.abortSignal,
             method: "POST",
             headers: {

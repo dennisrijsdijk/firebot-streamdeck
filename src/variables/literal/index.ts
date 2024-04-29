@@ -5,5 +5,5 @@ import literalTrue from './true';
 export default [
     literalFalse,
     literalNull,
-    literalTrue,
-]
+    literalTrue
+];

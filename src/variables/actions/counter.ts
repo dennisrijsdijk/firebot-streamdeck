@@ -1,8 +1,8 @@
-import {ReplaceVariable, ReplaceVariableTrigger} from "../../types/replaceVariable";
-import {CounterSettings} from "../../types/settings";
+import { ReplaceVariable, ReplaceVariableTrigger } from "../../types/replaceVariable";
+import { CounterSettings } from "../../types/settings";
 import firebotService from '../../plugin/firebot-api/service';
 import FirebotCounter from "../../plugin/firebot-api/routes/counter";
-import {ACTION, fullActionId} from "../../constants";
+import { ACTION, fullActionId } from "../../constants";
 
 const model: ReplaceVariable = {
     handle: "counter",
@@ -19,7 +19,7 @@ const model: ReplaceVariable = {
             counter = instance.counters.find(instanceCounter => instanceCounter.data.name === counterName);
         } else {
             if (trigger.actionId !== fullActionId(ACTION.COUNTER)) {
-                return null
+                return null;
             }
 
             counter = instance.counters.find(instanceCounter => instanceCounter.data.id === trigger.settings.action.id);
@@ -31,6 +31,6 @@ const model: ReplaceVariable = {
 
         return counter.value;
     }
-}
+};
 
 export default model;

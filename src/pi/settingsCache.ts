@@ -1,20 +1,20 @@
-import {ActionBaseSettings, GlobalSettings} from "../types/settings";
+import { ActionBaseSettings, GlobalSettings } from "../types/settings";
 import EventEmitter from "eventemitter3";
-import streamDeck from "@elgato/streamdeck";
+import streamDeck, { JsonObject } from "@elgato/streamdeck";
 
 class SettingsCache extends EventEmitter {
     global: GlobalSettings;
-    action: ActionBaseSettings<any>;
+    action: ActionBaseSettings<JsonObject>;
     constructor() {
         super();
         this.global = {
             defaultEndpoint: "",
-            instances: [ ]
+            instances: []
         };
         this.action = {
             title: "",
             endpoint: "",
-            action: null
+            action: { }
         };
     }
 

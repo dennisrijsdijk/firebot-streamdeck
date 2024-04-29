@@ -1,27 +1,25 @@
-import {ReplaceVariable, ReplaceVariableTrigger} from "../../types/replaceVariable";
+import { ReplaceVariable, ReplaceVariableTrigger } from "../../types/replaceVariable";
 import firebotService from '../../plugin/firebot-api/service';
-import {ApiCustomVariableBody} from "../../types/api";
-import {JsonValue} from "@elgato/streamdeck";
+import { ApiCustomVariableBody } from "../../types/api";
+import { JsonValue } from "@elgato/streamdeck";
 
 const model: ReplaceVariable = {
     handle: "customVariable",
     evaluator: async (trigger: ReplaceVariableTrigger<never>, name?: string, propertyPath?: string, defaultData?: JsonValue) => {
+        if (!name) {
+            return defaultData;
+        }
+
         const endpoint = trigger.settings.endpoint;
         const instance = firebotService.instances.find(inst => inst.data.endpoint === endpoint);
         if (!instance) {
             return null;
         }
 
-        let variable: ApiCustomVariableBody | undefined;
-
-        if (!name) {
-            return null;
-        }
-
-        variable = instance.customVariables[name];
+        const variable: ApiCustomVariableBody | undefined = instance.customVariables[name];
 
         if (!variable) {
-            return null;
+            return defaultData;
         }
 
         let data = structuredClone(variable.v);
@@ -60,6 +58,6 @@ const model: ReplaceVariable = {
             return defaultData;
         }
     }
-}
+};
 
 export default model;

@@ -1,6 +1,6 @@
 import ApiBase from "../apiBase";
-import {FirebotCounterData} from "../../../types/firebot";
-import {ApiCounter} from "../../../types/api";
+import { FirebotCounterData } from "../../../types/firebot";
+import { ApiCounter } from "../../../types/api";
 
 export default class FirebotCounter extends ApiBase {
     private readonly _data: FirebotCounterData;

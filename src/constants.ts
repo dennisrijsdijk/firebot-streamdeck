@@ -1,4 +1,4 @@
-export const PLUGIN: string = "gg.dennis.firebot";
+export const PLUGIN = "gg.dennis.firebot";
 
 export enum ACTION {
     COMMAND = "command",

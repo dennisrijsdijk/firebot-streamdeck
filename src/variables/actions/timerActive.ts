@@ -1,8 +1,8 @@
-import {ReplaceVariable, ReplaceVariableTrigger} from "../../types/replaceVariable";
-import {TimerSettings} from "../../types/settings";
+import { ReplaceVariable, ReplaceVariableTrigger } from "../../types/replaceVariable";
+import { TimerSettings } from "../../types/settings";
 import firebotService from "../../plugin/firebot-api/service";
 import FirebotTimer from "../../plugin/firebot-api/routes/timer";
-import {ACTION, fullActionId} from "../../constants";
+import { ACTION, fullActionId } from "../../constants";
 
 const model: ReplaceVariable = {
     handle: "timerActive",
@@ -19,7 +19,7 @@ const model: ReplaceVariable = {
             timer = instance.timers.find(instanceQueue => instanceQueue.data.name === timerName);
         } else {
             if (trigger.actionId !== fullActionId(ACTION.TIMER)) {
-                return null
+                return null;
             }
 
             timer = instance.timers.find(instanceQueue => instanceQueue.data.id === trigger.settings.action.id);
@@ -31,6 +31,6 @@ const model: ReplaceVariable = {
 
         return timer.data.active;
     }
-}
+};
 
 export default model;

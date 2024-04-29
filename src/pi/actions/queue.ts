@@ -1,8 +1,8 @@
 import PiAction from "../piAction";
-import {ActionBaseSettings, QueueSettings} from "../../types/settings";
+import { ActionBaseSettings, QueueSettings } from "../../types/settings";
 import streamDeck from "@elgato/streamdeck";
-import {ROUTE} from "../../constants";
-import {FirebotQueueData} from "../../types/firebot";
+import { ROUTE } from "../../constants";
+import { FirebotQueueData } from "../../types/firebot";
 import $ from 'jquery';
 import settingsCache from "../settingsCache";
 
@@ -15,7 +15,7 @@ class PiQueue implements PiAction {
         const queues = await streamDeck.plugin.fetch<FirebotQueueData[]>({
             path: ROUTE.QUEUE,
             body: {
-                endpoint: endpoint,
+                endpoint: endpoint
             }
         });
 
@@ -40,7 +40,7 @@ class PiQueue implements PiAction {
             endpoint: settingsCache.global.defaultEndpoint,
             action: {
                 id: queue?.id ?? null,
-                action: "toggle",
+                action: "toggle"
             }
         };
 

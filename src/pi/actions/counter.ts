@@ -1,8 +1,8 @@
 import PiAction from "../piAction";
-import {ActionBaseSettings, CounterSettings} from "../../types/settings";
+import { ActionBaseSettings, CounterSettings } from "../../types/settings";
 import streamDeck from "@elgato/streamdeck";
-import {ROUTE} from "../../constants";
-import {FirebotCounterData} from "../../types/firebot";
+import { ROUTE } from "../../constants";
+import { FirebotCounterData } from "../../types/firebot";
 import $ from 'jquery';
 import settingsCache from "../settingsCache";
 
@@ -15,7 +15,7 @@ class PiCounter implements PiAction {
         const counters = await streamDeck.plugin.fetch<FirebotCounterData[]>({
             path: ROUTE.COUNTER,
             body: {
-                endpoint: endpoint,
+                endpoint: endpoint
             }
         });
 
@@ -41,7 +41,7 @@ class PiCounter implements PiAction {
             action: {
                 id: counter?.id ?? null,
                 value: 0,
-                action: "update",
+                action: "update"
             }
         };
 

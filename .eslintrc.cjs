@@ -25,14 +25,9 @@ module.exports = {
         "es2020": true
     },
 
-    // Project specific globals
-    "globals": {
-        "renderWindow": true,
-        "$": true,
-        "firebotAppDetails": true
-    },
-
     "rules": {
+
+        "object-curly-spacing": [ "warn", "always" ],
 
         // Deviations from https://eslint.org/docs/rules/#possible-errors
         "no-console": 0, // Enable the use of console
@@ -77,7 +72,6 @@ module.exports = {
         "linebreak-style": "warn", // Line breaks must be \n
         "new-cap": "warn", // Constructors must start with capital letter
         "no-trailing-spaces": "warn", // no trailing spaces
-        "semi": "warn", // semi-colons required
         "semi-spacing": ["warn", {before: false, after: true}], // space after semi-colon, no space before
         "semi-style": "warn", // See: https://eslint.org/docs/rules/semi-style
         "space-before-blocks": "warn", // whitespace required before and after {}
@@ -99,7 +93,7 @@ module.exports = {
         "no-empty": ["error", {"allowEmptyCatch": true }],
         "no-debugger": "warn",
         "no-extra-boolean-cast": "off",
-        "no-warning-comments": ["warn", {"terms": ["todo", "to do", "fix", "fixme", "fix me", "need"], "location": "start"}], // warn about todo comments
+        "no-warning-comments": ["warn", {"terms": ["todo", "to do", "fix", "fixme", "fix me", "need"], "location": "start"}], // warn about to-do comments
 
         // typescript
         "@typescript-eslint/no-unused-vars": "warn",

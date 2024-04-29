@@ -1,8 +1,7 @@
 import fsp from 'fs/promises';
-// TODO: Write declaration or replace
 // @ts-ignore
 import formatter from 'html-formatter';
-import {Plugin} from "rollup";
+import { Plugin } from "rollup";
 
 function url(file: string) {
     return new URL(file, import.meta.url);
@@ -28,7 +27,7 @@ export default function generatePi(options: GeneratePropertyInspectorOptions): P
         async generateBundle() {
             const base = await fsp.readFile(url(options.base), 'utf-8');
             const actionFiles = await fsp.readdir(url(options.actionsDir));
-            await Promise.all(actionFiles.map(async file => {
+            await Promise.all(actionFiles.map(async (file) => {
                 if (!file.endsWith(".html")) {
                     return;
                 }

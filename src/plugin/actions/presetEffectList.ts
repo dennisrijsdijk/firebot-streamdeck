@@ -10,7 +10,7 @@ import {EndpointBody} from "../../types/routing";
 export class PresetEffectList extends ActionBase<PresetEffectListSettings> {
 
     @route(ROUTE.PRESETLIST)
-    getQueues(request?: MessageRequest<EndpointBody, ActionBaseSettings<PresetEffectListSettings>>, responder?: MessageResponder) {
+    async getPresetLists(request?: MessageRequest<EndpointBody, ActionBaseSettings<PresetEffectListSettings>>, responder?: MessageResponder) {
         let endpoint = request?.body?.endpoint;
         if (endpoint == null) {
             endpoint = "127.0.0.1";
@@ -19,7 +19,7 @@ export class PresetEffectList extends ActionBase<PresetEffectListSettings> {
         if (!instance) {
             return [];
         }
-        return instance.presetEffectLists.map(presetList => presetList.data);
+        return (await instance.getPresetEffectLists()).map(presetList => presetList.data);
     }
 
     async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<PresetEffectListSettings>>): Promise<void> {
@@ -39,7 +39,7 @@ export class PresetEffectList extends ActionBase<PresetEffectListSettings> {
             return ev.action.showAlert();
         }
 
-        const maybePresetList = maybeInstance.presetEffectLists.find(presetList => {
+        const maybePresetList = (await maybeInstance.getPresetEffectLists()).find(presetList => {
             return presetList.data.id === ev.payload.settings.action.id;
         });
 

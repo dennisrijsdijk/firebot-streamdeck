@@ -10,7 +10,7 @@ import {EndpointBody} from "../../types/routing";
 export class Command extends ActionBase<CommandSettings> {
 
 	@route(ROUTE.COMMAND)
-	getCounters(request?: MessageRequest<EndpointBody, ActionBaseSettings<CommandSettings>>, responder?: MessageResponder) {
+	async getCommands(request?: MessageRequest<EndpointBody, ActionBaseSettings<CommandSettings>>, responder?: MessageResponder) {
 		let endpoint = request?.body?.endpoint;
 		if (endpoint == null) {
 			endpoint = "127.0.0.1";
@@ -19,7 +19,7 @@ export class Command extends ActionBase<CommandSettings> {
 		if (!instance) {
 			return [];
 		}
-		return instance.commands.map(command => command.data);
+		return (await instance.getCommands()).map(command => command.data);
 	}
 
 	async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<CommandSettings>>): Promise<void> {
@@ -40,8 +40,8 @@ export class Command extends ActionBase<CommandSettings> {
 			return ev.action.showAlert();
 		}
 
-		const maybeCommand = maybeInstance.commands.find(counter => {
-			return counter.data.id === ev.payload.settings.action.id;
+		const maybeCommand = (await maybeInstance.getCommands()).find(command => {
+			return command.data.id === ev.payload.settings.action.id;
 		});
 
 		if (!maybeCommand) {

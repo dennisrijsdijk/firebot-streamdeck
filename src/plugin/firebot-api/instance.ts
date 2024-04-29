@@ -19,11 +19,9 @@ import {JsonValue} from "@elgato/streamdeck";
 
 export class FirebotInstance extends ApiBase {
     private readonly _data: FirebotInstanceData;
-    private _commands: FirebotCommand[];
     private _counters: FirebotCounter[];
     private _customRoles: FirebotCustomRole[];
     private _queues: FirebotQueue[];
-    private _presetEffectLists: FirebotPresetEffectList[];
     private _timers: FirebotTimer[];
     private _customVariables: Record<string, ApiCustomVariableBody>;
     constructor(endpoint: string, name: string) {
@@ -33,17 +31,11 @@ export class FirebotInstance extends ApiBase {
             name,
             status: FirebotInstanceStatus.OFFLINE
         }
-        this._commands = [];
         this._counters = [];
         this._customRoles = [];
         this._queues = [];
-        this._presetEffectLists = [];
         this._timers = [];
         this._customVariables = { };
-    }
-
-    get commands() {
-        return this._commands;
     }
 
     get counters() {
@@ -60,10 +52,6 @@ export class FirebotInstance extends ApiBase {
 
     get queues() {
         return this._queues;
-    }
-
-    get presetEffectLists() {
-        return this._presetEffectLists;
     }
 
     get timers() {
@@ -105,7 +93,7 @@ export class FirebotInstance extends ApiBase {
         });
     }
 
-    private async fetchPresetEffectLists(): Promise<FirebotPresetEffectList[]> {
+    async getPresetEffectLists(): Promise<FirebotPresetEffectList[]> {
         return this.arrayFetch<ApiPresetEffectList, FirebotPresetEffectList>("effects/preset", list => {
             return new FirebotPresetEffectList(list, this._data.endpoint);
         });
@@ -126,7 +114,7 @@ export class FirebotInstance extends ApiBase {
         return { };
     }
 
-    private async fetchCommands() {
+    async getCommands() {
         const [
             systemCommands,
             customCommands
@@ -174,20 +162,16 @@ export class FirebotInstance extends ApiBase {
     async update() {
         try {
             [
-                this._commands,
                 this._counters,
                 this._customVariables,
                 this._queues,
                 this._customRoles,
-                this._presetEffectLists,
                 this._timers
             ] = await Promise.all([
-                this.fetchCommands(),
                 this.fetchCounters(),
                 this.fetchCustomVariables(),
                 this.fetchQueues(),
                 this.fetchCustomRoles(),
-                this.fetchPresetEffectLists(),
                 this.fetchTimers()
             ]);
             this._data.status = FirebotInstanceStatus.ONLINE;

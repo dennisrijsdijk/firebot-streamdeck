@@ -47,4 +47,5 @@ export type TimerSettings = {
 export type CustomVariableSettings = {
     name: string;
     value: string;
+    propertyPath: string | undefined;
 }

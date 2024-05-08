@@ -139,24 +139,70 @@ export class FirebotInstance extends ApiBase {
         this._timers = await this.fetchTimers();
     }
 
-    async setCustomVariable(name: string, data: JsonValue, ttl = 0) {
-        await fetch(`http://${this._data.endpoint}:7472/api/v1/custom-variables/${encodeURIComponent(name)}`, {
-            ...this.abortSignal,
-            method: "POST",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                data,
-                ttl
-            })
-        });
+    async getCustomVariable(name: string) {
+        const result = await fetch(`http://${this._data.endpoint}:7472/api/v1/custom-variables/${encodeURIComponent(name)}`, this.abortSignal);
+        return await result.json() as Promise<JsonValue>;
+    }
 
-        this._customVariables[name] = {
-            t: 0,
-            v: data
-        };
+    async setCustomVariable(name: string, data: JsonValue, ttl = 0) {
+        try {
+            await fetch(`http://${this._data.endpoint}:7472/api/v1/custom-variables/${encodeURIComponent(name)}`, {
+                ...this.abortSignal,
+                method: "POST",
+                headers: {
+                    "Accept": "application/json",
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    data,
+                    ttl
+                })
+            });
+
+            this._customVariables[name] = {
+                t: 0,
+                v: data
+            };
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    async setCustomVariableWithPath(name: string, data: JsonValue, propertyPath: string, ttl = 0) {
+        try {
+            const variable = await this.getCustomVariable(name);
+            let cursor = variable;
+            // regex: match . but not \.
+            const nodes: (string | number)[] = propertyPath.split(/(?<!\\)\./gm);
+            for (let idx = 0; idx < nodes.length; idx++) {
+                let node = nodes[idx];
+                (node as string).replace("\\.", ".");
+                if (!isNaN(Number(node))) {
+                    node = Number(node);
+                }
+
+                if (idx !== nodes.length - 1) {
+                    cursor = cursor[node];
+
+                    if (cursor == null) {
+                        return false;
+                    }
+
+                    continue;
+                }
+
+                if (Array.isArray(cursor[node]) && !Array.isArray(data)) {
+                    cursor[node].push(data);
+                } else {
+                    cursor[node] = data;
+                }
+            }
+
+            return this.setCustomVariable(name, variable, ttl);
+        } catch (error) {
+            return false;
+        }
     }
 
     async update() {

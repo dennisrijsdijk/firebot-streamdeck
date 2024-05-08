@@ -14,7 +14,8 @@ class PiCustomVariable implements PiAction {
             endpoint: settingsCache.global.defaultEndpoint,
             action: {
                 name: "",
-                value: ""
+                value: "",
+                propertyPath: ""
             }
         };
 
@@ -28,6 +29,7 @@ class PiCustomVariable implements PiAction {
     async populateElements() {
         const customVariableName = $('#customVariable-name');
         const customVariableValue = $('#customVariable-value');
+        const customVariablePropertyPath = $('#customVariable-path');
 
         customVariableName.val(this.settings.action.name);
 
@@ -40,6 +42,13 @@ class PiCustomVariable implements PiAction {
 
         customVariableValue.on('input', async () => {
             this.settings.action.value = customVariableValue.val() as string;
+            await settingsCache.saveAction();
+        });
+
+        customVariablePropertyPath.val(this.settings.action.propertyPath ?? "");
+
+        customVariablePropertyPath.on('input', async () => {
+            this.settings.action.propertyPath = customVariablePropertyPath.val() as string;
             await settingsCache.saveAction();
         });
     }

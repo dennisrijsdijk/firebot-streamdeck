@@ -4,9 +4,9 @@ export function clickTab(clickedTab: Element) {
     clickedTab.classList.add('selected');
     allTabs.forEach((el: HTMLElement) => {
         if (el.dataset.target) {
-            const t = document.querySelector(el.dataset.target) as HTMLElement;
-            if (t) {
-                t.style.display = el === clickedTab ? 'block' : 'none';
+            const tab = document.querySelector(el.dataset.target) as HTMLElement;
+            if (tab) {
+                tab.style.display = el === clickedTab ? 'block' : 'none';
             }
         }
     });

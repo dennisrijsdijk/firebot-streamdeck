@@ -37,11 +37,11 @@ const model: ReplaceVariable = {
                 data = JSON.parse(data as string);
             }
             const pathNodes = `${propertyPath}`.split(".");
-            for (let i = 0; i < pathNodes.length; i++) {
+            for (let idx = 0; idx < pathNodes.length; idx++) {
                 if (data == null) {
                     break;
                 }
-                let node: string | number = pathNodes[i];
+                let node: string | number = pathNodes[idx];
                 // parse to int for array access
                 if (Array.isArray(data)) {
                     if (isNaN(Number(node))) {

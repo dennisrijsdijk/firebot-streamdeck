@@ -54,12 +54,12 @@ class PiPresetEffectList implements PiAction {
 
         presetListSelect.find('option').remove();
 
-        for (let i = 0; i < presetLists.length; i++) {
-            const presetList = presetLists[i];
+        for (let idx = 0; idx < presetLists.length; idx++) {
+            const presetList = presetLists[idx];
             presetListSelect.append(new Option(
                 presetList.name,
                 presetList.id,
-                i === 0,
+                idx === 0,
                 presetList.id === this.settings.action.id
             ));
         }

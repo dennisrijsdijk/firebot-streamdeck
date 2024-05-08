@@ -53,12 +53,12 @@ class PiCustomRole implements PiAction {
 
         roleSelect.find('option').remove();
 
-        for (let i = 0; i < roles.length; i++) {
-            const role = roles[i];
+        for (let idx = 0; idx < roles.length; idx++) {
+            const role = roles[idx];
             roleSelect.append(new Option(
                 role.name,
                 role.id,
-                i === 0,
+                idx === 0,
                 role.id === this.settings.action.id
             ));
         }

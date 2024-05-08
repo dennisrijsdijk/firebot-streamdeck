@@ -17,8 +17,8 @@ function populateInstanceSelects() {
     instanceSelect.find('option').remove();
     instanceManagement.find('option').remove();
 
-    for (let i = 0; i < settingsCache.global.instances.length; i++) {
-        const instance = settingsCache.global.instances[i];
+    for (let idx = 0; idx < settingsCache.global.instances.length; idx++) {
+        const instance = settingsCache.global.instances[idx];
         instanceSelect.append(new Option(
             instance.name,
             instance.endpoint,
@@ -29,7 +29,7 @@ function populateInstanceSelects() {
             new Option(
                 `${instance.name} (${instance.endpoint}) ${instance.endpoint === settingsCache.global.defaultEndpoint ? "[DEFAULT]" : ""}`,
                 instance.endpoint,
-                i === 0,
+                idx === 0,
                 instance.endpoint === settingsCache.global.defaultEndpoint
             )
         );

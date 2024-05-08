@@ -54,12 +54,12 @@ class PiQueue implements PiAction {
 
         queueSelect.find('option').remove();
 
-        for (let i = 0; i < queues.length; i++) {
-            const queue = queues[i];
+        for (let idx = 0; idx < queues.length; idx++) {
+            const queue = queues[idx];
             queueSelect.append(new Option(
                 queue.name,
                 queue.id,
-                i === 0,
+                idx === 0,
                 queue.id === this.settings.action.id
             ));
         }

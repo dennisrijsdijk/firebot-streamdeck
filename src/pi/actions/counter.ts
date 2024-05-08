@@ -55,12 +55,12 @@ class PiCounter implements PiAction {
 
         counterSelect.find('option').remove();
 
-        for (let i = 0; i < counters.length; i++) {
-            const counter = counters[i];
+        for (let idx = 0; idx < counters.length; idx++) {
+            const counter = counters[idx];
             counterSelect.append(new Option(
                 counter.name,
                 counter.id,
-                i === 0,
+                idx === 0,
                 counter.id === this.settings.action.id
             ));
         }

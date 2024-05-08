@@ -56,13 +56,13 @@ class PiCommand implements PiAction {
         systemCommandOptGroup.find('option').remove();
         customCommandOptGroup.find('option').remove();
 
-        for (let i = 0; i < commands.length; i++) {
-            const command = commands[i];
+        for (let idx = 0; idx < commands.length; idx++) {
+            const command = commands[idx];
             const optGroup = command.type === "system" ? systemCommandOptGroup : customCommandOptGroup;
             optGroup.append(new Option(
                 command.trigger,
                 command.id,
-                i === 0,
+                idx === 0,
                 command.id === this.settings.action.id
             ));
         }

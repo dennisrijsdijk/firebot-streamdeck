@@ -54,12 +54,12 @@ class PiTimer implements PiAction {
 
         timerSelect.find('option').remove();
 
-        for (let i = 0; i < timers.length; i++) {
-            const timer = timers[i];
+        for (let idx = 0; idx < timers.length; idx++) {
+            const timer = timers[idx];
             timerSelect.append(new Option(
                 timer.name,
                 timer.id,
-                i === 0,
+                idx === 0,
                 timer.id === this.settings.action.id
             ));
         }

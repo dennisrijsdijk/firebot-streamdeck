@@ -36,18 +36,20 @@ const model: ReplaceVariable = {
             if (typeof data === "string") {
                 data = JSON.parse(data as string);
             }
-            const pathNodes = `${propertyPath}`.split(".");
+            // regex: match . but not \.
+            const pathNodes: (string | number)[] = propertyPath.split(/(?<!\\)\./gm);
             for (let idx = 0; idx < pathNodes.length; idx++) {
                 if (data == null) {
                     break;
                 }
                 let node: string | number = pathNodes[idx];
+                (node as string).replace("\\.", ".");
                 // parse to int for array access
                 if (Array.isArray(data)) {
                     if (isNaN(Number(node))) {
                         break;
                     }
-                    node = parseInt(node);
+                    node = Number(node);
                     data = data[node];
                 } else {
                     data = (data as Record<string, JsonValue>)[node];

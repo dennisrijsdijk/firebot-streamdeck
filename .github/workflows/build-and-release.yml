@@ -20,7 +20,7 @@ jobs:
       dobuild: ${{ steps.dobuild.outputs.dobuild }}
 
     steps:
-      - name: Checkout crowbartools/firebot
+      - name: Checkout dennisrijsdijk/firebot-streamdeck
         uses: actions/checkout@v3
         with:
           fetch-depth: 0

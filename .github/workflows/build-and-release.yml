@@ -1,0 +1,103 @@
+name: Build and Draft Release
+
+# Only runs
+# - after PRs have been merged into master
+# - when a user specifically requests the workflow to run on a branch
+on:
+  workflow_dispatch:
+  push:
+    branches: master
+
+jobs:
+
+  checkversion:
+    name: Check if version has corrosponding tag
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.plugin_version.outputs.propStr }}
+      commits: ${{ steps.commits.outputs.commits }}
+      template: ${{ steps.template.outputs.template }}
+      dobuild: ${{ steps.dobuild.outputs.dobuild }}
+
+    steps:
+      - name: Checkout crowbartools/firebot
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Retrieve Plugin version
+        id: plugin_version
+        uses: notiz-dev/github-action-json-property@release
+        with:
+          path: 'gg.dennis.firebot.sdPlugin/manifest.json'
+          prop_path: 'Version'
+
+      - name: Get commit messages
+        id: commits
+        shell: bash
+        run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          RES=$(git log --pretty=format:'- %s' --branches=origin/v5 $(git describe --tags `git rev-list --tags --max-count=1`)..HEAD)
+          echo "commits<<${EOF}" >> $GITHUB_OUTPUT
+          echo "${RES}" >> $GITHUB_OUTPUT
+          echo "${EOF}" >> $GITHUB_OUTPUT
+
+      - name: Read Release Template
+        id: template
+        shell: bash
+        run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          TEMPLATE=`cat './.github/release-template.md'`
+          echo "template<<${EOF}" >> $GITHUB_OUTPUT
+          echo "${TEMPLATE}" >> $GITHUB_OUTPUT
+          echo "${EOF}" >> $GITHUB_OUTPUT
+
+      - name: 'Check: package version has corrosponding git tag'
+        id: dobuild
+        shell: bash
+        run: echo dobuild=$(git show-ref --tags --verify --quiet -- "refs/tags/v${{ steps.version.outputs.version }}" && echo 0 || echo 1) >> $GITHUB_OUTPUT
+
+  compile:
+    name: 'Compile'
+    needs: [checkversion]
+    if: needs.checkversion.outputs.dobuild == 1
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.11.0'
+
+      - name: Install correct npm version
+        run: npm install -g npm@10.2.4
+
+      - name: Install Project Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Pack
+        run: streamdeck pack gg.dennis.firebot.sdPlugin
+
+      - name: Rename Binary
+        run: mv gg.dennis.firebot.streamDeckPlugin gg.dennis.firebot-v${{ needs.checkversion.outputs.version }}.streamDeckPlugin
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          token: ${{ env.GITHUB_TOKEN }}
+          draft: true
+          prerelease: false
+          tag_name: v${{ needs.checkversion.outputs.version }}
+          name: Release v${{ needs.checkversion.outputs.version }}
+          body: ${{ format(needs.checkversion.outputs.template, needs.checkversion.outputs.version, needs.checkversion.outputs.commits) }}
+          generate_release_notes: false
+          files: |
+            ./gg.dennis.firebot-v${{ needs.checkversion.outputs.version }}.streamdeckPlugin

@@ -10,4 +10,4 @@
 {1}
 
 ## Install (sideload)
-- Download and run gg.dennis.firebot.streamdeckPlugin
+- Download and run gg.dennis.firebot-v{0}.streamDeckPlugin

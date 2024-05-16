@@ -14,7 +14,7 @@ jobs:
     name: Check if version has corrosponding tag
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.plugin_version.outputs.propStr }}
+      version: ${{ steps.plugin_version.outputs.prop }}
       commits: ${{ steps.commits.outputs.commits }}
       template: ${{ steps.template.outputs.template }}
       dobuild: ${{ steps.dobuild.outputs.dobuild }}

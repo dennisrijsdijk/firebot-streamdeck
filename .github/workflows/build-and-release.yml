@@ -103,4 +103,4 @@ jobs:
           body: ${{ format(needs.checkversion.outputs.template, needs.checkversion.outputs.version, needs.checkversion.outputs.commits) }}
           generate_release_notes: false
           files: |
-            ./gg.dennis.firebot-v${{ needs.checkversion.outputs.version }}.streamdeckPlugin
+            ./gg.dennis.firebot-v${{ needs.checkversion.outputs.version }}.streamDeckPlugin

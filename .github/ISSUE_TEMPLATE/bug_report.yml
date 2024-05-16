@@ -1,0 +1,68 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please search to see if an issue already exists for the bug you encountered.
+      options:
+      - label: I have searched the existing issues
+        required: true
+  - type: textarea
+    attributes:
+      label: Current Behavior
+      description: A concise description of what you're experiencing.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A concise description of what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Steps To Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Go to...
+        2. Click on...
+        3. See error...
+    validations:
+      required: true
+  - type: input
+    id: sd_version
+    attributes:
+      label: Stream Deck Version
+      description: What version of Elgato Stream Deck are you running? You can find this in the Stream Deck settings.
+    validations:
+      required: true
+    - type: input
+    id: plugin_version
+    attributes:
+      label: Firebot Plugin Version
+      description: What version of the Firebot Plugin are you running? You can find this in the Stream Deck Plugins page.
+    validations:
+      required: true
+  - type: dropdown
+    id: os_type
+    attributes:
+      label: What operating system are you using the Stream Deck Plugin on?
+      options:
+        - Windows
+        - MacOS
+    validations:
+      required: true
+  - type: input
+    id: os_version
+    attributes:
+      label: OS Version
+      description: What's the version of the operating system
+    validations:
+      required: true

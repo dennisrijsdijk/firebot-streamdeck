@@ -6,7 +6,7 @@ name: Build and Draft Release
 on:
   workflow_dispatch:
   push:
-    branches: master
+    branches: main
 
 jobs:
 

@@ -9,3 +9,7 @@ export type ReplaceVariable = {
     evaluator: (trigger: ReplaceVariableTrigger<unknown>, ...args: unknown[]) => Promise<unknown>;
     handle: string;
 }
+
+export type ShorthandLookup = (name: string) => {
+    evaluator: (trigger: ReplaceVariableTrigger<unknown>, ...args: unknown[]) => Promise<unknown>;
+}

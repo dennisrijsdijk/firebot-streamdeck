@@ -67,7 +67,22 @@ class PiCommand implements PiAction {
             ));
         }
 
-        const id = commandSelect.find("option:selected").val() as string;
+        const settingsId = this.settings.action.id;
+
+        const systemId = systemCommandOptGroup.find("option:selected").val() as string;
+        const customId = customCommandOptGroup.find("option:selected").val() as string;
+
+        let id: string;
+
+        if (systemId === settingsId) {
+            id = systemId;
+        } else if (customId === settingsId) {
+            id = customId;
+        }
+
+        if (id == null) {
+            id = commands[0].id;
+        }
 
         if (id !== this.settings.action.id) {
             this.settings.action.id = id;

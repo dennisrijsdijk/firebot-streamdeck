@@ -3,13 +3,15 @@ import { ActionBaseSettings, CustomRoleSettings } from "../../types/settings";
 import streamDeck from "@elgato/streamdeck";
 import { ROUTE } from "../../constants";
 import { FirebotCustomRoleData } from "../../types/firebot";
-import $ from 'jquery';
+import * as dom from '../dom';
 import settingsCache from "../settingsCache";
 
 class PiCustomRole implements PiAction {
     private get settings() {
         return settingsCache.action as ActionBaseSettings<CustomRoleSettings>;
     }
+
+    private id = document.getElementById('id') as HTMLSelectElement;
 
     private async getRoles(endpoint: string): Promise<FirebotCustomRoleData[]> {
         const roles = await streamDeck.plugin.fetch<FirebotCustomRoleData[]>({
@@ -49,33 +51,22 @@ class PiCustomRole implements PiAction {
     async populateRoles() {
         const roles = await this.getRoles(settingsCache.action.endpoint);
 
-        const roleSelect = $('#role-id-select');
+        this.id.innerHTML = '';
 
-        roleSelect.find('option').remove();
-
-        for (let idx = 0; idx < roles.length; idx++) {
-            const role = roles[idx];
-            roleSelect.append(new Option(
-                role.name,
-                role.id,
-                idx === 0,
-                role.id === this.settings.action.id
-            ));
+        for (const role of roles) {
+            this.id.add(dom.createOption(role.name, role.id, role.id === this.settings.action.id));
         }
 
-        const id = roleSelect.find("option:selected").val() as string;
-
-        if (id !== this.settings.action.id) {
-            this.settings.action.id = id;
+        if (this.id.value !== this.settings.action.id) {
+            this.id.value = roles[0].id
+            this.settings.action.id = roles[0].id;
             await settingsCache.saveAction();
         }
     }
 
     async populateElements(): Promise<void> {
-        const roleSelect = $('#role-id-select');
-
-        roleSelect.on('change', async () => {
-            this.settings.action.id = roleSelect.find("option:selected").val() as string;
+        this.id.addEventListener('change', async () => {
+            this.settings.action.id = this.id.value;
             await settingsCache.saveAction();
         });
 

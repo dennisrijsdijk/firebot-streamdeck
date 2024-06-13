@@ -3,13 +3,17 @@ import { ActionBaseSettings, CommandSettings } from "../../types/settings";
 import streamDeck from "@elgato/streamdeck";
 import { ROUTE } from "../../constants";
 import { FirebotCommandData } from "../../types/firebot";
-import $ from 'jquery';
+import * as dom from '../dom';
 import settingsCache from "../settingsCache";
 
 class PiCommand implements PiAction {
     private get settings() {
         return settingsCache.action as ActionBaseSettings<CommandSettings>;
     }
+
+    private id = document.getElementById('id') as HTMLSelectElement;
+
+    private arguments = document.getElementById('arguments') as HTMLInputElement;
 
     private async getCommands(endpoint: string): Promise<FirebotCommandData[]> {
         const commands = await streamDeck.plugin.fetch<FirebotCommandData[]>({
@@ -49,60 +53,31 @@ class PiCommand implements PiAction {
 
     async populateCommands() {
         const commands = await this.getCommands(settingsCache.action.endpoint);
-        const commandSelect = $('#queue-id-select');
-        const systemCommandOptGroup = $('#sdpi-system-commands-optgroup');
-        const customCommandOptGroup = $('#sdpi-custom-commands-optgroup');
 
-        systemCommandOptGroup.find('option').remove();
-        customCommandOptGroup.find('option').remove();
+        this.id.innerHTML = "";
 
         for (let idx = 0; idx < commands.length; idx++) {
             const command = commands[idx];
-            const optGroup = command.type === "system" ? systemCommandOptGroup : customCommandOptGroup;
-            optGroup.append(new Option(
-                command.trigger,
-                command.id,
-                idx === 0,
-                command.id === this.settings.action.id
-            ));
+            const option = dom.createOption(command.trigger, command.id, command.id === this.settings.action.id);
+            this.id.add(option);
         }
 
-        const settingsId = this.settings.action.id;
-
-        const systemId = systemCommandOptGroup.find("option:selected").val() as string;
-        const customId = customCommandOptGroup.find("option:selected").val() as string;
-
-        let id: string;
-
-        if (systemId === settingsId) {
-            id = systemId;
-        } else if (customId === settingsId) {
-            id = customId;
-        }
-
-        if (id == null) {
-            id = commands[0].id;
-        }
-
-        if (id !== this.settings.action.id) {
-            this.settings.action.id = id;
+        if (this.id.value !== this.settings.action.id) {
+            this.settings.action.id = commands[0].id;
             await settingsCache.saveAction();
         }
     }
 
     async populateElements(): Promise<void> {
-        const commandSelect = $('#command-id-select');
-        const commandArgs = $('#command-args');
-
-        commandSelect.on('change', async () => {
-            this.settings.action.id = commandSelect.find("option:selected").val() as string;
+        this.id.addEventListener('change', async () => {
+            this.settings.action.id = this.id.value;
             await settingsCache.saveAction();
         });
 
-        commandArgs.val(this.settings.action.args);
+        this.arguments.value = this.settings.action.args;
 
-        commandArgs.on('input', async () => {
-            this.settings.action.args = commandArgs.val() as string;
+        this.arguments.addEventListener('input', async () => {
+            this.settings.action.args = this.arguments.value;
             await settingsCache.saveAction();
         });
 

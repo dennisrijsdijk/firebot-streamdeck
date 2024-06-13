@@ -3,13 +3,16 @@ import { ActionBaseSettings, TimerSettings } from "../../types/settings";
 import streamDeck from "@elgato/streamdeck";
 import { ROUTE } from "../../constants";
 import { FirebotTimerData } from "../../types/firebot";
-import $ from 'jquery';
+import * as dom from "../dom";
 import settingsCache from "../settingsCache";
 
 class PiTimer implements PiAction {
     private get settings() {
         return settingsCache.action as ActionBaseSettings<TimerSettings>;
     }
+
+    private id = document.getElementById('id') as HTMLSelectElement;
+    private action = document.getElementById('action') as HTMLSelectElement;
 
     private async getTimers(endpoint: string): Promise<FirebotTimerData[]> {
         const timers = await streamDeck.plugin.fetch<FirebotTimerData[]>({
@@ -50,41 +53,29 @@ class PiTimer implements PiAction {
     async populateTimers() {
         const timers = await this.getTimers(settingsCache.action.endpoint);
 
-        const timerSelect = $('#timer-id-select');
+        this.id.innerHTML = '';
 
-        timerSelect.find('option').remove();
-
-        for (let idx = 0; idx < timers.length; idx++) {
-            const timer = timers[idx];
-            timerSelect.append(new Option(
-                timer.name,
-                timer.id,
-                idx === 0,
-                timer.id === this.settings.action.id
-            ));
+        for (const timer of timers) {
+            this.id.add(dom.createOption(timer.name, timer.id, timer.id === this.settings.action.id));
         }
 
-        const id = timerSelect.find("option:selected").val() as string;
-
-        if (id !== this.settings.action.id) {
-            this.settings.action.id = id;
+        if (this.id.value !== this.settings.action.id) {
+            this.id.value = timers[0].id;
+            this.settings.action.id = timers[0].id;
             await settingsCache.saveAction();
         }
     }
 
     async populateElements(): Promise<void> {
-        const timerSelect = $('#timer-id-select');
-        const timerActionSelect = $('#timer-action-select');
-
-        timerSelect.on('change', async () => {
-            this.settings.action.id = timerSelect.find("option:selected").val() as string;
+        this.id.addEventListener('change', async () => {
+            this.settings.action.id = this.id.value;
             await settingsCache.saveAction();
         });
 
-        timerActionSelect.val(this.settings.action.action);
+        this.action.value = (this.settings.action.action);
 
-        timerActionSelect.on('change', async () => {
-            this.settings.action.action = timerActionSelect.find("option:selected").val() as TimerSettings["action"];
+        this.action.addEventListener('change', async () => {
+            this.settings.action.action = this.action.value as TimerSettings["action"];
             await settingsCache.saveAction();
         });
 

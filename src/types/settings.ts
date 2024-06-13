@@ -41,7 +41,7 @@ export type PresetEffectListSettings = {
 
 export type TimerSettings = {
     id: string | null;
-    action: "pause" | "resume" | "toggle" | "clear";
+    action: "enable" | "disable" | "toggle" | "clear";
 }
 
 export type CustomVariableSettings = {

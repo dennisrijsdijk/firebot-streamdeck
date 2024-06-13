@@ -14,7 +14,6 @@
 		"@rollup/plugin-terser": "^0.4.4",
 		"@rollup/plugin-typescript": "^11.1.5",
 		"@tsconfig/node20": "^20.1.2",
-		"@types/jquery": "^3.5.29",
 		"@types/node": "20.8.10",
 		"@typescript-eslint/eslint-plugin": "^5.62.0",
 		"@typescript-eslint/parser": "^5.62.0",
@@ -29,7 +28,6 @@
 		"@elgato/streamdeck": "^0.4.0-beta.2",
 		"eventemitter3": "^5.0.1",
 		"expressionish": "github:SReject/expressionish#51536858317c92765f377fc39224bc39e767e464",
-		"jquery": "^3.7.1",
 		"mathjs": "^12.4.2"
 	},
 	"volta": {

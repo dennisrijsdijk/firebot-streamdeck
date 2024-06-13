@@ -3,13 +3,22 @@ import { ActionBaseSettings, CounterSettings } from "../../types/settings";
 import streamDeck from "@elgato/streamdeck";
 import { ROUTE } from "../../constants";
 import { FirebotCounterData } from "../../types/firebot";
-import $ from 'jquery';
+import * as dom from '../dom';
 import settingsCache from "../settingsCache";
 
 class PiCounter implements PiAction {
     private get settings() {
         return settingsCache.action as ActionBaseSettings<CounterSettings>;
     }
+
+    private get mode() {
+        return document.querySelector<HTMLInputElement>("input[name='mode']:checked").value;
+    }
+
+    private set = document.getElementById('set') as HTMLInputElement;
+    private update = document.getElementById('update') as HTMLInputElement;
+    private value = document.getElementById('value') as HTMLInputElement;
+    private id = document.getElementById('id') as HTMLSelectElement;
 
     private async getCounters(endpoint: string): Promise<FirebotCounterData[]> {
         const counters = await streamDeck.plugin.fetch<FirebotCounterData[]>({
@@ -51,44 +60,31 @@ class PiCounter implements PiAction {
     async populateCounters() {
         const counters = await this.getCounters(settingsCache.action.endpoint);
 
-        const counterSelect = $('#counter-id-select');
+        this.id.innerHTML = '';
 
-        counterSelect.find('option').remove();
-
-        for (let idx = 0; idx < counters.length; idx++) {
-            const counter = counters[idx];
-            counterSelect.append(new Option(
-                counter.name,
-                counter.id,
-                idx === 0,
-                counter.id === this.settings.action.id
-            ));
+        for (const counter of counters) {
+            this.id.add(dom.createOption(counter.name, counter.id, counter.id === this.settings.action.id));
         }
 
-        const id = counterSelect.find("option:selected").val() as string;
-
-        if (id !== this.settings.action.id) {
-            this.settings.action.id = id;
+        if (this.id.value !== this.settings.action.id) {
+            this.id.value = counters[0].id;
+            this.settings.action.id = counters[0].id;
             await settingsCache.saveAction();
         }
     }
 
     async populateElements(): Promise<void> {
-        const counterRadio = $('input[type=radio][name=counter-radio]');
-        const counterSet = $('#counter-set');
-        const counterUpdate = $('#counter-update');
-        const counterValue = $('#counter-value');
-        const counterSelect = $('#counter-id-select');
-
-        counterValue.val(this.settings.action.value);
+        this.value.value = this.settings.action.value.toString();
         if (this.settings.action.action === "set") {
-            counterSet.attr('checked', 'checked');
+            this.set.setAttribute('checked', '');
+            this.update.removeAttribute('checked');
         } else {
-            counterUpdate.attr('checked', 'checked');
+            this.update.setAttribute('checked', '');
+            this.set.removeAttribute('checked');
         }
 
-        counterValue.on('input', async () => {
-            const value = counterValue.val() as string;
+        this.value.addEventListener('input', async () => {
+            const value = this.value.value;
             if (isNaN(parseInt(value, 10))) {
                 return;
             }
@@ -97,13 +93,15 @@ class PiCounter implements PiAction {
             await settingsCache.saveAction();
         });
 
-        counterRadio.on('change', async () => {
-            this.settings.action.action = $('input[name=counter-radio]:checked').val() as CounterSettings["action"];
-            await settingsCache.saveAction();
-        });
+        [this.set, this.update].forEach((radio) => {
+            radio.addEventListener('change', async () => {
+                this.settings.action.action = this.mode as "update" | "set";
+                await settingsCache.saveAction();
+            })
+        })
 
-        counterSelect.on('change', async () => {
-            this.settings.action.id = counterSelect.find("option:selected").val() as string;
+        this.id.addEventListener('change', async () => {
+            this.settings.action.id = this.id.value;
             await settingsCache.saveAction();
         });
 

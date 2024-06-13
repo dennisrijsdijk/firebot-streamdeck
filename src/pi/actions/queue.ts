@@ -3,13 +3,16 @@ import { ActionBaseSettings, QueueSettings } from "../../types/settings";
 import streamDeck from "@elgato/streamdeck";
 import { ROUTE } from "../../constants";
 import { FirebotQueueData } from "../../types/firebot";
-import $ from 'jquery';
+import * as dom from "../dom";
 import settingsCache from "../settingsCache";
 
 class PiQueue implements PiAction {
     private get settings() {
         return settingsCache.action as ActionBaseSettings<QueueSettings>;
     }
+
+    private id = document.getElementById('id') as HTMLSelectElement;
+    private action = document.getElementById('action') as HTMLSelectElement;
 
     private async getQueues(endpoint: string): Promise<FirebotQueueData[]> {
         const queues = await streamDeck.plugin.fetch<FirebotQueueData[]>({
@@ -50,41 +53,29 @@ class PiQueue implements PiAction {
     async populateQueues() {
         const queues = await this.getQueues(settingsCache.action.endpoint);
 
-        const queueSelect = $('#queue-id-select');
+        this.id.innerHTML = '';
 
-        queueSelect.find('option').remove();
-
-        for (let idx = 0; idx < queues.length; idx++) {
-            const queue = queues[idx];
-            queueSelect.append(new Option(
-                queue.name,
-                queue.id,
-                idx === 0,
-                queue.id === this.settings.action.id
-            ));
+        for (const queue of queues) {
+            this.id.add(dom.createOption(queue.name, queue.id, queue.id === this.settings.action.id));
         }
 
-        const id = queueSelect.find("option:selected").val() as string;
-
-        if (id !== this.settings.action.id) {
-            this.settings.action.id = id;
+        if (this.id.value !== this.settings.action.id) {
+            this.id.value = queues[0].id;
+            this.settings.action.id = queues[0].id;
             await settingsCache.saveAction();
         }
     }
 
     async populateElements(): Promise<void> {
-        const queueSelect = $('#queue-id-select');
-        const queueActionSelect = $('#queue-action-select');
-
-        queueSelect.on('change', async () => {
-            this.settings.action.id = queueSelect.find("option:selected").val() as string;
+        this.id.addEventListener('change', async () => {
+            this.settings.action.id = this.id.value;
             await settingsCache.saveAction();
         });
 
-        queueActionSelect.val(this.settings.action.action);
+        this.action.value = this.settings.action.action;
 
-        queueActionSelect.on('change', async () => {
-            this.settings.action.action = queueActionSelect.find("option:selected").val() as QueueSettings["action"];
+        this.action.addEventListener('change', async () => {
+            this.settings.action.action = this.action.value as QueueSettings["action"];
             await settingsCache.saveAction();
         });
 

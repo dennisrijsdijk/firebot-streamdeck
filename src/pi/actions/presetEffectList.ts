@@ -3,13 +3,16 @@ import { ActionBaseSettings, PresetEffectListSettings } from "../../types/settin
 import streamDeck from "@elgato/streamdeck";
 import { ROUTE } from "../../constants";
 import { FirebotPresetEffectListData } from "../../types/firebot";
-import $ from 'jquery';
+import * as dom from '../dom';
 import settingsCache from "../settingsCache";
 
 class PiPresetEffectList implements PiAction {
     private get settings() {
         return settingsCache.action as ActionBaseSettings<PresetEffectListSettings>;
     }
+
+    private arguments = document.getElementById('arguments') as HTMLDivElement;
+    private id = document.getElementById('id') as HTMLSelectElement;
 
     private async getPresetLists(endpoint: string): Promise<FirebotPresetEffectListData[]> {
         const presetLists = await streamDeck.plugin.fetch<FirebotPresetEffectListData[]>({
@@ -50,24 +53,15 @@ class PiPresetEffectList implements PiAction {
     async populatePresetLists() {
         const presetLists = await this.getPresetLists(settingsCache.action.endpoint);
 
-        const presetListSelect = $('#presetlist-id-select');
+        this.id.innerHTML = '';
 
-        presetListSelect.find('option').remove();
-
-        for (let idx = 0; idx < presetLists.length; idx++) {
-            const presetList = presetLists[idx];
-            presetListSelect.append(new Option(
-                presetList.name,
-                presetList.id,
-                idx === 0,
-                presetList.id === this.settings.action.id
-            ));
+        for (const presetList of presetLists) {
+            this.id.add(dom.createOption(presetList.name, presetList.id, presetList.id === this.settings.action.id));
         }
 
-        const id = presetListSelect.find("option:selected").val() as string;
-
-        if (id !== this.settings.action.id) {
-            this.settings.action.id = id;
+        if (this.id.value !== this.settings.action.id) {
+            this.id.value = presetLists[0].id;
+            this.settings.action.id = presetLists[0].id;
             await settingsCache.saveAction();
         }
 
@@ -77,34 +71,33 @@ class PiPresetEffectList implements PiAction {
     }
 
     populatePresetListArgs(args: string[]) {
-        const presetListArgsContainer = $('#preset-list-arg-container');
-        presetListArgsContainer.find('div').remove();
+        this.arguments.innerHTML = '';
 
         for (const arg of args) {
-            //language=HTML
-            const sdpiItem = $(`
-                <div class="sdpi-item">
-                    <div class="sdpi-item-label">${arg}</div>
-                </div>
-            `);
-            const sdpiItemValue = $(`<input class="sdpi-item-value" placeholder="Argument Value">`);
+            const sdpiItem = document.createElement("div");
+            sdpiItem.classList.add("sdpi-item");
 
-            sdpiItemValue.val(this.settings.action.arguments[arg] ?? "");
-            sdpiItemValue.on('input', async () => {
-                this.settings.action.arguments[arg] = sdpiItemValue.val() as string;
+            const sdpiItemLabel = document.createElement("div");
+            sdpiItemLabel.classList.add("sdpi-item-label");
+            sdpiItemLabel.innerText = arg;
+
+            const sdpiItemValue = document.createElement("input");
+            sdpiItemValue.value = this.settings.action.arguments[arg] ?? "";
+            sdpiItemValue.addEventListener('input', async () => {
+                this.settings.action.arguments[arg] = sdpiItemValue.value;
                 await settingsCache.saveAction();
             });
 
-            sdpiItem.append(sdpiItemValue);
-            presetListArgsContainer.append(sdpiItem);
+            sdpiItem.appendChild(sdpiItemLabel);
+            sdpiItem.appendChild(sdpiItemValue);
+
+            this.arguments.appendChild(sdpiItem);
         }
     }
 
     async populateElements(): Promise<void> {
-        const presetListSelect = $('#presetlist-id-select');
-
-        presetListSelect.on('change', async () => {
-            this.settings.action.id = presetListSelect.find("option:selected").val() as string;
+        this.id.addEventListener('change', async () => {
+            this.settings.action.id = this.id.value;
             const lists = await this.getPresetLists(this.settings.endpoint);
             const maybeList = lists.find(list => list.id === this.settings.action.id);
             this.populatePresetListArgs(maybeList?.args || []);

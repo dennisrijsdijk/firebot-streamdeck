@@ -3,6 +3,16 @@
 <head>
     <title>{{ACTION_UUID}} Property Inspector</title>
     <link rel="stylesheet" href="sdpi.css">
+    <style>
+        .show {
+            opacity: 1;
+            transition: opacity 400ms;
+        }
+        .hide {
+            opacity: 0;
+            transition: opacity 400ms;
+        }
+    </style>
 </head>
 <body>
 
@@ -10,61 +20,61 @@
     <div type="tabs" class="sdpi-item">
         <div class="sdpi-item-label empty"></div>
         <div class="tabs">
-            <div data-localize class="tab selected" data-target="#sdpi-tab-action-settings" title="Action Settings">Action</div>
-            <div data-localize class="tab" data-target="#sdpi-tab-instance-settings" title="Plugin Instance Settings">Instances</div>
+            <div data-localize class="tab selected" data-target="#tab-action" title="Action Settings">Action</div>
+            <div data-localize class="tab" data-target="#tab-instances" title="Plugin Instance Settings">Instances</div>
         </div>
     </div>
     <hr class="tab-separator" />
 
-    <div id="sdpi-tab-action-settings" class="tab-container" style="display: block">
-        <div id="sd-base-settings-container">
-            <div class="sdpi-item" id="sdpi-action-instance-div">
+    <div id="tab-action" class="tab-container" style="display: block">
+        <div>
+            <div class="sdpi-item">
                 <div class="sdpi-item-label">Firebot Instance</div>
-                <select class="sdpi-item-value select" id="sdpi-action-instance-select">
+                <select class="sdpi-item-value select" id="instance">
                 </select>
             </div>
-            <div type="textarea" class="sdpi-item" id="sd-title-format-div">
+            <div type="textarea" class="sdpi-item">
                 <div class="sdpi-item-label">Title</div>
                 <span class="sdpi-item-value textarea">
-            <textarea type="textarea" id="sd-title-format" rows="{{TITLE_ROWS}}"></textarea>
+            <textarea type="textarea" id="title" rows="{{TITLE_ROWS}}"></textarea>
         </span>
             </div>
         </div>
 
-        <div id="sd-action-settings-container">
+        <div>
             {{ACTION_HTML_TEMPLATE}}
         </div>
     </div>
 
-    <div id="sdpi-tab-instance-settings" class="tab-container" style="display: none">
+    <div id="tab-instances" class="tab-container" style="display: none">
         <div class="sdpi-item">
             <div class="sdpi-item-label">Instance Name</div>
-            <input class="sdpi-item-value" id="sdpi-new-instance-name" value="" placeholder="Enter a name for a new instance">
+            <input class="sdpi-item-value" id="instance-name" value="" placeholder="Enter a name for a new instance">
         </div>
         <div class="sdpi-item">
-            <div class="sdpi-item-label">Instance IP</div>
-            <input class="sdpi-item-value" id="sdpi-new-instance-endpoint" value="" placeholder="Enter the IP for the new instance">
+            <div class="sdpi-item-label">Instance Endpoint</div>
+            <input class="sdpi-item-value" id="instance-endpoint" value="" placeholder="Enter the IP for the new instance">
         </div>
 
-        <details id="sdpi-new-instance-error-div" class="message caution" style="display: none;">
-            <summary id="sdpi-new-instance-error">Instance Endpoint or Name already in use.</summary>
+        <details id="error-div" class="message caution hide" style="display: none;">
+            <summary id="error">Instance Endpoint or Name already in use.</summary>
         </details>
 
         <div class="sdpi-item">
             <div class="sdpi-item-label">New Instance</div>
-            <button class="sdpi-item-value" id="sdpi-create-new-instance-button">Create</button>
+            <button class="sdpi-item-value" id="create">Create</button>
         </div>
 
         <div class="sdpi-heading">Manage Instances</div>
 
-        <div class="sdpi-item" id="instance_management_select_div">
-            <select class="sdpi-item-value select" id="sdpi-instance-management-select">
+        <div class="sdpi-item">
+            <select class="sdpi-item-value select" id="management">
             </select>
         </div>
 
         <div class="sdpi-item">
-            <button class="sdpi-item-value" id="sdpi-set-default-instance-button">Set Default</button>
-            <button class="sdpi-item-value" id="sdpi-delete-instance-button">Delete</button>
+            <button class="sdpi-item-value" id="default">Set Default</button>
+            <button class="sdpi-item-value" id="delete">Delete</button>
         </div>
     </div>
 </div>

@@ -256,6 +256,11 @@ export class FirebotInstance extends ApiBase {
             ]);
             this._data.status = FirebotInstanceStatus.ONLINE;
         } catch (err) {
+            this._counters = [];
+            this._customVariables = {};
+            this._queues = [];
+            this._customRoles = [];
+            this._timers = [];
             this._data.status = FirebotInstanceStatus.OFFLINE;
         }
     }

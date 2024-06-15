@@ -10,25 +10,35 @@ import { ActionBaseSettings } from "../types/settings";
 import ReplaceVariablesManager from "./replaceVariablesManager";
 import firebotService from "./firebot-api/service";
 
+export type CachedAction<T> = {
+    manifestId: string;
+    settings: ActionBaseSettings<T>;
+}
+
 export class ActionBase<T extends JsonObject> extends SingletonAction<ActionBaseSettings<T>> {
-    // "context": "manifestId"
-    private readonly actions: Record<string, string>;
+    private readonly actions: Record<string, CachedAction<T>>;
 
     constructor() {
         super();
         this.actions = {};
-        firebotService.on('data_updated', async () => {
+        firebotService.on('data_updated', async (endpoint: string) => {
             await Promise.all(Object.keys(this.actions).map(async (context) => {
+                if (this.actions[context].settings.endpoint !== endpoint) {
+                    return;
+                }
                 const action = streamDeck.actions.createController(context);
-                const manifestId = this.actions[context];
-                return this.update(action, manifestId);
+                const cachedAction = this.actions[context];
+                return this.update(action, cachedAction);
             }));
         });
     }
 
     async onWillAppear(ev: WillAppearEvent<ActionBaseSettings<T>>): Promise<void> {
-        this.actions[ev.action.id] = ev.action.manifestId;
-        return this.update(ev.action, ev.action.manifestId, ev.payload.settings);
+        this.actions[ev.action.id] = {
+            manifestId: ev.action.manifestId,
+            settings: ev.payload.settings
+        };
+        return this.update(ev.action, this.actions[ev.action.id]);
     }
 
     onWillDisappear(ev: WillDisappearEvent<ActionBaseSettings<T>>): Promise<void> | void {
@@ -36,26 +46,20 @@ export class ActionBase<T extends JsonObject> extends SingletonAction<ActionBase
     }
 
     async onDidReceiveSettings(ev: DidReceiveSettingsEvent<ActionBaseSettings<T>>) {
-        return this.update(ev.action, ev.action.manifestId, ev.payload.settings);
+        if (this.actions[ev.action.id] == null) {
+            return;
+        }
+        this.actions[ev.action.id].settings = ev.payload.settings;
+        return this.update(ev.action, this.actions[ev.action.id]);
     }
 
-    async update(action: Omit<Action<ActionBaseSettings<T>>, "manifestId">, manifestId: string, newSettings?: ActionBaseSettings<T>): Promise<void> {
-        if (newSettings == null) {
-            // getSettings fires an onDidReceiveSettings event, causing the key to trigger twice if we don't return here
-            await action.getSettings<ActionBaseSettings<T>>();
-            return;
-        }
-
-        if (newSettings.endpoint == null || newSettings.title == null) {
-            return;
-        }
-
+    async update(action: Omit<Action<ActionBaseSettings<T>>, "manifestId">, cachedAction: CachedAction<T>): Promise<void> {
         const meta = {
-            actionId: manifestId,
-            settings: newSettings
+            actionId: cachedAction.manifestId,
+            settings: cachedAction.settings
         };
 
-        const title = await ReplaceVariablesManager.evaluate(newSettings.title, meta);
+        const title = await ReplaceVariablesManager.evaluate(meta.settings.title, meta);
         return action.setTitle(title);
     }
 }

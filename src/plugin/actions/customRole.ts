@@ -11,15 +11,7 @@ export class CustomRole extends ActionBase<CustomRoleSettings> {
 
     @route(ROUTE.CUSTOMROLE)
     getRoles(request?: MessageRequest<EndpointBody, ActionBaseSettings<CustomRoleSettings>>) {
-        let endpoint = request?.body?.endpoint;
-        if (endpoint == null) {
-            endpoint = "127.0.0.1";
-        }
-        const instance = firebotService.instances.find(inst => inst.data.endpoint === endpoint);
-        if (!instance) {
-            return [];
-        }
-        return instance.customRoles.map(role => role.data);
+        return firebotService.getInstance(request.body.endpoint).customRoles.map(role => role.data);
     }
 
     async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<CustomRoleSettings>>): Promise<void> {
@@ -31,15 +23,13 @@ export class CustomRole extends ActionBase<CustomRoleSettings> {
             return ev.action.showAlert();
         }
 
-        const maybeInstance = firebotService.instances.find((instance) => {
-            return instance.data.endpoint === ev.payload.settings.endpoint;
-        });
+        const instance = firebotService.getInstance(ev.payload.settings.endpoint);
 
-        if (!maybeInstance) {
+        if (instance.isNull) {
             return ev.action.showAlert();
         }
 
-        const maybeRole = maybeInstance.customRoles.find((role) => {
+        const maybeRole = instance.customRoles.find((role) => {
             return role.data.id === ev.payload.settings.action.id;
         });
 
@@ -49,6 +39,9 @@ export class CustomRole extends ActionBase<CustomRoleSettings> {
 
         await maybeRole.clear();
 
-        return this.update(ev.action, ev.action.manifestId, ev.payload.settings);
+        return this.update(ev.action, {
+            manifestId: ev.action.manifestId,
+            settings: ev.payload.settings
+        });
     }
 }

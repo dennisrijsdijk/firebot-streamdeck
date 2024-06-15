@@ -8,8 +8,8 @@ export function getCustomVariable(endpoint: string, name: string, propertyPath: 
         return null;
     }
 
-    const instance = firebotService.instances.find(inst => inst.data.endpoint === endpoint);
-    if (!instance) {
+    const instance = firebotService.getInstance(endpoint);
+    if (instance.isNull) {
         return null;
     }
 

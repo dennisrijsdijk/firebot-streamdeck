@@ -16,11 +16,9 @@ export class CustomVariable extends ActionBase<CustomVariableSettings> {
             return ev.action.showAlert();
         }
 
-        const maybeInstance = firebotService.instances.find((instance) => {
-            return instance.data.endpoint === ev.payload.settings.endpoint;
-        });
+        const instance = firebotService.getInstance(ev.payload.settings.endpoint);
 
-        if (!maybeInstance) {
+        if (instance.isNull) {
             return ev.action.showAlert();
         }
 
@@ -36,9 +34,9 @@ export class CustomVariable extends ActionBase<CustomVariableSettings> {
         let result: boolean;
 
         if (ev.payload.settings.action.propertyPath == null || ev.payload.settings.action.propertyPath === "") {
-            result = await maybeInstance.setCustomVariable(ev.payload.settings.action.name, value);
+            result = await instance.setCustomVariable(ev.payload.settings.action.name, value);
         } else {
-            result = await maybeInstance.setCustomVariableWithPath(
+            result = await instance.setCustomVariableWithPath(
                 ev.payload.settings.action.name,
                 value,
                 ev.payload.settings.action.propertyPath
@@ -46,7 +44,10 @@ export class CustomVariable extends ActionBase<CustomVariableSettings> {
         }
 
         if (result) {
-            return this.update(ev.action, ev.action.manifestId, ev.payload.settings);
+            return this.update(ev.action, {
+                manifestId: ev.action.manifestId,
+                settings: ev.payload.settings
+            });
         }
         return ev.action.showAlert();
     }

@@ -7,9 +7,8 @@ import FirebotCustomRole from "../../plugin/firebot-api/routes/customRole";
 const model: ReplaceVariable = {
     handle: "customRoleUserCount",
     evaluator: async (trigger: ReplaceVariableTrigger<CustomRoleSettings>, roleName?: string) => {
-        const endpoint = trigger.settings.endpoint;
-        const instance = firebotService.instances.find(inst => inst.data.endpoint === endpoint);
-        if (!instance) {
+        const instance = firebotService.getInstance(trigger.settings.endpoint);
+        if (instance.isNull) {
             return null;
         }
 

@@ -5,9 +5,8 @@ import FirebotQueue from "../../plugin/firebot-api/routes/queue";
 import { ACTION, fullActionId } from "../../constants";
 
 export async function getQueue(trigger: ReplaceVariableTrigger<QueueSettings>, queueName?: string) {
-    const endpoint = trigger.settings.endpoint;
-    const instance = firebotService.instances.find(inst => inst.data.endpoint === endpoint);
-    if (!instance) {
+    const instance = firebotService.getInstance(trigger.settings.endpoint);
+    if (instance.isNull) {
         return null;
     }
 

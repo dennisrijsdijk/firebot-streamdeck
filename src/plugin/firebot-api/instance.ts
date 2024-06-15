@@ -24,7 +24,7 @@ export class FirebotInstance extends ApiBase {
     private _queues: FirebotQueue[];
     private _timers: FirebotTimer[];
     private _customVariables: Record<string, ApiCustomVariableBody>;
-    constructor(endpoint: string, name: string) {
+    constructor(endpoint?: string, name?: string) {
         super();
         this._data = {
             endpoint,
@@ -36,6 +36,10 @@ export class FirebotInstance extends ApiBase {
         this._queues = [];
         this._timers = [];
         this._customVariables = { };
+    }
+
+    get isNull() {
+        return this._data.endpoint == null;
     }
 
     get counters() {
@@ -76,36 +80,54 @@ export class FirebotInstance extends ApiBase {
     }
 
     private async fetchCounters(): Promise<FirebotCounter[]> {
+        if (this._data.endpoint == null) {
+            return [];
+        }
         return this.arrayFetch<ApiCounter, FirebotCounter>("counters", (counter) => {
             return new FirebotCounter(counter, this._data.endpoint);
         });
     }
 
     private async fetchQueues(): Promise<FirebotQueue[]> {
+        if (this._data.endpoint == null) {
+            return [];
+        }
         return this.arrayFetch<ApiQueue, FirebotQueue>("queues", (queue) => {
             return new FirebotQueue(queue, this._data.endpoint);
         });
     }
 
     private async fetchCustomRoles(): Promise<FirebotCustomRole[]> {
+        if (this._data.endpoint == null) {
+            return [];
+        }
         return this.arrayFetch<ApiCustomRole, FirebotCustomRole>("customRoles", (role) => {
             return new FirebotCustomRole(role, this._data.endpoint);
         });
     }
 
     async getPresetEffectLists(): Promise<FirebotPresetEffectList[]> {
+        if (this._data.endpoint == null) {
+            return [];
+        }
         return this.arrayFetch<ApiPresetEffectList, FirebotPresetEffectList>("effects/preset", (list) => {
             return new FirebotPresetEffectList(list, this._data.endpoint);
         });
     }
 
     private async fetchCommandsByType(type: FirebotCommandData["type"]): Promise<FirebotCommand[]> {
+        if (this._data.endpoint == null) {
+            return [];
+        }
         return this.arrayFetch<ApiCommand, FirebotCommand>(`commands/${type}`, (command) => {
             return new FirebotCommand(command, type, this._data.endpoint);
         });
     }
 
     private async fetchCustomVariables() {
+        if (this._data.endpoint == null) {
+            return {};
+        }
         const result = await fetch(`http://${this._data.endpoint}:7472/api/v1/custom-variables`, this.abortSignal);
         const variables = await result.json() as Record<string, ApiCustomVariableBody>;
         if (typeof variables === "object" && variables != null) {
@@ -130,6 +152,9 @@ export class FirebotInstance extends ApiBase {
     }
 
     private async fetchTimers() {
+        if (this._data.endpoint == null) {
+            return [];
+        }
         return this.arrayFetch<ApiTimer, FirebotTimer>("timers", (timer) => {
             return new FirebotTimer(timer, this._data.endpoint);
         });
@@ -140,11 +165,17 @@ export class FirebotInstance extends ApiBase {
     }
 
     async getCustomVariable(name: string) {
+        if (this._data.endpoint == null) {
+            return null;
+        }
         const result = await fetch(`http://${this._data.endpoint}:7472/api/v1/custom-variables/${encodeURIComponent(name)}`, this.abortSignal);
         return await result.json() as Promise<JsonValue>;
     }
 
     async setCustomVariable(name: string, data: JsonValue, ttl = 0) {
+        if (this._data.endpoint == null) {
+            return false;
+        }
         try {
             await fetch(`http://${this._data.endpoint}:7472/api/v1/custom-variables/${encodeURIComponent(name)}`, {
                 ...this.abortSignal,
@@ -170,6 +201,9 @@ export class FirebotInstance extends ApiBase {
     }
 
     async setCustomVariableWithPath(name: string, data: JsonValue, propertyPath: string, ttl = 0) {
+        if (this._data.endpoint == null) {
+            return false;
+        }
         try {
             const variable = await this.getCustomVariable(name);
             let cursor = variable;
@@ -222,6 +256,11 @@ export class FirebotInstance extends ApiBase {
             ]);
             this._data.status = FirebotInstanceStatus.ONLINE;
         } catch (err) {
+            this._counters = [];
+            this._customVariables = {};
+            this._queues = [];
+            this._customRoles = [];
+            this._timers = [];
             this._data.status = FirebotInstanceStatus.OFFLINE;
         }
     }

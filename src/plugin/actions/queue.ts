@@ -1,5 +1,5 @@
 import { Action, action, KeyDownEvent, MessageRequest, route } from "@elgato/streamdeck";
-import { ActionBase } from "../actionBase";
+import { ActionBase, CachedAction } from "../actionBase";
 import { ActionBaseSettings, QueueSettings } from "../../types/settings";
 
 import firebotService from "../firebot-api/service";
@@ -11,15 +11,7 @@ export class Queue extends ActionBase<QueueSettings> {
 
     @route(ROUTE.QUEUE)
     getQueues(request?: MessageRequest<EndpointBody, ActionBaseSettings<QueueSettings>>) {
-        let endpoint = request?.body?.endpoint;
-        if (endpoint == null) {
-            endpoint = "127.0.0.1";
-        }
-        const instance = firebotService.instances.find(inst => inst.data.endpoint === endpoint);
-        if (!instance) {
-            return [];
-        }
-        return instance.queues.map(queue => queue.data);
+        return firebotService.getInstance(request.body.endpoint).queues.map(queue => queue.data);
     }
 
     async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<QueueSettings>>): Promise<void> {
@@ -32,15 +24,13 @@ export class Queue extends ActionBase<QueueSettings> {
             return ev.action.showAlert();
         }
 
-        const maybeInstance = firebotService.instances.find((instance) => {
-            return instance.data.endpoint === ev.payload.settings.endpoint;
-        });
+        const instance = firebotService.getInstance(ev.payload.settings.endpoint);
 
-        if (!maybeInstance) {
+        if (instance.isNull) {
             return ev.action.showAlert();
         }
 
-        const maybeQueue = maybeInstance.queues.find((queue) => {
+        const maybeQueue = instance.queues.find((queue) => {
             return queue.data.id === ev.payload.settings.action.id;
         });
 
@@ -50,26 +40,23 @@ export class Queue extends ActionBase<QueueSettings> {
 
         await maybeQueue.update(ev.payload.settings.action.action);
 
-        return this.update(ev.action, ev.action.manifestId, ev.payload.settings);
+        return this.update(ev.action, {
+            manifestId: ev.action.manifestId,
+            settings: ev.payload.settings
+        });
     }
 
-    async update(action: Omit<Action<ActionBaseSettings<QueueSettings>>, "manifestId">, manifestId: string, newSettings?: ActionBaseSettings<QueueSettings>): Promise<void> {
-        await super.update(action, manifestId, newSettings);
+    async update(action: Omit<Action<ActionBaseSettings<QueueSettings>>, "manifestId">, cachedAction: CachedAction<QueueSettings>): Promise<void> {
+        await super.update(action, cachedAction);
 
-        if (!newSettings) {
+        const instance = firebotService.getInstance(cachedAction.settings.endpoint);
+
+        if (instance.isNull) {
             return;
         }
 
-        const maybeInstance = firebotService.instances.find((instance) => {
-            return instance.data.endpoint === newSettings.endpoint;
-        });
-
-        if (!maybeInstance) {
-            return;
-        }
-
-        const maybeQueue = maybeInstance.queues.find((queue) => {
-            return queue.data.id === newSettings.action.id;
+        const maybeQueue = instance.queues.find((queue) => {
+            return queue.data.id === cachedAction.settings.action.id;
         });
 
         if (!maybeQueue) {

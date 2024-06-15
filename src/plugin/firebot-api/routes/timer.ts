@@ -19,7 +19,7 @@ export default class FirebotTimer extends ApiBase {
 
     async update(mode: TimerSettings["action"]) {
         await fetch(`http://${this._endpoint}:7472/api/v1/timers/${this._data.id}/${mode}`, this.abortSignal);
-        const instance = firebotService.instances.find(instance => instance.data.endpoint === this._endpoint);
+        const instance = firebotService.getInstance(this._endpoint);
         if (instance != null) {
             await instance.updateTimers();
         }

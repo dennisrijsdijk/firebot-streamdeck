@@ -1,95 +1,98 @@
 import streamDeck, { ActionInfo, JsonObject, RegistrationInfo } from "@elgato/streamdeck";
 import { ActionBaseSettings, GlobalSettings } from "../types/settings";
 import { activateTabs } from "./tabs";
-import $ from 'jquery';
+import * as dom from "./dom";
 import PiAction from "./piAction";
 import settingsCache from "./settingsCache";
 import { getAction } from "./actions";
 
-let titleUpdateDebounce: ReturnType<typeof setTimeout>;
+const instanceSelect = document.getElementById('instance') as HTMLSelectElement;
+const instanceManagementSelect = document.getElementById('management') as HTMLSelectElement;
+const title = document.getElementById('title') as HTMLInputElement;
 
-function populateInstanceSelects() {
-    const instanceSelect = $('#sdpi-action-instance-select');
-    const instanceManagement = $('#sdpi-instance-management-select');
-    const instanceManagementSetDefault = $('#sdpi-set-default-instance-button');
-    const instanceManagementDelete = $('#sdpi-delete-instance-button');
+const newInstanceName = document.getElementById('instance-name') as HTMLInputElement;
+const newInstanceEndpoint = document.getElementById('instance-endpoint') as HTMLInputElement;
+const newInstanceButton = document.getElementById('create') as HTMLButtonElement;
+const newInstanceErrorDiv = document.getElementById('error-div') as HTMLDivElement;
+const newInstanceError = document.getElementById('error');
 
-    instanceSelect.find('option').remove();
-    instanceManagement.find('option').remove();
+const instanceManagementSetDefault = document.getElementById('default') as HTMLButtonElement;
+const instanceManagementDelete = document.getElementById('delete') as HTMLButtonElement;
 
-    for (let idx = 0; idx < settingsCache.global.instances.length; idx++) {
-        const instance = settingsCache.global.instances[idx];
-        instanceSelect.append(new Option(
-            instance.name,
-            instance.endpoint,
-            instance.endpoint === settingsCache.global.defaultEndpoint,
-            instance.endpoint === settingsCache.action.endpoint
-        ));
-        instanceManagement.append(
-            new Option(
-                `${instance.name} (${instance.endpoint}) ${instance.endpoint === settingsCache.global.defaultEndpoint ? "[DEFAULT]" : ""}`,
-                instance.endpoint,
-                idx === 0,
-                instance.endpoint === settingsCache.global.defaultEndpoint
-            )
-        );
 
-        const selected = instanceManagement.find("option:selected");
-        const disable = selected.val() as string === settingsCache.global.defaultEndpoint;
-        instanceManagementSetDefault.prop("disabled", disable);
-        instanceManagementDelete.prop("disabled", disable);
+function updateManagementButtons(endpoint: string) {
+    if (endpoint === settingsCache.global.defaultEndpoint) {
+        instanceManagementSetDefault.setAttribute('disabled', '');
+        instanceManagementDelete.setAttribute('disabled', '');
+    } else {
+        instanceManagementSetDefault.removeAttribute('disabled');
+        instanceManagementDelete.removeAttribute('disabled');
     }
 }
 
-function populateGlobalElements(action: PiAction) {
-    const instanceSelect = $('#sdpi-action-instance-select');
-    const instanceManagement = $('#sdpi-instance-management-select');
-    const instanceManagementDefault = $('#sdpi-set-default-instance-button');
-    const instanceManagementDelete = $('#sdpi-delete-instance-button');
-    const title = $('#sd-title-format');
+async function populateInstanceSelects() {
+    instanceSelect.innerHTML = '';
+    instanceManagementSelect.innerHTML = '';
 
-    populateInstanceSelects();
+    for (const instance of settingsCache.global.instances) {
+        const option = dom.createOption(instance.name, instance.endpoint, instance.endpoint === settingsCache.global.defaultEndpoint);
+        const managementOption = dom.createOption(
+            `${instance.name} (${instance.endpoint}) ${instance.endpoint === settingsCache.global.defaultEndpoint ? "[DEFAULT]" : ""}`,
+            instance.endpoint,
+            instance.endpoint === settingsCache.action.endpoint
+        );
 
-    title.val(settingsCache.action.title);
+        instanceSelect.add(option);
+        instanceManagementSelect.add(managementOption);
+    }
 
-    title.on('input', function () {
-        clearTimeout(titleUpdateDebounce);
-        titleUpdateDebounce = setTimeout(() => {
-            settingsCache.action.title = title.val() as string;
-            return settingsCache.saveAction();
-        }, 50);
+    if (instanceSelect.value !== settingsCache.action.endpoint) {
+        instanceSelect.value = settingsCache.global.defaultEndpoint;
+        settingsCache.action.endpoint = settingsCache.global.defaultEndpoint;
+        await settingsCache.saveAction();
+    }
+
+    instanceManagementSelect.value = instanceSelect.value;
+
+    updateManagementButtons(instanceManagementSelect.value);
+}
+
+async function populateGlobalElements(action: PiAction) {
+    await populateInstanceSelects();
+
+    title.value = settingsCache.action.title;
+
+    title.addEventListener('input', async () => {
+        settingsCache.action.title = title.value;
+        await settingsCache.saveAction();
     });
 
-    instanceSelect.on('change', async function () {
-        const selected = instanceSelect.find("option:selected");
-        settingsCache.action.endpoint = selected.val() as string;
+    instanceSelect.addEventListener('change', async () => {
+        settingsCache.action.endpoint = instanceSelect.value;
         await settingsCache.saveAction();
         await action.instanceUpdated();
     });
 
-    instanceManagement.on('change', async function () {
-        const selected = instanceManagement.find("option:selected");
-        const disable = selected.val() as string === settingsCache.global.defaultEndpoint;
-        instanceManagementDefault.prop("disabled", disable);
-        instanceManagementDelete.prop("disabled", disable);
+    instanceManagementSelect.addEventListener('change', async () => {
+        updateManagementButtons(instanceManagementSelect.value);
     });
 
-    instanceManagementDefault.on('click', async () => {
-        if (instanceManagementDefault.prop("disabled")) {
+    instanceManagementSetDefault.addEventListener('click', async () => {
+        if (instanceManagementSetDefault.disabled) {
             return;
         }
 
-        settingsCache.global.defaultEndpoint = instanceManagement.find("option:selected").val() as string;
+        settingsCache.global.defaultEndpoint = instanceManagementSelect.value;
         await settingsCache.saveGlobal();
         populateInstanceSelects();
     });
 
-    instanceManagementDelete.on('click', async () => {
-        if (instanceManagementDelete.prop("disabled")) {
+    instanceManagementDelete.addEventListener('click', async () => {
+        if (instanceManagementDelete.disabled) {
             return;
         }
 
-        const endpoint = instanceManagement.find("option:selected").val() as string;
+        const endpoint = instanceManagementSelect.value;
         const index = settingsCache.global.instances.findIndex(instance => instance.endpoint === endpoint);
         if (index === -1) {
             return;
@@ -100,35 +103,29 @@ function populateGlobalElements(action: PiAction) {
         populateInstanceSelects();
     });
 
-    const newInstanceName = $('#sdpi-new-instance-name');
-    const newInstanceEndpoint = $('#sdpi-new-instance-endpoint');
-    const newInstanceButton = $('#sdpi-create-new-instance-button');
-    const newInstanceErrorDiv = $('#sdpi-new-instance-error-div');
-    const newInstanceError = $('#sdpi-create-new-instance-error');
-
-    newInstanceButton.on('click', async () => {
+    newInstanceButton.addEventListener('click', async () => {
         const index = settingsCache.global.instances.findIndex((instance) => {
-            if (instance.name.toLowerCase() === (newInstanceName.val() as string).toLowerCase()) {
-                newInstanceError.val("Instance Name already in use.");
+            if (instance.name.toLowerCase() === (newInstanceName.value).toLowerCase()) {
+                newInstanceError.innerText = "Instance Name already in use.";
                 return true;
             }
-            if (instance.endpoint === newInstanceEndpoint.val()) {
-                newInstanceError.val("Instance Endpoint already in use.");
+            if (instance.endpoint.toLowerCase() === newInstanceEndpoint.value) {
+                newInstanceError.innerText = "Instance Endpoint already in use.";
                 return true;
             }
             return false;
         });
         if (index !== -1) {
-            newInstanceErrorDiv.show(200);
+            newInstanceErrorDiv.classList.replace('hide', 'show');
             return;
         }
 
-        newInstanceErrorDiv.hide(200);
+        newInstanceErrorDiv.classList.replace('show', 'hide');
 
-        const name = newInstanceName.val() as string;
-        const endpoint = newInstanceEndpoint.val() as string;
-        newInstanceName.val("");
-        newInstanceEndpoint.val("");
+        const name = newInstanceName.value;
+        const endpoint = newInstanceEndpoint.value;
+        newInstanceName.value = "";
+        newInstanceEndpoint.value = "";
 
         settingsCache.global.instances.push({
             endpoint,
@@ -154,7 +151,7 @@ streamDeck.onDidConnect(async (registration: RegistrationInfo, actionInfo: Actio
         await action.defaultSettings();
     }
 
-    populateGlobalElements(action);
+    await populateGlobalElements(action);
     await action.populateElements();
 
     activateTabs();

@@ -7,9 +7,8 @@ import { ACTION, fullActionId } from "../../constants";
 const model: ReplaceVariable = {
     handle: "counter",
     evaluator: async (trigger: ReplaceVariableTrigger<CounterSettings>, counterName?: string) => {
-        const endpoint = trigger.settings.endpoint;
-        const instance = firebotService.instances.find(inst => inst.data.endpoint === endpoint);
-        if (!instance) {
+        const instance = firebotService.getInstance(trigger.settings.endpoint);
+        if (instance.isNull) {
             return null;
         }
 

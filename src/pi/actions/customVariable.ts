@@ -1,12 +1,15 @@
 import PiAction from "../piAction";
 import settingsCache from "../settingsCache";
 import { ActionBaseSettings, CustomVariableSettings } from "../../types/settings";
-import $ from 'jquery';
 
 class PiCustomVariable implements PiAction {
     private get settings() {
         return settingsCache.action as ActionBaseSettings<CustomVariableSettings>;
     }
+
+    private name = document.getElementById('name') as HTMLInputElement;
+    private value = document.getElementById('value') as HTMLInputElement;
+    private path = document.getElementById('path') as HTMLInputElement;
 
     async defaultSettings() {
         settingsCache.action = {
@@ -27,28 +30,24 @@ class PiCustomVariable implements PiAction {
     }
 
     async populateElements() {
-        const customVariableName = $('#customVariable-name');
-        const customVariableValue = $('#customVariable-value');
-        const customVariablePropertyPath = $('#customVariable-path');
+        this.name.value = this.settings.action.name;
 
-        customVariableName.val(this.settings.action.name);
-
-        customVariableName.on('input', async () => {
-            this.settings.action.name = customVariableName.val() as string;
+        this.name.addEventListener('input', async () => {
+            this.settings.action.name = this.name.value;
             await settingsCache.saveAction();
         });
 
-        customVariableValue.val(this.settings.action.value);
+        this.value.value = this.settings.action.value;
 
-        customVariableValue.on('input', async () => {
-            this.settings.action.value = customVariableValue.val() as string;
+        this.value.addEventListener('input', async () => {
+            this.settings.action.value = this.value.value;
             await settingsCache.saveAction();
         });
 
-        customVariablePropertyPath.val(this.settings.action.propertyPath ?? "");
+        this.path.value = this.settings.action.propertyPath ?? "";
 
-        customVariablePropertyPath.on('input', async () => {
-            this.settings.action.propertyPath = customVariablePropertyPath.val() as string;
+        this.path.addEventListener('input', async () => {
+            this.settings.action.propertyPath = this.path.value;
             await settingsCache.saveAction();
         });
     }

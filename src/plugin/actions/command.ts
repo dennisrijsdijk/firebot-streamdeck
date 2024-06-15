@@ -11,15 +11,7 @@ export class Command extends ActionBase<CommandSettings> {
 
     @route(ROUTE.COMMAND)
     async getCommands(request?: MessageRequest<EndpointBody, ActionBaseSettings<CommandSettings>>) {
-        let endpoint = request?.body?.endpoint;
-        if (endpoint == null) {
-            endpoint = "127.0.0.1";
-        }
-        const instance = firebotService.instances.find(inst => inst.data.endpoint === endpoint);
-        if (!instance) {
-            return [];
-        }
-        return (await instance.getCommands()).map(command => command.data);
+        return (await firebotService.getInstance(request.body.endpoint).getCommands()).map(command => command.data);
     }
 
     async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<CommandSettings>>): Promise<void> {
@@ -32,15 +24,13 @@ export class Command extends ActionBase<CommandSettings> {
             return ev.action.showAlert();
         }
 
-        const maybeInstance = firebotService.instances.find((instance) => {
-            return instance.data.endpoint === ev.payload.settings.endpoint;
-        });
+        const instance = firebotService.getInstance(ev.payload.settings.endpoint);
 
-        if (!maybeInstance) {
+        if (instance.isNull) {
             return ev.action.showAlert();
         }
 
-        const maybeCommand = (await maybeInstance.getCommands()).find((command) => {
+        const maybeCommand = (await instance.getCommands()).find((command) => {
             return command.data.id === ev.payload.settings.action.id;
         });
 
@@ -50,6 +40,9 @@ export class Command extends ActionBase<CommandSettings> {
 
         await maybeCommand.run(ev.payload.settings.action.args);
 
-        return this.update(ev.action, ev.action.manifestId, ev.payload.settings);
+        return this.update(ev.action, {
+            manifestId: ev.action.manifestId,
+            settings: ev.payload.settings
+        });
     }
 }

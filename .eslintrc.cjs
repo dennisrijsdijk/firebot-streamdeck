@@ -26,7 +26,7 @@ module.exports = {
     },
 
     "rules": {
-        "id-length": [ "warn", { exceptions: [ "_", "$" ], properties: "never" } ],
+        "id-length": [ "warn", { exceptions: [ "_" ], properties: "never" } ],
 
         "object-curly-spacing": [ "warn", "always" ],
 

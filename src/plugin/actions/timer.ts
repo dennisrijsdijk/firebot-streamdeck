@@ -1,6 +1,6 @@
 import { Action, action, KeyDownEvent, MessageRequest, route } from "@elgato/streamdeck";
-import { ActionBase } from "../actionBase";
-import { ActionBaseSettings, QueueSettings, TimerSettings } from "../../types/settings";
+import { ActionBase, CachedAction } from "../actionBase";
+import { ActionBaseSettings, TimerSettings } from "../../types/settings";
 
 import firebotService from "../firebot-api/service";
 import { ACTION, fullActionId, ROUTE } from "../../constants";
@@ -11,15 +11,7 @@ export class Timer extends ActionBase<TimerSettings> {
 
     @route(ROUTE.TIMER)
     getTimers(request?: MessageRequest<EndpointBody, ActionBaseSettings<TimerSettings>>) {
-        let endpoint = request?.body?.endpoint;
-        if (endpoint == null) {
-            endpoint = "127.0.0.1";
-        }
-        const instance = firebotService.instances.find(inst => inst.data.endpoint === endpoint);
-        if (!instance) {
-            return [];
-        }
-        return instance.timers.map(timer => timer.data);
+        return firebotService.getInstance(request.body.endpoint).timers.map(timer => timer.data);
     }
 
     async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<TimerSettings>>): Promise<void> {
@@ -32,15 +24,13 @@ export class Timer extends ActionBase<TimerSettings> {
             return ev.action.showAlert();
         }
 
-        const maybeInstance = firebotService.instances.find((instance) => {
-            return instance.data.endpoint === ev.payload.settings.endpoint;
-        });
+        const instance = firebotService.getInstance(ev.payload.settings.endpoint);
 
-        if (!maybeInstance) {
+        if (instance.isNull) {
             return ev.action.showAlert();
         }
 
-        const maybeTimer = maybeInstance.timers.find((queue) => {
+        const maybeTimer = instance.timers.find((queue) => {
             return queue.data.id === ev.payload.settings.action.id;
         });
 
@@ -50,26 +40,23 @@ export class Timer extends ActionBase<TimerSettings> {
 
         await maybeTimer.update(ev.payload.settings.action.action);
 
-        return this.update(ev.action, ev.action.manifestId, ev.payload.settings);
+        return this.update(ev.action, {
+            manifestId: ev.action.manifestId,
+            settings: ev.payload.settings
+        });
     }
 
-    async update(action: Omit<Action<ActionBaseSettings<QueueSettings>>, "manifestId">, manifestId: string, newSettings?: ActionBaseSettings<QueueSettings>): Promise<void> {
-        await super.update(action, manifestId, newSettings);
+    async update(action: Omit<Action<ActionBaseSettings<TimerSettings>>, "manifestId">, cachedAction: CachedAction<TimerSettings>): Promise<void> {
+        await super.update(action, cachedAction);
 
-        if (!newSettings) {
+        const instance = firebotService.getInstance(cachedAction.settings.endpoint);
+
+        if (instance.isNull) {
             return;
         }
 
-        const maybeInstance = firebotService.instances.find((instance) => {
-            return instance.data.endpoint === newSettings.endpoint;
-        });
-
-        if (!maybeInstance) {
-            return;
-        }
-
-        const maybeTimer = maybeInstance.timers.find((timer) => {
-            return timer.data.id === newSettings.action.id;
+        const maybeTimer = instance.timers.find((timer) => {
+            return timer.data.id === cachedAction.settings.action.id;
         });
 
         if (!maybeTimer) {

@@ -35,11 +35,11 @@ async function populateInstanceSelects() {
     instanceManagementSelect.innerHTML = '';
 
     for (const instance of settingsCache.global.instances) {
-        const option = dom.createOption(instance.name, instance.endpoint, instance.endpoint === settingsCache.global.defaultEndpoint);
+        const option = dom.createOption(instance.name, instance.endpoint, instance.endpoint === settingsCache.action.endpoint);
         const managementOption = dom.createOption(
             `${instance.name} (${instance.endpoint}) ${instance.endpoint === settingsCache.global.defaultEndpoint ? "[DEFAULT]" : ""}`,
             instance.endpoint,
-            instance.endpoint === settingsCache.action.endpoint
+            instance.endpoint === settingsCache.global.defaultEndpoint
         );
 
         instanceSelect.add(option);

@@ -337,13 +337,13 @@ option {
 .sdpi-wrapper {
     overflow-x: hidden;
     height: 100%;
-    margin-right: 1px; /* ensure scroller thumb is not clipped */
+  margin-right: 1px; /* ensure scroller thumb is not clipped */
 }
 
 .sdpi-item {
     display: flex;
     flex-direction: row;
-    min-height: 30px;
+  min-height: 30px;
     align-items: first baseline;
     margin-top: 2px;
     max-width: 344px;
@@ -446,17 +446,6 @@ table>caption {
 .list,
 .sdpi-item[type="list"] {
     align-items: baseline;
-}
-
-.sdpi-item-label-empty {
-    text-align: right;
-    flex: none;
-    width: 94px;
-    padding-right: 5px;
-    font-weight: 600;
-    -webkit-user-select: none;
-    line-height: normal;
-    margin-left: -1px;
 }
 
 .sdpi-item-label {
@@ -1043,10 +1032,10 @@ input[type="range" i] {
 input[type="range"]::-webkit-slider-thumb::before {
     position: absolute;
     content: "";
-    height: 5px; /* equal to height of runnable track or 1 less */
-    width: 500px; /* make this bigger than the widest range input element */
-    left: -502px; /* this should be -2px - width */
-    top: 8px; /* don't change this */
+  height: 5px; /* equal to height of runnable track or 1 less */
+  width: 500px; /* make this bigger than the widest range input element */
+  left: -502px; /* this should be -2px - width */
+  top: 8px; /* don't change this */
     background: #77f;
 }
 
@@ -1075,7 +1064,7 @@ textarea {
 }
 
 textarea {
-    width: 219px; /*98%;*/
+  width: 219px; /*98%;*/
     height: 96%;
     min-height: 3em;
     resize: none;
@@ -1702,7 +1691,7 @@ select {
     min-width: 0px;
 
     /* this is a clunky fix for using background image as select arrow with long text options */
-    -webkit-appearance: media-slider;
+   /* -webkit-appearance: media-slider; */
     text-overflow: ellipsis;
 }
 

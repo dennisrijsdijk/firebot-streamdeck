@@ -2,50 +2,37 @@ import { SettingsInstance } from "../../types/settings";
 import { EventEmitter } from "node:events";
 import { FirebotInstance } from "./instance";
 
-type InstanceWithTimeout = {
-    instance: FirebotInstance;
-    timeout?: ReturnType<typeof setTimeout>;
-}
-
 class FirebotService extends EventEmitter {
-    private _instances: Record<string, InstanceWithTimeout>;
+    private _instances: Record<string, FirebotInstance>;
 
     constructor() {
         super();
         this._instances = {};
     }
 
+    public emitDataUpdate(endpoint: string) {
+        this.emit("data_updated", endpoint);
+    }
+
     public getInstance(endpoint: string) {
-        return this._instances[endpoint]?.instance ?? new FirebotInstance();
+        return this._instances[endpoint] ?? new FirebotInstance();
     }
 
     public async updateInstances(instances: SettingsInstance[]): Promise<void> {
-        Object.keys(this._instances).forEach(key => clearTimeout(this._instances[key].timeout));
+        const existingEndpoints = Object.keys(this._instances);
 
-        this._instances = {};
+        const newInstances = instances.filter(instance => !existingEndpoints.includes(instance.endpoint));
 
-        instances.map(instance => this.registerInstance(instance.endpoint, instance.name));
+        const newEndpoints = instances.map(instance => instance.endpoint);
 
-        await Promise.all(Object.keys(this._instances).map(key => this.updateInstance(key)));
-    }
+        const deleteEndpoints = existingEndpoints.filter(endpoint => !newEndpoints.includes(endpoint));
 
-    private registerInstance(endpoint: string, label: string) {
-        const instance = {
-            instance: new FirebotInstance(endpoint, label),
-            timeout: undefined
-        };
-        this._instances[endpoint] = instance;
-    }
+        deleteEndpoints.forEach((endpoint) => {
+            this._instances[endpoint].close();
+            delete this._instances[endpoint];
+        });
 
-    async updateInstance(endpoint: string) {
-        const instance = this._instances[endpoint];
-        if (instance == null) {
-            return;
-        }
-        clearTimeout(instance.timeout);
-        await instance.instance.update();
-        this.emit("data_updated", endpoint);
-        instance.timeout = setTimeout(() => this.updateInstance(endpoint), 500);
+        newInstances.forEach(instance => this._instances[instance.endpoint] = new FirebotInstance(instance.endpoint, instance.name));
     }
 }
 

@@ -11,7 +11,7 @@ export class PresetEffectList extends ActionBase<PresetEffectListSettings> {
 
     @route(ROUTE.PRESETLIST)
     async getPresetLists(request?: MessageRequest<EndpointBody, ActionBaseSettings<PresetEffectListSettings>>) {
-        return (await firebotService.getInstance(request.body.endpoint).getPresetEffectLists()).map(presetList => presetList.data);
+        return Object.values((await firebotService.getInstance(request.body.endpoint).presetLists)).map(presetList => presetList.data);
     }
 
     async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<PresetEffectListSettings>>): Promise<void> {
@@ -29,9 +29,7 @@ export class PresetEffectList extends ActionBase<PresetEffectListSettings> {
             return ev.action.showAlert();
         }
 
-        const maybePresetList = (await instance.getPresetEffectLists()).find((presetList) => {
-            return presetList.data.id === ev.payload.settings.action.id;
-        });
+        const maybePresetList = instance.presetLists[ev.payload.settings.action.id];
 
         if (!maybePresetList) {
             return ev.action.showAlert();

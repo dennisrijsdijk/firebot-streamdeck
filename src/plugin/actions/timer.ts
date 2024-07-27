@@ -11,7 +11,7 @@ export class Timer extends ActionBase<TimerSettings> {
 
     @route(ROUTE.TIMER)
     getTimers(request?: MessageRequest<EndpointBody, ActionBaseSettings<TimerSettings>>) {
-        return firebotService.getInstance(request.body.endpoint).timers.map(timer => timer.data);
+        return Object.values(firebotService.getInstance(request.body.endpoint).timers).map(timer => timer.data);
     }
 
     async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<TimerSettings>>): Promise<void> {
@@ -30,9 +30,7 @@ export class Timer extends ActionBase<TimerSettings> {
             return ev.action.showAlert();
         }
 
-        const maybeTimer = instance.timers.find((queue) => {
-            return queue.data.id === ev.payload.settings.action.id;
-        });
+        const maybeTimer = instance.timers[ev.payload.settings.action.id];
 
         if (!maybeTimer) {
             return ev.action.showAlert();
@@ -55,9 +53,7 @@ export class Timer extends ActionBase<TimerSettings> {
             return;
         }
 
-        const maybeTimer = instance.timers.find((timer) => {
-            return timer.data.id === cachedAction.settings.action.id;
-        });
+        const maybeTimer = instance.timers[cachedAction.settings.action.id];
 
         if (!maybeTimer) {
             return;

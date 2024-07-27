@@ -11,7 +11,7 @@ export class CustomRole extends ActionBase<CustomRoleSettings> {
 
     @route(ROUTE.CUSTOMROLE)
     getRoles(request?: MessageRequest<EndpointBody, ActionBaseSettings<CustomRoleSettings>>) {
-        return firebotService.getInstance(request.body.endpoint).customRoles.map(role => role.data);
+        return Object.values(firebotService.getInstance(request.body.endpoint).customRoles).map(role => role.data);
     }
 
     async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<CustomRoleSettings>>): Promise<void> {
@@ -29,9 +29,7 @@ export class CustomRole extends ActionBase<CustomRoleSettings> {
             return ev.action.showAlert();
         }
 
-        const maybeRole = instance.customRoles.find((role) => {
-            return role.data.id === ev.payload.settings.action.id;
-        });
+        const maybeRole = instance.customRoles[ev.payload.settings.action.id];
 
         if (!maybeRole) {
             return ev.action.showAlert();

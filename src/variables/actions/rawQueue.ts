@@ -13,13 +13,13 @@ export async function getQueue(trigger: ReplaceVariableTrigger<QueueSettings>, q
     let queue: FirebotQueue | undefined;
 
     if (queueName) {
-        queue = instance.queues.find(instanceQueue => instanceQueue.data.name === queueName);
+        queue = Object.values(instance.queues).find(instanceQueue => instanceQueue.data.name === queueName);
     } else {
         if (trigger.actionId !== fullActionId(ACTION.QUEUE)) {
             return null;
         }
 
-        queue = instance.queues.find(instanceQueue => instanceQueue.data.id === trigger.settings.action.id);
+        queue = instance.queues[trigger.settings.action.id];
     }
 
     if (!queue) {

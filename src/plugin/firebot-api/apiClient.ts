@@ -27,9 +27,11 @@ export class ApiClient extends ApiBase {
     }
 
     async getCommands() {
+        const customCommands = await this.getCustomCommands();
+        const systemCommands = await this.getSystemCommands();
         return {
-            ...await this.getCustomCommands(),
-            ...await this.getSystemCommands()
+            ...systemCommands,
+            ...customCommands
         }
     }
 

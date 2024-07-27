@@ -6,7 +6,7 @@ export default class ApiBase {
     }
 
     constructor(endpoint: string | null) {
-        if (endpoint === null || endpoint.startsWith("http://")) {
+        if (endpoint == null || endpoint.startsWith("http://")) {
             this.baseEndpoint = endpoint;
         } else {
             this.baseEndpoint = `http://${endpoint}:7472/api/v1`;
@@ -14,7 +14,7 @@ export default class ApiBase {
     }
 
     protected async objectFetch<Tin, Tout>(apiPath: string, transformer: (input: Tin) => [string, Tout]): Promise<Record<string, Tout>> {
-        if (this.baseEndpoint === null) {
+        if (this.baseEndpoint == null) {
             return {};
         }
 

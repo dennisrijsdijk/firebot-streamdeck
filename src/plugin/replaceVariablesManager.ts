@@ -30,6 +30,9 @@ class ReplaceVariablesManager {
     }
 
     async evaluate(expression: string, metadata: unknown): Promise<string> {
+        if (expression == null) {
+            return "";
+        }
         try {
             return await evaluate({
                 handlers: this._handlers,

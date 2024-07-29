@@ -11,6 +11,7 @@ import { ApiClient } from "./apiClient";
 import { FirebotWebSocket } from "./websocket";
 import service from "./service";
 import { ApiCounter, ApiCustomRole, ApiQueue, ApiTimer } from "../../types/api";
+import { WebSocketEventType } from "../../types/firebot-websocket";
 
 export class FirebotInstance {
     private _ws: FirebotWebSocket;
@@ -79,70 +80,107 @@ export class FirebotInstance {
             this.sendUpdate();
         });
 
-        this._ws.on("effect-queue:length-updated", ({ id, length }: {id: string, length: number}) => {
-            this._queues[id]?.updateLength(length);
-        });
+        this._ws.on("firebot-event", (firebotEvent: { event: WebSocketEventType, data: unknown }) => {
+            const event = firebotEvent.event;
+            const data = firebotEvent.data as {
+                id: string;
+                name: string;
+                type: "custom" | "system";
+                trigger: string;
+                value: number;
+                viewers: object[];
+                args: Array<{name: string}>;
+                length: number;
+                active: boolean;
+                data: { value: JsonValue };
+            };
+            switch (event) {
+                case "counter:deleted": {
+                    delete this._counters[data.id];
+                    break;
+                }
+                case "command:deleted": {
+                    delete this._commands[data.id];
+                    break;
+                }
+                case "custom-role:deleted": {
+                    delete this._customRoles[data.id];
+                    break;
+                }
+                case "custom-variable:deleted": {
+                    delete this._customVariables[data.name];
+                    break;
+                }
+                case "effect-queue:deleted": {
+                    delete this._queues[data.id];
+                    break;
+                }
+                case "preset-effect-list:deleted": {
+                    delete this._presetLists[data.id];
+                    break;
+                }
+                case "timer:deleted": {
+                    delete this._timers[data.id];
+                    break;
+                }
 
-        this._ws.on("firebot-event", (event) => {
-            const { action, subject, data }: {
-                action: "create" | "update" | "delete" | null,
-                subject: string,
-                data: unknown;
-            } = event;
+                case "command:created":
+                case "command:updated": {
+                    const { id, trigger, type } = data;
+                    this._commands[id] = new FirebotCommand({ id, trigger }, type, this.data.endpoint);
+                    break;
+                }
 
-            const key = subject === "_customVariables" ? "name" : "id";
-            let value = null;
+                case "counter:created":
+                case "counter:updated": {
+                    const counter: ApiCounter = data;
+                    this._counters[counter.id] = new FirebotCounter(counter, this.data.endpoint)
+                    break;
+                }
 
-            if (action === "delete") {
-                delete this[subject][data[key]];
-                this.sendUpdate();
-                return;
+                case "custom-role:created":
+                case "custom-role:updated": {
+                    const role: ApiCustomRole = data;
+                    this._customRoles[role.id] = new FirebotCustomRole(role, this.data.endpoint);
+                    break;
+                }
+
+                case "custom-variable:created":
+                case "custom-variable:updated": {
+                    this._customVariables[data.name] = data.value;
+                    break;
+                }
+
+                case "effect-queue:created":
+                case "effect-queue:updated": {
+                    const queue: ApiQueue = data;
+                    this._queues[queue.id] = new FirebotQueue(queue, this.data.endpoint);
+                    break;
+                }
+
+                case "effect-queue:length-updated": {
+                    this._queues[data.id].updateLength(data.length);
+                    break;
+                }
+
+                case "preset-effect-list:created":
+                case "preset-effect-list:updated": {
+                    const { id, name, args } = data;
+                    this._presetLists[id] = new FirebotPresetEffectList({ id, name, args: args.map(arg => arg.name) }, this.data.endpoint);
+                    break;
+                }
+
+                case "timer:created":
+                case "timer:updated": {
+                    const timer: ApiTimer = data;
+                    this._timers[timer.id] = new FirebotTimer(timer, this.data.endpoint);
+                    break;
+                }
+
+                default: {
+                    break;
+                }
             }
-
-            switch (subject) {
-                case "_commands": {
-                    const { id, trigger, type } = data as {
-                        id: string,
-                        trigger: string,
-                        type: "custom" | "system"
-                    };
-                    value = new FirebotCommand({ id, trigger }, type, this.data.endpoint);
-                    break;
-                }
-                case "_counters": {
-                    value = new FirebotCounter(data as ApiCounter, this.data.endpoint);
-                    break;
-                }
-                case "_customRoles": {
-                    value = new FirebotCustomRole(data as ApiCustomRole, this.data.endpoint);
-                    break;
-                }
-                case "_customVariables": {
-                    value = (data as { value: JsonValue }).value as JsonValue;
-                    break;
-                }
-                case "_queues": {
-                    value = new FirebotQueue(data as ApiQueue, this.data.endpoint);
-                    break;
-                }
-                case "_presetLists": {
-                    const { id, name, args } = data as {
-                        id: string;
-                        name: string;
-                        args: {name: string}[]
-                    }
-                    value = new FirebotPresetEffectList({ id, name, args: args.map(arg => arg.name) }, this.data.endpoint);
-                    break;
-                }
-                case "_timers": {
-                    value = new FirebotTimer(data as ApiTimer, this.data.endpoint);
-                    break;
-                }
-            }
-
-            this[subject][data[key]] = value;
-            this.sendUpdate();
-            return;
         });
 
         this.connectionPoll();

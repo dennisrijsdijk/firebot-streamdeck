@@ -3,13 +3,9 @@ export type WebSocketEventType =
 "error" |
 "success" |
 
-"command:custom:updated" |
-"command:custom:created" |
-"command:custom:deleted" |
-
-"command:system:created" |
-"command:system:updated" |
-"command:system:deleted" |
+"command:created" |
+"command:updated" |
+"command:deleted" |
 
 "counter:created" |
 "counter:updated" |

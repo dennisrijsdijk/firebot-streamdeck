@@ -48,47 +48,10 @@ export class FirebotWebSocket extends EventEmitter {
             return;
         }
 
-        if (message.name === "effect-queue:length-updated") {
-            this.emit(message.name, message.data);
-            return;
-        }
-
         const meta = {
-            action: null,
-            subject: null,
+            event: message.name,
             data: message.data
         };
-
-        const endsWith = {
-            ":created": "create",
-            ":updated": "update",
-            ":deleted": "delete"
-        };
-
-        for (const [key, value] of Object.entries(endsWith)) {
-            if (message.name.endsWith(key)) {
-                meta.action = value;
-                break;
-            }
-        }
-
-        const startsWith = {
-            "command:custom": "_commands",
-            "command:system": "_commands",
-            "counter": "_counters",
-            "custom-role": "_customRoles",
-            "custom-variable": "_customVariables",
-            "effect-queue": "_queues",
-            "preset-effect-list": "_presetLists",
-            "timer": "_timers"
-        }
-
-        for (const [key, value] of Object.entries(startsWith)) {
-            if (message.name.startsWith(key)) {
-                meta.subject = value;
-                break;
-            }
-        }
 
         this.emit("firebot-event", meta);
     }

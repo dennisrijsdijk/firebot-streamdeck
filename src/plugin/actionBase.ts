@@ -13,6 +13,7 @@ import firebotService from "./firebot-api/service";
 export type CachedAction<T> = {
     manifestId: string;
     settings: ActionBaseSettings<T>;
+    title?: string;
 }
 
 export class ActionBase<T extends JsonObject> extends SingletonAction<ActionBaseSettings<T>> {
@@ -60,6 +61,12 @@ export class ActionBase<T extends JsonObject> extends SingletonAction<ActionBase
         };
 
         const title = await ReplaceVariablesManager.evaluate(meta.settings.title, meta);
+
+        if (cachedAction.title === title) {
+            return;
+        }
+
+        cachedAction.title = title;
         return action.setTitle(title);
     }
 }

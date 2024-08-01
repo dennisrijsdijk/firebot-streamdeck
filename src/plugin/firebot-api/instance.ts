@@ -95,6 +95,88 @@ export class FirebotInstance {
                 data: { value: JsonValue };
             };
             switch (event) {
+                case "command:created": {
+                    const { id, trigger, type } = data;
+                    this._commands[id] = new FirebotCommand({ id, trigger }, type, this.data.endpoint);
+                    break;
+                }
+
+                case "counter:created": {
+                    this._counters[data.id] = new FirebotCounter(data, this.data.endpoint)
+                    break;
+                }
+
+                case "custom-role:created": {
+                    this._customRoles[data.id] = new FirebotCustomRole(data, this.data.endpoint);
+                    break;
+                }
+
+                case "custom-variable:created": {
+                    this._customVariables[data.name] = data.value;
+                    break;
+                }
+
+                case "effect-queue:created": {
+                    this._queues[data.id] = new FirebotQueue(data, this.data.endpoint);
+                    break;
+                }
+
+                case "preset-effect-list:created": {
+                    const { id, name, args } = data;
+                    this._presetLists[id] = new FirebotPresetEffectList({ id, name, args: args.map(arg => arg.name) }, this.data.endpoint);
+                    break;
+                }
+
+                case "timer:created": {
+                    this._timers[data.id] = new FirebotTimer(data, this.data.endpoint);
+                    break;
+                }
+
+                case "command:updated": {
+                    this._commands[data.id].setTrigger(data.trigger);
+                    break;
+                }
+
+                case "counter:updated": {
+                    this._counters[data.id].setName(data.name);
+                    this._counters[data.id].setValue(data.value);
+                    break;
+                }
+
+                case "custom-role:updated": {
+                    this._customRoles[data.id].setName(data.name);
+                    this._customRoles[data.id].setLength(data.viewers.length);
+                    break;
+                }
+
+                case "custom-variable:updated": {
+                    this._customVariables[data.name] = data.value;
+                    break;
+                }
+
+                case "effect-queue:updated": {
+                    this._queues[data.id].setName(data.name);
+                    this._queues[data.id].setActive(data.active);
+                    break;
+                }
+
+                case "effect-queue:length-updated": {
+                    this._queues[data.id].setLength(data.length);
+                    break;
+                }
+
+                case "preset-effect-list:updated": {
+                    this._presetLists[data.id].setName(data.name);
+                    this._presetLists[data.id].setArgs(data.args.map(arg => arg.name));
+                    break;
+                }
+
+                case "timer:updated": {
+                    this._timers[data.id].setName(data.name);
+                    this._timers[data.id].setActive(data.active);
+                    break;
+                }
+
                 case "counter:deleted": {
                     delete this._counters[data.id];
                     break;
@@ -121,59 +203,6 @@ export class FirebotInstance {
                 }
                 case "timer:deleted": {
                     delete this._timers[data.id];
-                    break;
-                }
-
-                case "command:created":
-                case "command:updated": {
-                    const { id, trigger, type } = data;
-                    this._commands[id] = new FirebotCommand({ id, trigger }, type, this.data.endpoint);
-                    break;
-                }
-
-                case "counter:created":
-                case "counter:updated": {
-                    const counter: ApiCounter = data;
-                    this._counters[counter.id] = new FirebotCounter(counter, this.data.endpoint)
-                    break;
-                }
-
-                case "custom-role:created":
-                case "custom-role:updated": {
-                    const role: ApiCustomRole = data;
-                    this._customRoles[role.id] = new FirebotCustomRole(role, this.data.endpoint);
-                    break;
-                }
-
-                case "custom-variable:created":
-                case "custom-variable:updated": {
-                    this._customVariables[data.name] = data.value;
-                    break;
-                }
-
-                case "effect-queue:created":
-                case "effect-queue:updated": {
-                    const queue: ApiQueue = data;
-                    this._queues[queue.id] = new FirebotQueue(queue, this.data.endpoint);
-                    break;
-                }
-
-                case "effect-queue:length-updated": {
-                    this._queues[data.id].updateLength(data.length);
-                    break;
-                }
-
-                case "preset-effect-list:created":
-                case "preset-effect-list:updated": {
-                    const { id, name, args } = data;
-                    this._presetLists[id] = new FirebotPresetEffectList({ id, name, args: args.map(arg => arg.name) }, this.data.endpoint);
-                    break;
-                }
-
-                case "timer:created":
-                case "timer:updated": {
-                    const timer: ApiTimer = data;
-                    this._timers[timer.id] = new FirebotTimer(timer, this.data.endpoint);
                     break;
                 }
 

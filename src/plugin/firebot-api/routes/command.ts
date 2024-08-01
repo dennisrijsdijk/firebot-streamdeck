@@ -17,6 +17,10 @@ export default class FirebotCommand extends ApiBase {
         return this._data;
     }
 
+    setTrigger(trigger: string) {
+        this._data.trigger = trigger;
+    }
+
     async run(args: string) {
         await fetch(`${this.baseEndpoint}/commands/${this.data.type}/${this._data.id}/run`, {
             ...this.abortSignal,

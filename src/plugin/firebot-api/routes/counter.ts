@@ -19,6 +19,14 @@ export default class FirebotCounter extends ApiBase {
         return this._value;
     }
 
+    setName(name: string) {
+        this._data.name = name;
+    }
+
+    setValue(value: number) {
+        this._value = value;
+    }
+
     async updateByMode(value: number, override: boolean): Promise<number> {
         const result = await fetch(`${this.baseEndpoint}/counters/${this._data.id}`, {
             ...this.abortSignal,

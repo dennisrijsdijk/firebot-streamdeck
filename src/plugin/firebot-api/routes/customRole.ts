@@ -19,6 +19,14 @@ export default class FirebotCustomRole extends ApiBase {
         return this._length;
     }
 
+    setName(name: string) {
+        this._data.name = name;
+    }
+
+    setLength(length: number) {
+        this._length = length;
+    }
+
     // This is a hack as Firebot doesn't directly expose an API function to clear roles.
     // https://github.com/crowbartools/Firebot/issues/2483
     async clear() {

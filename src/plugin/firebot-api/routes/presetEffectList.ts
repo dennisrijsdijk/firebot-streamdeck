@@ -14,6 +14,14 @@ export default class FirebotPresetEffectList extends ApiBase {
         return this._data;
     }
 
+    setName(name: string) {
+        this._data.name = name;
+    }
+
+    setArgs(args: string[]) {
+        this._data.args = args;
+    }
+
     async run(rawArgs: PresetEffectListSettings["arguments"]) {
         const args: Record<string, string> = {};
         this._data.args.forEach((arg) => {

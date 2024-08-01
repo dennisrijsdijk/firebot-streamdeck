@@ -26,7 +26,15 @@ export default class FirebotQueue extends ApiBase {
         return this._length;
     }
 
-    updateLength(newLength: number) {
+    setName(name: string) {
+        this._data.name = name;
+    }
+
+    setActive(active: boolean) {
+        this._active = active;
+    }
+
+    setLength(newLength: number) {
         this._length = newLength;
     }
 

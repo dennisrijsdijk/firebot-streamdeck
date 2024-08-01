@@ -11,6 +11,14 @@ export default class FirebotTimer extends ApiBase {
         this._data = apiTimer;
     }
 
+    setName(name: string) {
+        this._data.name = name;
+    }
+
+    setActive(active: boolean) {
+        this._data.active = active;
+    }
+
     get data() {
         return this._data;
     }

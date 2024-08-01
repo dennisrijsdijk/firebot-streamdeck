@@ -11,7 +11,7 @@ export class Command extends ActionBase<CommandSettings> {
 
     @route(ROUTE.COMMAND)
     async getCommands(request?: MessageRequest<EndpointBody, ActionBaseSettings<CommandSettings>>) {
-        return (await firebotService.getInstance(request.body.endpoint).getCommands()).map(command => command.data);
+        return Object.values((await firebotService.getInstance(request.body.endpoint).commands)).map(command => command.data);
     }
 
     async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<CommandSettings>>): Promise<void> {
@@ -30,9 +30,7 @@ export class Command extends ActionBase<CommandSettings> {
             return ev.action.showAlert();
         }
 
-        const maybeCommand = (await instance.getCommands()).find((command) => {
-            return command.data.id === ev.payload.settings.action.id;
-        });
+        const maybeCommand = instance.commands[ev.payload.settings.action.id];
 
         if (!maybeCommand) {
             return ev.action.showAlert();

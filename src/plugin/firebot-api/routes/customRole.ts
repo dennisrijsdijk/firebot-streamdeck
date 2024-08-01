@@ -5,12 +5,10 @@ import { ApiCustomRole } from "../../../types/api";
 export default class FirebotCustomRole extends ApiBase {
     private readonly _data: FirebotCustomRoleData;
     private _length: number;
-    private readonly _endpoint: string;
     constructor(apiRole: ApiCustomRole, endpoint: string) {
-        super();
+        super(endpoint);
         this._data = { id: apiRole.id, name: apiRole.name };
         this._length = apiRole.viewers.length;
-        this._endpoint = endpoint;
     }
 
     get data() {
@@ -21,10 +19,18 @@ export default class FirebotCustomRole extends ApiBase {
         return this._length;
     }
 
-    // This is a hack as Firebot doesn't directly expose an API function to clear queues.
+    setName(name: string) {
+        this._data.name = name;
+    }
+
+    setLength(length: number) {
+        this._length = length;
+    }
+
+    // This is a hack as Firebot doesn't directly expose an API function to clear roles.
     // https://github.com/crowbartools/Firebot/issues/2483
     async clear() {
-        await fetch(`http://${this._endpoint}:7472/api/v1/effects`, {
+        await fetch(`${this.baseEndpoint}/effects`, {
             ...this.abortSignal,
             method: "POST",
             headers: {

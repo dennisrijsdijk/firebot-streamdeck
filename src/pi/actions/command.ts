@@ -62,7 +62,7 @@ class PiCommand implements PiAction {
             this.id.add(option);
         }
 
-        if (this.id.value !== this.settings.action.id) {
+        if (this.id.value !== this.settings.action.id && commands.length > 0) {
             this.settings.action.id = commands[0].id;
             await settingsCache.saveAction();
         }

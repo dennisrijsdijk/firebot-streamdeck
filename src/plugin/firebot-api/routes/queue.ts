@@ -7,13 +7,11 @@ export default class FirebotQueue extends ApiBase {
     private readonly _data: FirebotQueueData;
     private _length: number;
     private _active: boolean;
-    private readonly _endpoint: string;
     constructor(apiQueue: ApiQueue, endpoint: string) {
-        super();
+        super(endpoint);
         this._data = { id: apiQueue.id, name: apiQueue.name };
         this._active = apiQueue.active;
         this._length = apiQueue.length;
-        this._endpoint = endpoint;
     }
 
     get data() {
@@ -28,9 +26,21 @@ export default class FirebotQueue extends ApiBase {
         return this._length;
     }
 
+    setName(name: string) {
+        this._data.name = name;
+    }
+
+    setActive(active: boolean) {
+        this._active = active;
+    }
+
+    setLength(newLength: number) {
+        this._length = newLength;
+    }
+
     async update(mode: QueueSettings["action"]) {
         const result = await fetch(
-            `http://${this._endpoint}:7472/api/v1/queues/${this._data.id}/${mode}`,
+            `${this.baseEndpoint}/queues/${this._data.id}/${mode}`,
             this.abortSignal
         );
 

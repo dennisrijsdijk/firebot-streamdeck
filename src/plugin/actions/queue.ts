@@ -11,7 +11,7 @@ export class Queue extends ActionBase<QueueSettings> {
 
     @route(ROUTE.QUEUE)
     getQueues(request?: MessageRequest<EndpointBody, ActionBaseSettings<QueueSettings>>) {
-        return firebotService.getInstance(request.body.endpoint).queues.map(queue => queue.data);
+        return Object.values(firebotService.getInstance(request.body.endpoint).queues).map(queue => queue.data);
     }
 
     async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<QueueSettings>>): Promise<void> {
@@ -30,9 +30,7 @@ export class Queue extends ActionBase<QueueSettings> {
             return ev.action.showAlert();
         }
 
-        const maybeQueue = instance.queues.find((queue) => {
-            return queue.data.id === ev.payload.settings.action.id;
-        });
+        const maybeQueue = instance.queues[ev.payload.settings.action.id];
 
         if (!maybeQueue) {
             return ev.action.showAlert();
@@ -55,9 +53,7 @@ export class Queue extends ActionBase<QueueSettings> {
             return;
         }
 
-        const maybeQueue = instance.queues.find((queue) => {
-            return queue.data.id === cachedAction.settings.action.id;
-        });
+        const maybeQueue = instance.queues[cachedAction.settings.action.id];
 
         if (!maybeQueue) {
             return;

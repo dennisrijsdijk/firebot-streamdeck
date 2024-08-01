@@ -1,6 +1,5 @@
 import { ReplaceVariable, ReplaceVariableTrigger } from "../../types/replaceVariable";
 import firebotService from '../../plugin/firebot-api/service';
-import { ApiCustomVariableBody } from "../../types/api";
 import { JsonValue } from "@elgato/streamdeck";
 
 export function getCustomVariable(endpoint: string, name: string, propertyPath: string[]) {
@@ -13,19 +12,19 @@ export function getCustomVariable(endpoint: string, name: string, propertyPath: 
         return null;
     }
 
-    const variable: ApiCustomVariableBody | undefined = instance.customVariables[name];
+    const variable: JsonValue | undefined = instance.customVariables[name];
 
     if (!variable) {
         return null;
     }
 
-    let data = structuredClone(variable.v);
+    let data = structuredClone(variable);
 
     if (!data) {
         return null;
     }
 
-    if (propertyPath.length === 0/* || propertyPath.length === 1 && propertyPath[0] === ""*/) {
+    if (propertyPath.length === 0) {
         return data;
     }
 
@@ -51,8 +50,11 @@ export function getCustomVariable(endpoint: string, name: string, propertyPath: 
 const model: ReplaceVariable = {
     handle: "customVariable",
     evaluator: async (trigger: ReplaceVariableTrigger<never>, name?: string, propertyPath?: string, defaultData?: JsonValue) => {
-        const nodes: string[] = propertyPath.split(/(?<!\\)\./gm);
-        nodes.forEach(node => node.replace("\\.", "."));
+        let nodes: string[] = [];
+        if (propertyPath != null) {
+            nodes = propertyPath.split(/(?<!\\)\./gm);
+            nodes.forEach(node => node.replace("\\.", "."));
+        }
         return getCustomVariable(trigger.settings.endpoint, name, nodes) ?? defaultData;
     }
 };

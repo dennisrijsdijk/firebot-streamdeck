@@ -15,13 +15,13 @@ const model: ReplaceVariable = {
         let timer: FirebotTimer | undefined;
 
         if (timerName) {
-            timer = instance.timers.find(instanceQueue => instanceQueue.data.name === timerName);
+            timer = Object.values(instance.timers).find(instanceTimer => instanceTimer.data.name === timerName);
         } else {
             if (trigger.actionId !== fullActionId(ACTION.TIMER)) {
                 return null;
             }
 
-            timer = instance.timers.find(instanceQueue => instanceQueue.data.id === trigger.settings.action.id);
+            timer = instance.timers[trigger.settings.action.id];
         }
 
         if (!timer) {

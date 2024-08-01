@@ -5,12 +5,10 @@ import { ApiCounter } from "../../../types/api";
 export default class FirebotCounter extends ApiBase {
     private readonly _data: FirebotCounterData;
     private _value: number;
-    private readonly _endpoint: string;
     constructor(apiCounter: ApiCounter, endpoint: string) {
-        super();
+        super(endpoint);
         this._data = { id: apiCounter.id, name: apiCounter.name };
         this._value = apiCounter.value;
-        this._endpoint = endpoint;
     }
 
     get data() {
@@ -21,8 +19,16 @@ export default class FirebotCounter extends ApiBase {
         return this._value;
     }
 
+    setName(name: string) {
+        this._data.name = name;
+    }
+
+    setValue(value: number) {
+        this._value = value;
+    }
+
     async updateByMode(value: number, override: boolean): Promise<number> {
-        const result = await fetch(`http://${this._endpoint}:7472/api/v1/counters/${this._data.id}`, {
+        const result = await fetch(`${this.baseEndpoint}/counters/${this._data.id}`, {
             ...this.abortSignal,
             method: "POST",
             headers: {

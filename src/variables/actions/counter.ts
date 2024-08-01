@@ -15,13 +15,13 @@ const model: ReplaceVariable = {
         let counter: FirebotCounter | undefined;
 
         if (counterName) {
-            counter = instance.counters.find(instanceCounter => instanceCounter.data.name === counterName);
+            counter = Object.values(instance.counters).find(instanceCounter => instanceCounter.data.name === counterName);
         } else {
             if (trigger.actionId !== fullActionId(ACTION.COUNTER)) {
                 return null;
             }
 
-            counter = instance.counters.find(instanceCounter => instanceCounter.data.id === trigger.settings.action.id);
+            counter = instance.counters[trigger.settings.action.id];
         }
 
         if (!counter) {

@@ -11,7 +11,7 @@ export class Counter extends ActionBase<CounterSettings> {
 
     @route(ROUTE.COUNTER)
     getCounters(request?: MessageRequest<EndpointBody, ActionBaseSettings<CounterSettings>>) {
-        return firebotService.getInstance(request.body.endpoint).counters.map(counter => counter.data);
+        return Object.values(firebotService.getInstance(request.body.endpoint).counters).map(counter => counter.data);
     }
 
     async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<CounterSettings>>): Promise<void> {
@@ -31,9 +31,7 @@ export class Counter extends ActionBase<CounterSettings> {
             return ev.action.showAlert();
         }
 
-        const maybeCounter = instance.counters.find((counter) => {
-            return counter.data.id === ev.payload.settings.action.id;
-        });
+        const maybeCounter = instance.counters[ev.payload.settings.action.id];
 
         if (!maybeCounter) {
             return ev.action.showAlert();

@@ -15,13 +15,13 @@ const model: ReplaceVariable = {
         let role: FirebotCustomRole | undefined;
 
         if (roleName) {
-            role = instance.customRoles.find(instanceRole => instanceRole.data.name === roleName);
+            role = Object.values(instance.customRoles).find(instanceRole => instanceRole.data.name === roleName);
         } else {
             if (trigger.actionId !== fullActionId(ACTION.CUSTOMROLE)) {
                 return null;
             }
 
-            role = instance.customRoles.find(instanceRole => instanceRole.data.id === trigger.settings.action.id);
+            role = instance.customRoles[trigger.settings.action.id];
         }
 
         if (!role) {

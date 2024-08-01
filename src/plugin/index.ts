@@ -5,7 +5,7 @@ import actions from "./actions";
 import firebotService from './firebot-api/service';
 
 // We can enable "trace" logging so that all messages between the Stream Deck, and the plugin are recorded. When storing sensitive information
-streamDeck.logger.setLevel(LogLevel.TRACE);
+streamDeck.logger.setLevel(LogLevel.DEBUG);
 
 // Register the increment action.
 actions.forEach(action => streamDeck.actions.registerAction(action));

@@ -59,7 +59,7 @@ class PiTimer implements PiAction {
             this.id.add(dom.createOption(timer.name, timer.id, timer.id === this.settings.action.id));
         }
 
-        if (this.id.value !== this.settings.action.id) {
+        if (this.id.value !== this.settings.action.id && timers.length > 0) {
             this.id.value = timers[0].id;
             this.settings.action.id = timers[0].id;
             await settingsCache.saveAction();

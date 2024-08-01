@@ -59,7 +59,7 @@ class PiQueue implements PiAction {
             this.id.add(dom.createOption(queue.name, queue.id, queue.id === this.settings.action.id));
         }
 
-        if (this.id.value !== this.settings.action.id) {
+        if (this.id.value !== this.settings.action.id && queues.length > 0) {
             this.id.value = queues[0].id;
             this.settings.action.id = queues[0].id;
             await settingsCache.saveAction();

@@ -57,7 +57,7 @@ class PiCustomRole implements PiAction {
             this.id.add(dom.createOption(role.name, role.id, role.id === this.settings.action.id));
         }
 
-        if (this.id.value !== this.settings.action.id) {
+        if (this.id.value !== this.settings.action.id && roles.length > 0) {
             this.id.value = roles[0].id
             this.settings.action.id = roles[0].id;
             await settingsCache.saveAction();

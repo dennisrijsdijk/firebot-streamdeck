@@ -59,7 +59,7 @@ class PiPresetEffectList implements PiAction {
             this.id.add(dom.createOption(presetList.name, presetList.id, presetList.id === this.settings.action.id));
         }
 
-        if (this.id.value !== this.settings.action.id) {
+        if (this.id.value !== this.settings.action.id && presetLists.length > 0) {
             this.id.value = presetLists[0].id;
             this.settings.action.id = presetLists[0].id;
             await settingsCache.saveAction();

@@ -66,7 +66,7 @@ class PiCounter implements PiAction {
             this.id.add(dom.createOption(counter.name, counter.id, counter.id === this.settings.action.id));
         }
 
-        if (this.id.value !== this.settings.action.id) {
+        if (this.id.value !== this.settings.action.id && counters.length > 0) {
             this.id.value = counters[0].id;
             this.settings.action.id = counters[0].id;
             await settingsCache.saveAction();

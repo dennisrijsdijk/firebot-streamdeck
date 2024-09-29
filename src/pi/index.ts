@@ -137,7 +137,7 @@ async function populateGlobalElements(action: PiAction) {
     });
 }
 
-streamDeck.onDidConnect(async (registration: RegistrationInfo, actionInfo: ActionInfo) => {
+streamDeck.onConnected(async (registration: RegistrationInfo, actionInfo: ActionInfo) => {
     settingsCache.global = await streamDeck.settings.getGlobalSettings<GlobalSettings>();
     settingsCache.action = actionInfo.payload.settings as ActionBaseSettings<JsonObject>;
 

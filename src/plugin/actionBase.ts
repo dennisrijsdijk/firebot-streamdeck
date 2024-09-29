@@ -17,41 +17,41 @@ export type CachedAction<T> = {
 }
 
 export class ActionBase<T extends JsonObject> extends SingletonAction<ActionBaseSettings<T>> {
-    private readonly actions: Record<string, CachedAction<T>>;
+    private readonly cachedActions: Record<string, CachedAction<T>>;
 
     constructor() {
         super();
-        this.actions = {};
+        this.cachedActions = {};
         firebotService.on('data_updated', async (endpoint: string) => {
-            await Promise.all(Object.keys(this.actions).map(async (context) => {
-                if (this.actions[context].settings.endpoint !== endpoint) {
+            await Promise.all(Object.keys(this.cachedActions).map(async (context) => {
+                if (this.cachedActions[context].settings.endpoint !== endpoint) {
                     return;
                 }
-                const action = streamDeck.actions.createController(context);
-                const cachedAction = this.actions[context];
+                const action = streamDeck.actions.getActionById(context);
+                const cachedAction = this.cachedActions[context];
                 return this.update(action, cachedAction);
             }));
         });
     }
 
     async onWillAppear(ev: WillAppearEvent<ActionBaseSettings<T>>): Promise<void> {
-        this.actions[ev.action.id] = {
+        this.cachedActions[ev.action.id] = {
             manifestId: ev.action.manifestId,
             settings: ev.payload.settings
         };
-        return this.update(ev.action, this.actions[ev.action.id]);
+        return this.update(ev.action, this.cachedActions[ev.action.id]);
     }
 
     onWillDisappear(ev: WillDisappearEvent<ActionBaseSettings<T>>): Promise<void> | void {
-        delete this.actions[ev.action.id];
+        delete this.cachedActions[ev.action.id];
     }
 
     async onDidReceiveSettings(ev: DidReceiveSettingsEvent<ActionBaseSettings<T>>) {
-        if (this.actions[ev.action.id] == null) {
+        if (this.cachedActions[ev.action.id] == null) {
             return;
         }
-        this.actions[ev.action.id].settings = ev.payload.settings;
-        return this.update(ev.action, this.actions[ev.action.id]);
+        this.cachedActions[ev.action.id].settings = ev.payload.settings;
+        return this.update(ev.action, this.cachedActions[ev.action.id]);
     }
 
     async update(action: Omit<Action<ActionBaseSettings<T>>, "manifestId">, cachedAction: CachedAction<T>): Promise<void> {
@@ -67,6 +67,8 @@ export class ActionBase<T extends JsonObject> extends SingletonAction<ActionBase
         }
 
         cachedAction.title = title;
-        return action.setTitle(title);
+        if (action.isKey()) {
+            return action.setTitle(title);
+        }
     }
 }

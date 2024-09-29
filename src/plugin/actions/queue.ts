@@ -59,6 +59,8 @@ export class Queue extends ActionBase<QueueSettings> {
             return;
         }
 
-        await action.setState(maybeQueue.active ? 0 : 1);
+        if (action.isKey()) {
+            await action.setState(maybeQueue.active ? 0 : 1);
+        }
     }
 }

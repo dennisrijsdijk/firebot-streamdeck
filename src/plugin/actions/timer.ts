@@ -59,6 +59,8 @@ export class Timer extends ActionBase<TimerSettings> {
             return;
         }
 
-        await action.setState(maybeTimer.data.active ? 0 : 1);
+        if (action.isKey()) {
+            await action.setState(maybeTimer.data.active ? 0 : 1);
+        }
     }
 }

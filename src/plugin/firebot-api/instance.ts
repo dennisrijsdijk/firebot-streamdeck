@@ -5,12 +5,11 @@ import FirebotCustomRole from "./routes/customRole";
 import FirebotPresetEffectList from "./routes/presetEffectList";
 import FirebotCommand from "./routes/command";
 import FirebotTimer from "./routes/timer";
-import { JsonValue } from "@elgato/streamdeck";
+import streamDeck, { JsonValue } from "@elgato/streamdeck";
 
 import { ApiClient } from "./apiClient";
 import { FirebotWebSocket } from "./websocket";
 import service from "./service";
-import { ApiCounter, ApiCustomRole, ApiQueue, ApiTimer } from "../../types/api";
 import { WebSocketEventType } from "../../types/firebot-websocket";
 
 export class FirebotInstance {
@@ -94,121 +93,125 @@ export class FirebotInstance {
                 active: boolean;
                 data: { value: JsonValue };
             };
-            switch (event) {
-                case "command:created": {
-                    const { id, trigger, type } = data;
-                    this._commands[id] = new FirebotCommand({ id, trigger }, type, this.data.endpoint);
-                    break;
-                }
+            try {
+                switch (event) {
+                    case "command:created": {
+                        const { id, trigger, type } = data;
+                        this._commands[id] = new FirebotCommand({ id, trigger }, type, this.data.endpoint);
+                        break;
+                    }
 
-                case "counter:created": {
-                    this._counters[data.id] = new FirebotCounter(data, this.data.endpoint)
-                    break;
-                }
+                    case "counter:created": {
+                        this._counters[data.id] = new FirebotCounter(data, this.data.endpoint)
+                        break;
+                    }
 
-                case "custom-role:created": {
-                    this._customRoles[data.id] = new FirebotCustomRole(data, this.data.endpoint);
-                    break;
-                }
+                    case "custom-role:created": {
+                        this._customRoles[data.id] = new FirebotCustomRole(data, this.data.endpoint);
+                        break;
+                    }
 
-                case "custom-variable:created": {
-                    this._customVariables[data.name] = data.value;
-                    break;
-                }
+                    case "custom-variable:created": {
+                        this._customVariables[data.name] = data.value;
+                        break;
+                    }
 
-                case "effect-queue:created": {
-                    this._queues[data.id] = new FirebotQueue(data, this.data.endpoint);
-                    break;
-                }
+                    case "effect-queue:created": {
+                        this._queues[data.id] = new FirebotQueue(data, this.data.endpoint);
+                        break;
+                    }
 
-                case "preset-effect-list:created": {
-                    const { id, name, args } = data;
-                    this._presetLists[id] = new FirebotPresetEffectList({ id, name, args: args.map(arg => arg.name) }, this.data.endpoint);
-                    break;
-                }
+                    case "preset-effect-list:created": {
+                        const { id, name, args } = data;
+                        this._presetLists[id] = new FirebotPresetEffectList({ id, name, args: args.map(arg => arg.name) }, this.data.endpoint);
+                        break;
+                    }
 
-                case "timer:created": {
-                    this._timers[data.id] = new FirebotTimer(data, this.data.endpoint);
-                    break;
-                }
+                    case "timer:created": {
+                        this._timers[data.id] = new FirebotTimer(data, this.data.endpoint);
+                        break;
+                    }
 
-                case "command:updated": {
-                    this._commands[data.id].setTrigger(data.trigger);
-                    break;
-                }
+                    case "command:updated": {
+                        this._commands[data.id].setTrigger(data.trigger);
+                        break;
+                    }
 
-                case "counter:updated": {
-                    this._counters[data.id].setName(data.name);
-                    this._counters[data.id].setValue(data.value);
-                    break;
-                }
+                    case "counter:updated": {
+                        this._counters[data.id].setName(data.name);
+                        this._counters[data.id].setValue(data.value);
+                        break;
+                    }
 
-                case "custom-role:updated": {
-                    this._customRoles[data.id].setName(data.name);
-                    this._customRoles[data.id].setLength(data.viewers.length);
-                    break;
-                }
+                    case "custom-role:updated": {
+                        this._customRoles[data.id].setName(data.name);
+                        this._customRoles[data.id].setLength(data.viewers.length);
+                        break;
+                    }
 
-                case "custom-variable:updated": {
-                    this._customVariables[data.name] = data.value;
-                    break;
-                }
+                    case "custom-variable:updated": {
+                        this._customVariables[data.name] = data.value;
+                        break;
+                    }
 
-                case "effect-queue:updated": {
-                    this._queues[data.id].setName(data.name);
-                    this._queues[data.id].setActive(data.active);
-                    break;
-                }
+                    case "effect-queue:updated": {
+                        this._queues[data.id].setName(data.name);
+                        this._queues[data.id].setActive(data.active);
+                        break;
+                    }
 
-                case "effect-queue:length-updated": {
-                    this._queues[data.id].setLength(data.length);
-                    break;
-                }
+                    case "effect-queue:length-updated": {
+                        this._queues[data.id].setLength(data.length);
+                        break;
+                    }
 
-                case "preset-effect-list:updated": {
-                    this._presetLists[data.id].setName(data.name);
-                    this._presetLists[data.id].setArgs(data.args.map(arg => arg.name));
-                    break;
-                }
+                    case "preset-effect-list:updated": {
+                        this._presetLists[data.id].setName(data.name);
+                        this._presetLists[data.id].setArgs(data.args.map(arg => arg.name));
+                        break;
+                    }
 
-                case "timer:updated": {
-                    this._timers[data.id].setName(data.name);
-                    this._timers[data.id].setActive(data.active);
-                    break;
-                }
+                    case "timer:updated": {
+                        this._timers[data.id].setName(data.name);
+                        this._timers[data.id].setActive(data.active);
+                        break;
+                    }
 
-                case "counter:deleted": {
-                    delete this._counters[data.id];
-                    break;
-                }
-                case "command:deleted": {
-                    delete this._commands[data.id];
-                    break;
-                }
-                case "custom-role:deleted": {
-                    delete this._customRoles[data.id];
-                    break;
-                }
-                case "custom-variable:deleted": {
-                    delete this._customVariables[data.name];
-                    break;
-                }
-                case "effect-queue:deleted": {
-                    delete this._queues[data.id];
-                    break;
-                }
-                case "preset-effect-list:deleted": {
-                    delete this._presetLists[data.id];
-                    break;
-                }
-                case "timer:deleted": {
-                    delete this._timers[data.id];
-                    break;
-                }
+                    case "counter:deleted": {
+                        delete this._counters[data.id];
+                        break;
+                    }
+                    case "command:deleted": {
+                        delete this._commands[data.id];
+                        break;
+                    }
+                    case "custom-role:deleted": {
+                        delete this._customRoles[data.id];
+                        break;
+                    }
+                    case "custom-variable:deleted": {
+                        delete this._customVariables[data.name];
+                        break;
+                    }
+                    case "effect-queue:deleted": {
+                        delete this._queues[data.id];
+                        break;
+                    }
+                    case "preset-effect-list:deleted": {
+                        delete this._presetLists[data.id];
+                        break;
+                    }
+                    case "timer:deleted": {
+                        delete this._timers[data.id];
+                        break;
+                    }
 
-                default: {
-                    break;
+                    default: {
+                        break;
+                    }
                 }
+            } catch (err) {
+                streamDeck.logger.error("Error when receiving Firebot WebSocket Event", err);
             }
         });
 

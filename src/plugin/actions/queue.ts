@@ -14,7 +14,7 @@ export class Queue extends ActionBase<QueueSettings> {
         return Object.values(firebotService.getInstance(request.body.endpoint).queues).map(queue => queue.data);
     }
 
-    async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<QueueSettings>>): Promise<void> {
+    override async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<QueueSettings>>): Promise<void> {
         if (
             ev.payload.settings.endpoint == null ||
 			ev.payload.settings.action == null ||
@@ -44,7 +44,7 @@ export class Queue extends ActionBase<QueueSettings> {
         });
     }
 
-    async update(action: Omit<Action<ActionBaseSettings<QueueSettings>>, "manifestId">, cachedAction: CachedAction<QueueSettings>): Promise<void> {
+    override async update(action: Omit<Action<ActionBaseSettings<QueueSettings>>, "manifestId">, cachedAction: CachedAction<QueueSettings>): Promise<void> {
         await super.update(action, cachedAction);
 
         const instance = firebotService.getInstance(cachedAction.settings.endpoint);

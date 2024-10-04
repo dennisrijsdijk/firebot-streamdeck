@@ -14,7 +14,7 @@ export class PresetEffectList extends ActionBase<PresetEffectListSettings> {
         return Object.values((await firebotService.getInstance(request.body.endpoint).presetLists)).map(presetList => presetList.data);
     }
 
-    async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<PresetEffectListSettings>>): Promise<void> {
+    override async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<PresetEffectListSettings>>): Promise<void> {
         if (
             ev.payload.settings.endpoint == null ||
             ev.payload.settings.action == null ||

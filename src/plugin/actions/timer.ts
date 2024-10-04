@@ -14,7 +14,7 @@ export class Timer extends ActionBase<TimerSettings> {
         return Object.values(firebotService.getInstance(request.body.endpoint).timers).map(timer => timer.data);
     }
 
-    async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<TimerSettings>>): Promise<void> {
+    override async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<TimerSettings>>): Promise<void> {
         if (
             ev.payload.settings.endpoint == null ||
 			ev.payload.settings.action == null ||
@@ -44,7 +44,7 @@ export class Timer extends ActionBase<TimerSettings> {
         });
     }
 
-    async update(action: Omit<Action<ActionBaseSettings<TimerSettings>>, "manifestId">, cachedAction: CachedAction<TimerSettings>): Promise<void> {
+    override async update(action: Omit<Action<ActionBaseSettings<TimerSettings>>, "manifestId">, cachedAction: CachedAction<TimerSettings>): Promise<void> {
         await super.update(action, cachedAction);
 
         const instance = firebotService.getInstance(cachedAction.settings.endpoint);

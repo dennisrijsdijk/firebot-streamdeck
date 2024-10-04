@@ -14,7 +14,7 @@ export class Counter extends ActionBase<CounterSettings> {
         return Object.values(firebotService.getInstance(request.body.endpoint).counters).map(counter => counter.data);
     }
 
-    async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<CounterSettings>>): Promise<void> {
+    override async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<CounterSettings>>): Promise<void> {
         if (
             ev.payload.settings.endpoint == null ||
 			ev.payload.settings.action == null ||

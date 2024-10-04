@@ -14,7 +14,7 @@ export class Command extends ActionBase<CommandSettings> {
         return Object.values((await firebotService.getInstance(request.body.endpoint).commands)).map(command => command.data);
     }
 
-    async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<CommandSettings>>): Promise<void> {
+    override async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<CommandSettings>>): Promise<void> {
         if (
             ev.payload.settings.endpoint == null ||
 			ev.payload.settings.action == null ||

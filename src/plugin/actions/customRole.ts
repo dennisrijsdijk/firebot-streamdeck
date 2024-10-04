@@ -14,7 +14,7 @@ export class CustomRole extends ActionBase<CustomRoleSettings> {
         return Object.values(firebotService.getInstance(request.body.endpoint).customRoles).map(role => role.data);
     }
 
-    async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<CustomRoleSettings>>): Promise<void> {
+    override async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<CustomRoleSettings>>): Promise<void> {
         if (
             ev.payload.settings.endpoint == null ||
 			ev.payload.settings.action == null ||

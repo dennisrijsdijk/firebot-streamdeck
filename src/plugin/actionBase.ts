@@ -34,7 +34,7 @@ export class ActionBase<T extends JsonObject> extends SingletonAction<ActionBase
         });
     }
 
-    async onWillAppear(ev: WillAppearEvent<ActionBaseSettings<T>>): Promise<void> {
+    override async onWillAppear(ev: WillAppearEvent<ActionBaseSettings<T>>): Promise<void> {
         this.cachedActions[ev.action.id] = {
             manifestId: ev.action.manifestId,
             settings: ev.payload.settings
@@ -42,11 +42,11 @@ export class ActionBase<T extends JsonObject> extends SingletonAction<ActionBase
         return this.update(ev.action, this.cachedActions[ev.action.id]);
     }
 
-    onWillDisappear(ev: WillDisappearEvent<ActionBaseSettings<T>>): Promise<void> | void {
+    override onWillDisappear(ev: WillDisappearEvent<ActionBaseSettings<T>>): Promise<void> | void {
         delete this.cachedActions[ev.action.id];
     }
 
-    async onDidReceiveSettings(ev: DidReceiveSettingsEvent<ActionBaseSettings<T>>) {
+    override async onDidReceiveSettings(ev: DidReceiveSettingsEvent<ActionBaseSettings<T>>) {
         if (this.cachedActions[ev.action.id] == null) {
             return;
         }

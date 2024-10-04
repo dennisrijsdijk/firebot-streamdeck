@@ -6,7 +6,7 @@ import firebotService from "../firebot-api/service";
 
 @action({ UUID: fullActionId(ACTION.CUSTOMVARIABLE) })
 export class CustomVariable extends ActionBase<CustomVariableSettings> {
-    async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<CustomVariableSettings>>) {
+    override async onKeyDown(ev: KeyDownEvent<ActionBaseSettings<CustomVariableSettings>>) {
         if (
             ev.payload.settings.endpoint == null ||
             ev.payload.settings.action == null ||

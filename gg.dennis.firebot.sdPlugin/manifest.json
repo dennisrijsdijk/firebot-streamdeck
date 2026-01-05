@@ -21,7 +21,7 @@
 		}
 	],
 	"Category": "Firebot",
-	"CategoryIcon": "imgs/plugin/category-icon",
+	"CategoryIcon": "imgs/plugin/category",
 	"CodePath": "bin/plugin.js",
 	"Description": "Control Firebot using Stream Deck",
 	"Icon": "imgs/plugin/marketplace",

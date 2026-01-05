@@ -1,5 +1,6 @@
 import streamDeck, { DidReceiveSettingsEvent, SingletonAction, WillAppearEvent, WillDisappearEvent, Action } from "@elgato/streamdeck";
 import { JsonObject } from "@elgato/utils";
+import firebotManager from "./firebot-manager";
 
 type CachedAction<T> = {
     settings: BaseActionSettings<T>;
@@ -12,13 +13,43 @@ export class BaseAction<T extends JsonObject> extends SingletonAction<BaseAction
     constructor() {
         super();
         this.actionsCache = {};
+
+        firebotManager.on("variablesDataUpdated", async (instance) => {
+            await Promise.all(Object.entries(this.actionsCache).map(async ([actionId, cachedAction]) => {
+                if (cachedAction.settings.endpoint !== instance.endpoint) {
+                    return;
+                }
+                return this.update(streamDeck.actions.getActionById(actionId));
+            }));
+        });
+    }
+
+    protected async waitUntilReady(): Promise<void> {
+        while (!firebotManager.ready) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+    }
+
+    protected async populateSettings(ev: WillAppearEvent<BaseActionSettings<T>>, settings: T): Promise<void> {
+        if (Object.keys(ev.payload.settings).length !== 0) {
+            return;
+        }
+
+        await this.waitUntilReady();
+
+        const newSettings: BaseActionSettings<T> = {
+            endpoint: firebotManager.defaultEndpoint,
+            title: "",
+            action: settings,
+        };
+        await ev.action.setSettings(newSettings);
+        await this.saveCachedSettings(ev.action.id, newSettings);
     }
 
     override async onWillAppear(ev: WillAppearEvent<BaseActionSettings<T>>): Promise<void> {
         this.actionsCache[ev.action.id] = {
             settings: ev.payload.settings,
         };
-        // TODO: listen for data updates from Firebot to update title dynamically
         return this.update(ev.action);
     }
 
@@ -42,7 +73,7 @@ export class BaseAction<T extends JsonObject> extends SingletonAction<BaseAction
         return this.update(streamDeck.actions.getActionById(actionId));
     }
 
-    async update(action?: (WillAppearEvent | DidReceiveSettingsEvent)["action"]) {
+    async update(action?: (Action<BaseActionSettings<T>>)) {
         if (!action || !action.isKey()) {
             return;
         }
@@ -52,17 +83,25 @@ export class BaseAction<T extends JsonObject> extends SingletonAction<BaseAction
             return;
         }
 
+        streamDeck.logger.info(`Received update for action ${action.manifestId} (${action.id}) with settings: ${JSON.stringify(cachedAction.settings)}`);
+
         const meta = {
             actionId: action.manifestId,
             settings: cachedAction.settings,
         }
 
+        await this.waitUntilReady();
+
         // TODO: Use expressionish here
         const title = meta.settings.title || "";
 
+        streamDeck.logger.info(`Generated title for action ${action.manifestId} (${action.id}): ${title}`);
+        
         if (cachedAction.title === title) {
             return;
         }
+
+        streamDeck.logger.info(`Updating title for action ${action.manifestId} (${action.id}) to: ${title}`);
 
         cachedAction.title = title;
         return action.setTitle(title);

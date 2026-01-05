@@ -4,15 +4,19 @@
 <head lang="en">
     <title>Increment Counter Settings</title>
     <meta charset="utf-8" />
-    <script src="https://sdpi-components.dev/releases/v4/sdpi-components.js"></script>
+    <script src="sdpi-components.js"></script>
 </head>
 
 <body>
-    <!--
-        Learn more about property inspector components at https://sdpi-components.dev/docs/components
-    -->
-    <sdpi-item label="Increment By">
-        <sdpi-range setting="incrementBy" min="1" max="5" step="1" default="1" showlabels></sdpi-range>
+    <sdpi-item label="Counter">
+        <sdpi-select setting="action.counterId" label-setting="action.counterLabel" datasource="getCounters" loading="Fetching Counters..." placeholder="Select a counter..." show-refresh hot-reload>
+        </sdpi-select>
+    </sdpi-item>
+    <sdpi-item label="Value">
+        <sdpi-number setting="action.value" step="1" default="1"></sdpi-number>
+    </sdpi-item>
+    <sdpi-item>
+        <sdpi-checkbox setting="action.overrideValue" label="Override Counter Value"></sdpi-checkbox>
     </sdpi-item>
 </body>
 

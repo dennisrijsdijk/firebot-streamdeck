@@ -13,3 +13,10 @@ type BaseActionSettings<T> = {
     endpoint?: string;
     action?: T;
 }
+
+type CounterActionSettings = {
+    counterId?: string;
+    counterLabel?: string;
+    value?: number;
+    overrideValue?: boolean;
+}

@@ -1,20 +1,23 @@
 import streamDeck from "@elgato/streamdeck";
+import firebotManager from "./firebot-manager";
 
-import { IncrementCounter } from "./actions/increment-counter";
+import { CounterAction } from "./actions/counter";
 
 // We can enable "trace" logging so that all messages between the Stream Deck, and the plugin are recorded. When storing sensitive information
 streamDeck.logger.setLevel("trace");
 
+streamDeck.settings.useExperimentalMessageIdentifiers = true;
+
 // Register the increment action.
-streamDeck.actions.registerAction(new IncrementCounter());
+streamDeck.actions.registerAction(new CounterAction());
 
 // Finally, connect to the Stream Deck.
 await streamDeck.connect();
 
-const globalSettings = await streamDeck.settings.getGlobalSettings<GlobalSettings>();
+let globalSettings = await streamDeck.settings.getGlobalSettings<GlobalSettings>();
 
 if (globalSettings && Object.keys(globalSettings).length === 0) {
-    await streamDeck.settings.setGlobalSettings<GlobalSettings>({
+    globalSettings = {
         defaultEndpoint: "localhost",
         instances: [
             {
@@ -22,5 +25,12 @@ if (globalSettings && Object.keys(globalSettings).length === 0) {
                 name: "Localhost"
             }
         ]
-    });
+    };
+    await streamDeck.settings.setGlobalSettings<GlobalSettings>(globalSettings);
 }
+
+for (const instance of globalSettings.instances) {
+    firebotManager.createInstance(instance);
+}
+
+firebotManager.ready = true;

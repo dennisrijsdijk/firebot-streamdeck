@@ -4,11 +4,11 @@
 	"Author": "DennisOnTheInternet",
 	"Actions": [
 		{
-			"Name": "Counter",
+			"Name": "Update Counter",
 			"UUID": "gg.dennis.firebot.counter",
-			"Icon": "imgs/actions/counter/icon",
+			"Icon": "imgs/actions/counter/action",
 			"Tooltip": "Interact with a Firebot Counter",
-			"PropertyInspectorPath": "ui/increment-counter.html",
+			"PropertyInspectorPath": "ui/counter.html",
 			"UserTitleEnabled": false,
 			"Controllers": [
 				"Keypad"
@@ -16,7 +16,7 @@
 			"States": [
 				{
 					"Image": "imgs/actions/counter/key",
-					"TitleAlignment": "middle"
+					"TitleAlignment": "top"
 				}
 			]
 		}

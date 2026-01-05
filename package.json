@@ -18,6 +18,7 @@
     },
     "dependencies": {
         "@dennisrijsdijk/node-firebot": "^0.1.0",
-        "@elgato/streamdeck": "^2.0.0"
+        "@elgato/streamdeck": "^2.0.0",
+        "expressionish": "^0.1.2"
     }
 }

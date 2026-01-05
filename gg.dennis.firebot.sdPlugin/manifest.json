@@ -9,6 +9,7 @@
 			"Icon": "imgs/actions/counter/icon",
 			"Tooltip": "Interact with a Firebot Counter",
 			"PropertyInspectorPath": "ui/increment-counter.html",
+			"UserTitleEnabled": false,
 			"Controllers": [
 				"Keypad"
 			],

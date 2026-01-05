@@ -9,4 +9,18 @@ streamDeck.logger.setLevel("trace");
 streamDeck.actions.registerAction(new IncrementCounter());
 
 // Finally, connect to the Stream Deck.
-streamDeck.connect();
+await streamDeck.connect();
+
+const globalSettings = await streamDeck.settings.getGlobalSettings<GlobalSettings>();
+
+if (globalSettings && Object.keys(globalSettings).length === 0) {
+    await streamDeck.settings.setGlobalSettings<GlobalSettings>({
+        defaultEndpoint: "localhost",
+        instances: [
+            {
+                endpoint: "localhost",
+                name: "Localhost"
+            }
+        ]
+    });
+}

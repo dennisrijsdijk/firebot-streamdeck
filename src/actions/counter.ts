@@ -39,9 +39,9 @@ export class CounterAction extends BaseAction<CounterActionSettings> {
 		await super.onWillAppear(ev);
 
 		await this.populateSettings(ev, {
-			counterId: "",
+			id: "",
 			value: 1,
-			overrideValue: false,
+			action: "update",
 		});
 	}
 
@@ -52,9 +52,9 @@ export class CounterAction extends BaseAction<CounterActionSettings> {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${ev.payload.settings.endpoint}`);
 			return;
 		}
-		const counterId = ev.payload.settings.action?.counterId;
+		const counterId = ev.payload.settings.action?.id;
 		const value = ev.payload.settings.action?.value || 1;
-		const overrideValue = ev.payload.settings.action?.overrideValue || false;
+		const overrideValue = ev.payload.settings.action?.action === "set";
 		if (!counterId) {
 			streamDeck.logger.error(`No counter ID set for action ${ev.action.id}`);
 			return;

@@ -12,14 +12,17 @@
         <sdpi-textarea setting="title" placeholder="Enter title..." rows="2"></sdpi-textarea>
     </sdpi-item>
     <sdpi-item label="Counter">
-        <sdpi-select setting="action.counterId" label-setting="action.counterLabel" datasource="getCounters" loading="Fetching Counters..." placeholder="Select a counter..." show-refresh hot-reload>
+        <sdpi-select setting="action.id" label-setting="action.label" datasource="getCounters" loading="Fetching Counters..." placeholder="Select a counter..." show-refresh hot-reload>
         </sdpi-select>
     </sdpi-item>
     <sdpi-item label="Value">
         <sdpi-number setting="action.value" step="1" default="1"></sdpi-number>
     </sdpi-item>
     <sdpi-item>
-        <sdpi-checkbox setting="action.overrideValue" label="Override Counter Value"></sdpi-checkbox>
+        <sdpi-radio setting="action.action" default="update">
+            <option value="update">Update</option>
+            <option value="set">Set</option>
+        </sdpi-radio>
     </sdpi-item>
 </body>
 

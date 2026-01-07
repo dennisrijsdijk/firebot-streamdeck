@@ -14,7 +14,7 @@ const variable: Variable = {
         }
 
         if (!counterName) {
-            const counter = instance.data.counters[trigger.settings.action?.counterId || ""];
+            const counter = instance.data.counters[trigger.settings.action?.id || ""];
             return counter ? counter.value : null;
         }
 

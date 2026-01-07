@@ -15,14 +15,14 @@ type BaseActionSettings<T> = {
 }
 
 type CounterActionSettings = {
-    counterId?: string;
-    counterLabel?: string;
+    id?: string;
+    label?: string;
     value?: number;
-    overrideValue?: boolean;
+    action?: "update" | "set";
 }
 
 type PresetListActionSettings = {
-    presetListId?: string;
-    presetListLabel?: string;
-    presetListArgs?: Record<string, string>;
+    id?: string;
+    label?: string;
+    arguments?: Record<string, string>;
 }

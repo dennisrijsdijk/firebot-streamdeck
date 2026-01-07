@@ -57,7 +57,7 @@
         <sdpi-textarea setting="title" placeholder="Enter title..." rows="2"></sdpi-textarea>
     </sdpi-item>
     <sdpi-item label="Preset Effect List">
-        <sdpi-select setting="action.presetListId" label-setting="action.presetListLabel" datasource="getPresetLists"
+        <sdpi-select setting="action.id" label-setting="action.label" datasource="getPresetLists"
             loading="Fetching Preset Effect Lists..." placeholder="Select a preset effect list..." show-refresh
             hot-reload>
         </sdpi-select>
@@ -89,7 +89,7 @@
                         item.setAttribute("label", arg.label);
 
                         const textField = document.createElement("sdpi-textfield");
-                        textField.setAttribute("setting", `action.presetListArgs.${arg.label}`);
+                        textField.setAttribute("setting", `action.arguments.${arg.label}`);
 
                         textField.value = arg.value || "";
 

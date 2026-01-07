@@ -59,7 +59,7 @@ export class PresetListAction extends BaseAction<PresetListActionSettings> {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
 			return;
 		}
-		const presetListId = settings.action?.presetListId;
+		const presetListId = settings.action?.id;
 		if (!presetListId) {
 			streamDeck.logger.error(`No preset effect list ID set for action ${actionId}`);
 			return;
@@ -73,7 +73,7 @@ export class PresetListAction extends BaseAction<PresetListActionSettings> {
 			event: "getPresetListArgs",
 			items: presetList.argumentNames.map(name => ({
 				label: name,
-				value: settings.action?.presetListArgs?.[name] || "",
+				value: settings.action?.arguments?.[name] || "",
 			}))
 		};
 
@@ -88,18 +88,18 @@ export class PresetListAction extends BaseAction<PresetListActionSettings> {
 		await super.onWillAppear(ev);
 
 		await this.populateSettings(ev, {
-			presetListId: "",
-			presetListArgs: {}
+			id: "",
+			arguments: {}
 		});
 
-		actionPresetListsCache[ev.action.id] = ev.payload.settings.action?.presetListId || "";
+		actionPresetListsCache[ev.action.id] = ev.payload.settings.action?.id || "";
 	}
 
 	override async onDidReceiveSettings(ev: DidReceiveSettingsEvent<BaseActionSettings<PresetListActionSettings>>): Promise<void> {
 		await super.onDidReceiveSettings(ev);
 
-		if (actionPresetListsCache[ev.action.id] !== ev.payload.settings.action?.presetListId) {
-			actionPresetListsCache[ev.action.id] = ev.payload.settings.action?.presetListId || "";
+		if (actionPresetListsCache[ev.action.id] !== ev.payload.settings.action?.id) {
+			actionPresetListsCache[ev.action.id] = ev.payload.settings.action?.id || "";
 			await this.sendPresetListArgsToPI(ev.action.id);
 		}
 	}
@@ -112,8 +112,8 @@ export class PresetListAction extends BaseAction<PresetListActionSettings> {
 			return;
 		}
 
-		const presetListId = ev.payload.settings.action?.presetListId;
-		const presetListArgs = ev.payload.settings.action?.presetListArgs || {};
+		const presetListId = ev.payload.settings.action?.id;
+		const presetListArgs = ev.payload.settings.action?.arguments || {};
 		if (!presetListId) {
 			streamDeck.logger.error(`No preset effect list ID set for action ${ev.action.id}`);
 			return;

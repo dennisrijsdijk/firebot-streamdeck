@@ -2,6 +2,7 @@ import streamDeck from "@elgato/streamdeck";
 import firebotManager from "./firebot-manager";
 
 import { CounterAction } from "./actions/counter";
+import { PresetListAction } from "./actions/preset-effect-list";
 
 // We can enable "trace" logging so that all messages between the Stream Deck, and the plugin are recorded. When storing sensitive information
 streamDeck.logger.setLevel("trace");
@@ -10,6 +11,7 @@ streamDeck.settings.useExperimentalMessageIdentifiers = true;
 
 // Register the increment action.
 streamDeck.actions.registerAction(new CounterAction());
+streamDeck.actions.registerAction(new PresetListAction());
 
 // Finally, connect to the Stream Deck.
 await streamDeck.connect();

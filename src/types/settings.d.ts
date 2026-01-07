@@ -20,3 +20,9 @@ type CounterActionSettings = {
     value?: number;
     overrideValue?: boolean;
 }
+
+type PresetListActionSettings = {
+    presetListId?: string;
+    presetListLabel?: string;
+    presetListArgs?: Record<string, string>;
+}

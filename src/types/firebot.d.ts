@@ -10,5 +10,10 @@ export type FirebotInstance = {
             name: string;
             value: number;
         }>;
+        presetEffectLists: Record<string, {
+            id: string;
+            name: string;
+            argumentNames: string[];
+        }>;
     }
 }

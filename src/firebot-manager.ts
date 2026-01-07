@@ -1,5 +1,5 @@
 import streamDeck from "@elgato/streamdeck";
-import { FirebotClient } from "@dennisrijsdijk/node-firebot";
+import { Counter, FirebotClient, WebsocketPresetEffectList } from "@dennisrijsdijk/node-firebot";
 import { FirebotInstance } from "./types/firebot";
 import EventEmitter from "events";
 
@@ -57,10 +57,11 @@ class FirebotManager {
             name: settingsInstance.name,
             data: {
                 counters: {},
+                presetEffectLists: {},
             }
         };
 
-        const counterCreatedOrUpdated = (counter: FirebotInstance["data"]["counters"][string]) => {
+        const counterCreatedOrUpdated = (counter: Counter) => {
             instance.data.counters[counter.id] = {
                 id: counter.id,
                 name: counter.name,
@@ -68,7 +69,15 @@ class FirebotManager {
             };
 
             this.emit("variablesDataUpdated", instance);
-        }
+        };
+
+        const presetEffectListCreatedOrUpdated = (presetEffectList: WebsocketPresetEffectList) => {
+            instance.data.presetEffectLists[presetEffectList.id] = {
+                id: presetEffectList.id,
+                name: presetEffectList.name,
+                argumentNames: presetEffectList.args.map(arg => arg.name),
+            };
+        };
 
         client.websocket.on("counter:created", counterCreatedOrUpdated.bind(this));
         client.websocket.on("counter:updated", counterCreatedOrUpdated.bind(this));
@@ -77,9 +86,16 @@ class FirebotManager {
             this.emit("variablesDataUpdated", instance);
         });
 
+        client.websocket.on("preset-effect-list:created", presetEffectListCreatedOrUpdated.bind(this));
+        client.websocket.on("preset-effect-list:updated", presetEffectListCreatedOrUpdated.bind(this));
+        client.websocket.on("preset-effect-list:deleted", (presetEffectList) => {
+            delete instance.data.presetEffectLists[presetEffectList.id];
+        });
+
         // ...
         client.websocket.on("connected", async () => {
             streamDeck.logger.info(`Connected to Firebot instance at ${settingsInstance.endpoint}`);
+
             const counters = await client.counters.getCounters();
             instance.data.counters = {};
             counters.forEach(counter => {
@@ -87,6 +103,16 @@ class FirebotManager {
                     id: counter.id,
                     name: counter.name,
                     value: counter.value,
+                };
+            });
+
+            const presetEffectLists = await client.effects.getPresetEffectLists();
+            instance.data.presetEffectLists = {};
+            presetEffectLists.forEach(presetEffectList => {
+                instance.data.presetEffectLists[presetEffectList.id] = {
+                    id: presetEffectList.id,
+                    name: presetEffectList.name,
+                    argumentNames: presetEffectList.args,
                 };
             });
             // ...

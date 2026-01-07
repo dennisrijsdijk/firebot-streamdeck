@@ -19,6 +19,23 @@
 					"TitleAlignment": "top"
 				}
 			]
+		},
+		{
+			"Name": "Run Preset Effect List",
+			"UUID": "gg.dennis.firebot.presetlist",
+			"Icon": "imgs/actions/preset/action",
+			"Tooltip": "Run a Firebot Preset Effect List",
+			"PropertyInspectorPath": "ui/preset-list.html",
+			"UserTitleEnabled": false,
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/preset/key",
+					"TitleAlignment": "top"
+				}
+			]
 		}
 	],
 	"Category": "Firebot",

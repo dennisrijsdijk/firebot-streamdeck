@@ -94,7 +94,7 @@ export class BaseAction<T extends JsonObject> extends SingletonAction<BaseAction
 
         await this.waitUntilReady();
 
-        const title = await findAndReplaceVariables(cachedAction.settings.title || "", meta) as string;
+        const title = await findAndReplaceVariables(cachedAction.settings.title || "", meta);
 
         streamDeck.logger.info(`Generated title for action ${action.manifestId} (${action.id}): ${title}`);
         
@@ -104,7 +104,7 @@ export class BaseAction<T extends JsonObject> extends SingletonAction<BaseAction
 
         streamDeck.logger.info(`Updating title for action ${action.manifestId} (${action.id}) to: ${title}`);
 
-        cachedAction.title = title;
-        return action.setTitle(title);
+        cachedAction.title = typeof title === "string" ? title : JSON.stringify(title);
+        return action.setTitle(cachedAction.title);
     }
 }

@@ -1,6 +1,7 @@
 import streamDeck from "@elgato/streamdeck";
 import firebotManager from "./firebot-manager";
 
+import { CommandAction } from "./actions/command";
 import { CounterAction } from "./actions/counter";
 import { PresetListAction } from "./actions/preset-effect-list";
 
@@ -10,6 +11,7 @@ streamDeck.logger.setLevel("trace");
 streamDeck.settings.useExperimentalMessageIdentifiers = true;
 
 // Register the increment action.
+streamDeck.actions.registerAction(new CommandAction());
 streamDeck.actions.registerAction(new CounterAction());
 streamDeck.actions.registerAction(new PresetListAction());
 

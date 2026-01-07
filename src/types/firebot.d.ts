@@ -1,10 +1,15 @@
-import { FirebotClient } from "@dennisrijsdijk/node-firebot";
+import { FirebotClient, CommandType } from "@dennisrijsdijk/node-firebot";
 
 export type FirebotInstance = {
     client: FirebotClient;
     endpoint: string;
     name: string;
     data: {
+        commands: Record<string, {
+            id: string;
+            trigger: string;
+            type: CommandType;
+        }>;
         counters: Record<string, {
             id: string;
             name: string;

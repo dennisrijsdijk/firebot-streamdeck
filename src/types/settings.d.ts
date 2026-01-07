@@ -26,3 +26,9 @@ type PresetListActionSettings = {
     label?: string;
     arguments?: Record<string, string>;
 }
+
+type CommandActionSettings = {
+    id?: string;
+    label?: string;
+    args?: string;
+}

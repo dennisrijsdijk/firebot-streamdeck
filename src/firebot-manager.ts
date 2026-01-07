@@ -1,5 +1,5 @@
 import streamDeck from "@elgato/streamdeck";
-import { Counter, FirebotClient, WebsocketPresetEffectList } from "@dennisrijsdijk/node-firebot";
+import { CommandDefinition, Counter, FirebotClient, WebsocketPresetEffectList } from "@dennisrijsdijk/node-firebot";
 import { FirebotInstance } from "./types/firebot";
 import EventEmitter from "events";
 
@@ -56,10 +56,29 @@ class FirebotManager {
             endpoint: settingsInstance.endpoint,
             name: settingsInstance.name,
             data: {
+                commands: {},
                 counters: {},
                 presetEffectLists: {},
             }
         };
+
+        const commandCreatedOrUpdated = (command: CommandDefinition) => {
+            if (!command.id) {
+                streamDeck.logger.error(`Received command without ID (${command.trigger}) from Firebot instance at ${settingsInstance.endpoint}`);
+                return;
+            }
+
+            if (!command.type) {
+                streamDeck.logger.error(`Received command without type (${command.trigger}) from Firebot instance at ${settingsInstance.endpoint}`);
+                return;
+            }
+
+            instance.data.commands[command.id] = {
+                id: command.id,
+                trigger: command.trigger,
+                type: command.type,
+            };
+        }
 
         const counterCreatedOrUpdated = (counter: Counter) => {
             instance.data.counters[counter.id] = {
@@ -79,6 +98,16 @@ class FirebotManager {
             };
         };
 
+        client.websocket.on("command:created", commandCreatedOrUpdated.bind(this));
+        client.websocket.on("command:updated", commandCreatedOrUpdated.bind(this));
+        client.websocket.on("command:deleted", (command) => {
+            if (!command.id) {
+                streamDeck.logger.error(`Received deleted command without ID (${command.trigger}) from Firebot instance at ${settingsInstance.endpoint}`);
+                return;
+            }
+            delete instance.data.commands[command.id];
+        });
+
         client.websocket.on("counter:created", counterCreatedOrUpdated.bind(this));
         client.websocket.on("counter:updated", counterCreatedOrUpdated.bind(this));
         client.websocket.on("counter:deleted", (counter) => {
@@ -95,6 +124,25 @@ class FirebotManager {
         // ...
         client.websocket.on("connected", async () => {
             streamDeck.logger.info(`Connected to Firebot instance at ${settingsInstance.endpoint}`);
+
+            const systemCommands = await client.commands.getSystemCommands();
+            const customCommands = await client.commands.getCustomCommands();
+            instance.data.commands = {};
+            systemCommands.forEach(command => {
+                instance.data.commands[command.id] = {
+                    id: command.id,
+                    trigger: command.trigger,
+                    type: "system",
+                };
+            });
+
+            customCommands.forEach(command => {
+                instance.data.commands[command.id] = {
+                    id: command.id,
+                    trigger: command.trigger,
+                    type: "custom",
+                };
+            });
 
             const counters = await client.counters.getCounters();
             instance.data.counters = {};

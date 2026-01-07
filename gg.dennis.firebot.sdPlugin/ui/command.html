@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>Run Command Settings</title>
+    <meta charset="utf-8" />
+    <script src="sdpi-components.js"></script>
+</head>
+
+<body>
+    <sdpi-item label="Title">
+        <sdpi-textarea setting="title" placeholder="Enter title..." rows="2"></sdpi-textarea>
+    </sdpi-item>
+    <sdpi-item label="Command">
+        <sdpi-select setting="action.id" label-setting="action.label" datasource="getCommands" loading="Fetching Commands..." placeholder="Select a command..." show-refresh hot-reload>
+        </sdpi-select>
+    </sdpi-item>
+    <sdpi-item label="Arguments">
+        <sdpi-textfield setting="action.args"></sdpi-textfield>
+    </sdpi-item>
+</body>
+
+</html>

@@ -36,6 +36,23 @@
 					"TitleAlignment": "top"
 				}
 			]
+		},
+		{
+			"Name": "Run Command",
+			"UUID": "gg.dennis.firebot.command",
+			"Icon": "imgs/actions/command/action",
+			"Tooltip": "Run a Firebot Command",
+			"PropertyInspectorPath": "ui/command.html",
+			"UserTitleEnabled": false,
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/command/key",
+					"TitleAlignment": "top"
+				}
+			]
 		}
 	],
 	"Category": "Firebot",

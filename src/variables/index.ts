@@ -1,6 +1,5 @@
 import actionVariables from "./actions";
-import { evaluate, LookupMap } from "expressionish";
-import { Variable, VariableMap, VariableEvaluateFnc, ReplaceVariableTrigger } from "../types/replace-variables";
+import { evaluate, LookupMap, VariableMap, VariableEvaluateFnc } from "expressionish";
 
 const variables: Variable[] = [
     ...actionVariables

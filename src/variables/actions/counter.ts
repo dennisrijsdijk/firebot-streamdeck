@@ -1,5 +1,4 @@
 import firebotManager from "../../firebot-manager";
-import { ReplaceVariableTrigger, Variable } from "../../types/replace-variables";
 
 const variable: Variable = {
     definition: {

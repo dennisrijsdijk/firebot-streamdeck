@@ -1,7 +1,6 @@
 import streamDeck, { DidReceiveSettingsEvent, SingletonAction, WillAppearEvent, WillDisappearEvent, Action } from "@elgato/streamdeck";
 import { JsonObject } from "@elgato/utils";
 import firebotManager from "./firebot-manager";
-import { ReplaceVariableTrigger } from "./types/replace-variables";
 import { findAndReplaceVariables } from "./variables";
 
 type CachedAction<T> = {
@@ -94,7 +93,13 @@ export class BaseAction<T extends JsonObject> extends SingletonAction<BaseAction
 
         await this.waitUntilReady();
 
-        const title = await findAndReplaceVariables(cachedAction.settings.title || "", meta);
+        let title: string | object = cachedAction.settings.title || "";
+
+        try {
+            title = await findAndReplaceVariables(cachedAction.settings.title || "", meta) as string | object;
+        } catch (error) {
+            streamDeck.logger.error(`Failed to replace variables in title for action ${action.manifestId} (${action.id}): ${error}`);
+        }
 
         streamDeck.logger.info(`Generated title for action ${action.manifestId} (${action.id}): ${title}`);
         

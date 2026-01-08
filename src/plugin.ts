@@ -3,6 +3,7 @@ import firebotManager from "./firebot-manager";
 
 import { CommandAction } from "./actions/command";
 import { CounterAction } from "./actions/counter";
+import { CustomRoleAction } from "./actions/custom-role";
 import { PresetListAction } from "./actions/preset-effect-list";
 
 // We can enable "trace" logging so that all messages between the Stream Deck, and the plugin are recorded. When storing sensitive information
@@ -13,6 +14,7 @@ streamDeck.settings.useExperimentalMessageIdentifiers = true;
 // Register the increment action.
 streamDeck.actions.registerAction(new CommandAction());
 streamDeck.actions.registerAction(new CounterAction());
+streamDeck.actions.registerAction(new CustomRoleAction());
 streamDeck.actions.registerAction(new PresetListAction());
 
 // Finally, connect to the Stream Deck.

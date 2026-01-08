@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>Clear Custom Role Settings</title>
+    <meta charset="utf-8" />
+    <script src="sdpi-components.js"></script>
+</head>
+
+<body>
+    <sdpi-item label="Title">
+        <sdpi-textarea setting="title" placeholder="Enter title..." rows="2"></sdpi-textarea>
+    </sdpi-item>
+    <sdpi-item label="Custom Role">
+        <sdpi-select setting="action.id" label-setting="action.label" datasource="getCustomRoles" loading="Fetching Custom Roles..." placeholder="Select a custom role..." show-refresh hot-reload>
+        </sdpi-select>
+    </sdpi-item>
+</body>
+
+</html>

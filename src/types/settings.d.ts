@@ -14,6 +14,12 @@ type BaseActionSettings<T> = {
     action?: T;
 }
 
+type CommandActionSettings = {
+    id?: string;
+    label?: string;
+    args?: string;
+}
+
 type CounterActionSettings = {
     id?: string;
     label?: string;
@@ -21,14 +27,13 @@ type CounterActionSettings = {
     action?: "update" | "set";
 }
 
+type CustomRoleActionSettings = {
+    id?: string;
+    label?: string;
+}
+
 type PresetListActionSettings = {
     id?: string;
     label?: string;
     arguments?: Record<string, string>;
-}
-
-type CommandActionSettings = {
-    id?: string;
-    label?: string;
-    args?: string;
 }

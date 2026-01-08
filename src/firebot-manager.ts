@@ -1,5 +1,5 @@
 import streamDeck from "@elgato/streamdeck";
-import { CommandDefinition, Counter, FirebotClient, WebsocketPresetEffectList } from "@dennisrijsdijk/node-firebot";
+import { CommandDefinition, Counter, FirebotClient, WebsocketCustomRole, WebsocketPresetEffectList } from "@dennisrijsdijk/node-firebot";
 import { FirebotInstance } from "./types/firebot";
 import EventEmitter from "events";
 
@@ -58,6 +58,7 @@ class FirebotManager {
             data: {
                 commands: {},
                 counters: {},
+                customRoles: {},
                 presetEffectLists: {},
             }
         };
@@ -90,6 +91,16 @@ class FirebotManager {
             this.emit("variablesDataUpdated", instance);
         };
 
+        const customRoleCreatedOrUpdated = (customRole: WebsocketCustomRole) => {
+            instance.data.customRoles[customRole.id] = {
+                id: customRole.id,
+                name: customRole.name,
+                count: customRole.viewers.length
+            };
+
+            this.emit("variablesDataUpdated", instance);
+        };
+
         const presetEffectListCreatedOrUpdated = (presetEffectList: WebsocketPresetEffectList) => {
             instance.data.presetEffectLists[presetEffectList.id] = {
                 id: presetEffectList.id,
@@ -113,6 +124,12 @@ class FirebotManager {
         client.websocket.on("counter:deleted", (counter) => {
             delete instance.data.counters[counter.id];
             this.emit("variablesDataUpdated", instance);
+        });
+
+        client.websocket.on("custom-role:created", customRoleCreatedOrUpdated.bind(this));
+        client.websocket.on("custom-role:updated", customRoleCreatedOrUpdated.bind(this));
+        client.websocket.on("custom-role:deleted", (customRole) => {
+            delete instance.data.customRoles[customRole.id];
         });
 
         client.websocket.on("preset-effect-list:created", presetEffectListCreatedOrUpdated.bind(this));
@@ -151,6 +168,16 @@ class FirebotManager {
                     id: counter.id,
                     name: counter.name,
                     value: counter.value,
+                };
+            });
+
+            const customRoles = await client.customRoles.getCustomRoles();
+            instance.data.customRoles = {};
+            customRoles.forEach(customRole => {
+                instance.data.customRoles[customRole.id] = {
+                    id: customRole.id,
+                    name: customRole.name,
+                    count: customRole.viewers.length
                 };
             });
 

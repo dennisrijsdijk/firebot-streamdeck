@@ -4,6 +4,23 @@
 	"Author": "DennisOnTheInternet",
 	"Actions": [
 		{
+			"Name": "Run Command",
+			"UUID": "gg.dennis.firebot.command",
+			"Icon": "imgs/actions/command/action",
+			"Tooltip": "Run a Firebot Command",
+			"PropertyInspectorPath": "ui/command.html",
+			"UserTitleEnabled": false,
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/command/key",
+					"TitleAlignment": "top"
+				}
+			]
+		},
+		{
 			"Name": "Update Counter",
 			"UUID": "gg.dennis.firebot.counter",
 			"Icon": "imgs/actions/counter/action",
@@ -21,6 +38,23 @@
 			]
 		},
 		{
+			"Name": "Clear Custom Role",
+			"UUID": "gg.dennis.firebot.customrole",
+			"Icon": "imgs/actions/role/action",
+			"PropertyInspectorPath": "ui/custom-role.html",
+			"UserTitleEnabled": false,
+			"Tooltip": "Remove all viewers from a Firebot Custom Role",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/role/key",
+					"TitleAlignment": "top"
+				}
+			]
+		},
+		{
 			"Name": "Run Preset Effect List",
 			"UUID": "gg.dennis.firebot.presetlist",
 			"Icon": "imgs/actions/preset/action",
@@ -33,23 +67,6 @@
 			"States": [
 				{
 					"Image": "imgs/actions/preset/key",
-					"TitleAlignment": "top"
-				}
-			]
-		},
-		{
-			"Name": "Run Command",
-			"UUID": "gg.dennis.firebot.command",
-			"Icon": "imgs/actions/command/action",
-			"Tooltip": "Run a Firebot Command",
-			"PropertyInspectorPath": "ui/command.html",
-			"UserTitleEnabled": false,
-			"Controllers": [
-				"Keypad"
-			],
-			"States": [
-				{
-					"Image": "imgs/actions/command/key",
 					"TitleAlignment": "top"
 				}
 			]

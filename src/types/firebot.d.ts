@@ -15,6 +15,11 @@ export type FirebotInstance = {
             name: string;
             value: number;
         }>;
+        customRoles: Record<string, {
+            id: string;
+            name: string;
+            count: number;
+        }>;
         presetEffectLists: Record<string, {
             id: string;
             name: string;

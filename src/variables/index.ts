@@ -1,3 +1,5 @@
+import firebotManager from "../firebot-manager";
+import { getCustomVariable, } from "../util";
 import actionVariables from "./actions";
 import { evaluate, LookupMap, VariableMap, VariableEvaluateFnc } from "expressionish";
 
@@ -6,6 +8,13 @@ const variables: Variable[] = [
 ]
 
 const lookups: LookupMap = new Map();
+
+lookups.set("$", (_, name: string) => ({
+    evaluate: (trigger: ReplaceVariableTrigger, ...args: unknown[]) => {
+        const instance = firebotManager.getInstance(trigger.settings?.endpoint || "");
+        return getCustomVariable(name, instance, args as string[]);
+    }
+}));
 
 const variableMap: VariableMap = new Map();
 

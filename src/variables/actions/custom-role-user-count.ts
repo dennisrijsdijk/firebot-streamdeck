@@ -7,7 +7,7 @@ const variable: Variable = {
         usage: "customRoleUserCount[name]"
     },
     evaluator: async (trigger: ReplaceVariableTrigger<CustomRoleActionSettings>, customRoleName?: string) => {
-        const instance = firebotManager.getInstance(trigger.settings.endpoint || "");
+        const instance = firebotManager.getInstance(trigger.settings?.endpoint || "");
         if (!instance) {
             return null;
         }
@@ -17,7 +17,7 @@ const variable: Variable = {
                 return null;
             }
 
-            const customRole = instance.data.customRoles[trigger.settings.action?.id || ""];
+            const customRole = instance.data.customRoles[trigger.settings?.action?.id || ""];
             return customRole ? customRole.count : null;
         }
     }

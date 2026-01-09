@@ -20,6 +20,7 @@ export type FirebotInstance = {
             name: string;
             count: number;
         }>;
+        customVariables: Record<string, unknown>;
         presetEffectLists: Record<string, {
             id: string;
             name: string;

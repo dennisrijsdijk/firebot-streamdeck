@@ -32,6 +32,12 @@ type CustomRoleActionSettings = {
     label?: string;
 }
 
+type CustomVariableActionSettings = {
+    name?: string;
+    value?: string;
+    propertyPath?: string;
+}
+
 type PresetListActionSettings = {
     id?: string;
     label?: string;

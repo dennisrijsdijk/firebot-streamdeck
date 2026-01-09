@@ -1,5 +1,5 @@
 import streamDeck from "@elgato/streamdeck";
-import { CommandDefinition, Counter, FirebotClient, WebsocketCustomRole, WebsocketPresetEffectList } from "@dennisrijsdijk/node-firebot";
+import { CommandDefinition, Counter, FirebotClient, WebsocketCustomRole, WebsocketCustomVariable, WebsocketPresetEffectList } from "@dennisrijsdijk/node-firebot";
 import { FirebotInstance } from "./types/firebot";
 import EventEmitter from "events";
 
@@ -59,6 +59,7 @@ class FirebotManager {
                 commands: {},
                 counters: {},
                 customRoles: {},
+                customVariables: {},
                 presetEffectLists: {},
             }
         };
@@ -101,6 +102,11 @@ class FirebotManager {
             this.emit("variablesDataUpdated", instance);
         };
 
+        const customVariableCreatedOrUpdated = (variable: WebsocketCustomVariable) => {
+            instance.data.customVariables[variable.name] = variable.value;
+            this.emit("variablesDataUpdated", instance);
+        };
+
         const presetEffectListCreatedOrUpdated = (presetEffectList: WebsocketPresetEffectList) => {
             instance.data.presetEffectLists[presetEffectList.id] = {
                 id: presetEffectList.id,
@@ -130,6 +136,13 @@ class FirebotManager {
         client.websocket.on("custom-role:updated", customRoleCreatedOrUpdated.bind(this));
         client.websocket.on("custom-role:deleted", (customRole) => {
             delete instance.data.customRoles[customRole.id];
+        });
+
+        client.websocket.on("custom-variable:created", customVariableCreatedOrUpdated.bind(this));
+        client.websocket.on("custom-variable:updated", customVariableCreatedOrUpdated.bind(this));
+        client.websocket.on("custom-variable:deleted", (variable) => {
+            delete instance.data.customVariables[variable.name];
+            this.emit("variablesDataUpdated", instance);
         });
 
         client.websocket.on("preset-effect-list:created", presetEffectListCreatedOrUpdated.bind(this));
@@ -179,6 +192,12 @@ class FirebotManager {
                     name: customRole.name,
                     count: customRole.viewers.length
                 };
+            });
+
+            const customVariables = await client.customVariables.getCustomVariables();
+            instance.data.customVariables = {};
+            customVariables.forEach(variable => {
+                instance.data.customVariables[variable.name] = variable.data;
             });
 
             const presetEffectLists = await client.effects.getPresetEffectLists();

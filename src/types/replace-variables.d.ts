@@ -12,8 +12,8 @@ interface VariableDefinition {
 }
 
 type ReplaceVariableTrigger<TActionSettings = unknown> = {
-    actionId: string;
-    settings: BaseActionSettings<TActionSettings>;
+    actionId?: string;
+    settings?: BaseActionSettings<TActionSettings>;
 };
 
 type Variable = {

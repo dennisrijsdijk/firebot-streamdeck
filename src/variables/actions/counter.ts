@@ -7,13 +7,13 @@ const variable: Variable = {
         usage: "counter[name]"
     },
     evaluator: async (trigger: ReplaceVariableTrigger<CounterActionSettings>, counterName?: string) => {
-        const instance = firebotManager.getInstance(trigger.settings.endpoint || "");
+        const instance = firebotManager.getInstance(trigger.settings?.endpoint || "");
         if (!instance) {
             return null;
         }
 
         if (!counterName) {
-            const counter = instance.data.counters[trigger.settings.action?.id || ""];
+            const counter = instance.data.counters[trigger.settings?.action?.id || ""];
             return counter ? counter.value : null;
         }
 

@@ -24,6 +24,11 @@ export class CustomRoleAction extends BaseAction<CustomRoleActionSettings> {
             return;
         }
 
+        if (!instance.connected) {
+            streamDeck.logger.error(`Not connected to Firebot instance at endpoint: ${settings.endpoint}, refusing to serve stale data.`);
+            return;
+        }
+
         const dataSourcePayload: DataSourcePayload = {
             event: "getCustomRoles",
             items: Object.values(instance.data.customRoles || {}).map(customRole => ({

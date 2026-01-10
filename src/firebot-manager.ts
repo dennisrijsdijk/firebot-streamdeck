@@ -1,5 +1,5 @@
 import streamDeck from "@elgato/streamdeck";
-import { CommandDefinition, Counter, FirebotClient, WebsocketCustomRole, WebsocketCustomVariable, WebsocketPresetEffectList } from "@dennisrijsdijk/node-firebot";
+import { CommandDefinition, Counter, EffectQueueConfig, FirebotClient, WebsocketCustomRole, WebsocketCustomVariable, WebsocketPresetEffectList } from "@dennisrijsdijk/node-firebot";
 import { FirebotInstance } from "./types/firebot";
 import EventEmitter from "events";
 
@@ -52,6 +52,7 @@ class FirebotManager {
 
         const client = new FirebotClient(settingsInstance.endpoint);
         const instance: FirebotInstance = {
+            connected: false,
             client,
             endpoint: settingsInstance.endpoint,
             name: settingsInstance.name,
@@ -61,6 +62,7 @@ class FirebotManager {
                 customRoles: {},
                 customVariables: {},
                 presetEffectLists: {},
+                queues: {}
             }
         };
 
@@ -115,6 +117,17 @@ class FirebotManager {
             };
         };
 
+        const queueCreatedOrUpdated = (queue: EffectQueueConfig) => {
+            instance.data.queues[queue.id] = {
+                id: queue.id,
+                name: queue.name,
+                type: queue.mode,
+                active: queue.active,
+                length: instance.data.queues[queue.id]?.length || 0,
+            };
+            this.emit("variablesDataUpdated", instance);
+        };
+
         client.websocket.on("command:created", commandCreatedOrUpdated.bind(this));
         client.websocket.on("command:updated", commandCreatedOrUpdated.bind(this));
         client.websocket.on("command:deleted", (command) => {
@@ -151,8 +164,21 @@ class FirebotManager {
             delete instance.data.presetEffectLists[presetEffectList.id];
         });
 
+        client.websocket.on("effect-queue:created", queueCreatedOrUpdated.bind(this));
+        client.websocket.on("effect-queue:updated", queueCreatedOrUpdated.bind(this));
+        client.websocket.on("effect-queue:deleted", (queue) => {
+            delete instance.data.queues[queue.id];
+        });
+        client.websocket.on("effect-queue:length-updated", (queueLengthUpdate) => {
+            if (instance.data.queues[queueLengthUpdate.id]) {
+                instance.data.queues[queueLengthUpdate.id].length = queueLengthUpdate.length;
+                this.emit("variablesDataUpdated", instance);
+            }
+        });
+
         // ...
         client.websocket.on("connected", async () => {
+            instance.connected = true;
             streamDeck.logger.info(`Connected to Firebot instance at ${settingsInstance.endpoint}`);
 
             const systemCommands = await client.commands.getSystemCommands();
@@ -209,10 +235,23 @@ class FirebotManager {
                     argumentNames: presetEffectList.args,
                 };
             });
+
+            const queues = await client.queues.getEffectQueues();
+            instance.data.queues = {};
+            queues.forEach(queue => {
+                instance.data.queues[queue.id] = {
+                    id: queue.id,
+                    name: queue.name,
+                    type: queue.mode,
+                    active: queue.active,
+                    length: queue.length,
+                };
+            });
             // ...
             this.emit("variablesDataUpdated", instance);
         });
         client.websocket.on("disconnected", async ({ code, reason }) => {
+            instance.connected = false;
             if (code === 4001) {
                 return;
             }

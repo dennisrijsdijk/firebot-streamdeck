@@ -29,6 +29,11 @@ export class PresetListAction extends BaseAction<PresetListActionSettings> {
 			return;
 		}
 
+		if (!instance.connected) {
+			streamDeck.logger.error(`Not connected to Firebot instance at endpoint: ${settings.endpoint}, refusing to serve stale data.`);
+			return;
+		}
+
 		let dataSourcePayload: { event: string; items: any[] };
 
 		dataSourcePayload = {
@@ -59,6 +64,12 @@ export class PresetListAction extends BaseAction<PresetListActionSettings> {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
 			return;
 		}
+
+		if (!instance.connected) {
+			streamDeck.logger.error(`Not connected to Firebot instance at endpoint: ${settings.endpoint}, refusing to serve stale data.`);
+			return;
+		}
+
 		const presetListId = settings.action?.id;
 		if (!presetListId) {
 			streamDeck.logger.error(`No preset effect list ID set for action ${actionId}`);

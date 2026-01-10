@@ -87,6 +87,28 @@
 					"TitleAlignment": "top"
 				}
 			]
+		},
+		{
+			"Name": "Update Queue",
+			"UUID": "gg.dennis.firebot.queue",
+			"Icon": "imgs/actions/queue/action",
+			"PropertyInspectorPath": "ui/queue.html",
+			"UserTitleEnabled": false,
+			"Tooltip": "Pause, Resume, Toggle, Clear or Trigger an effect queue",
+			"Controllers": [
+				"Keypad"
+			],
+			"DisableAutomaticStates": true,
+			"States": [
+				{
+					"Image": "imgs/actions/queue/keyActive",
+					"TitleAlignment": "top"
+				},
+				{
+					"Image": "imgs/actions/queue/keyPause",
+					"TitleAlignment": "top"
+				}
+			]
 		}
 	],
 	"Category": "Firebot",

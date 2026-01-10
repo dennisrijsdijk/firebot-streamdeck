@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>Update Effect Queue Settings</title>
+    <meta charset="utf-8" />
+    <script src="sdpi-components.js"></script>
+</head>
+
+<body>
+    <sdpi-item label="Title">
+        <sdpi-textarea setting="title" placeholder="Enter title..." rows="2"></sdpi-textarea>
+    </sdpi-item>
+    <sdpi-item label="Counter">
+        <sdpi-select setting="action.id" label-setting="action.label" datasource="getEffectQueues" loading="Fetching Effect Queues..." placeholder="Select an effect queue..." show-refresh hot-reload>
+        </sdpi-select>
+    </sdpi-item>
+    <sdpi-item label="Action">
+        <sdpi-select id="queue-action" setting="action.action" dataSource="getEffectQueueActions" loading="Fetching Effect Queue Actions..." placeholder="Select an action..." hot-reload></sdpi-select>
+    </sdpi-item>
+</body>
+
+<script>
+    (async function() {
+        const select = document.getElementById('queue-action');
+        SDPIComponents.streamDeckClient.sendToPropertyInspector.subscribe((data) => {
+            console.log(data);
+            if (data.payload && data.payload.event === "getEffectQueueActions") {
+                const currentValue = select.value;
+                if (!data.payload.items.find(item => item.value === currentValue)) {
+                    select.value = "";
+                }
+            }
+        });
+    })();
+</script>
+
+</html>

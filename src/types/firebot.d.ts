@@ -1,6 +1,7 @@
-import { FirebotClient, CommandType } from "@dennisrijsdijk/node-firebot";
+import { FirebotClient, CommandType, QueueMode } from "@dennisrijsdijk/node-firebot";
 
 export type FirebotInstance = {
+    connected: boolean;
     client: FirebotClient;
     endpoint: string;
     name: string;
@@ -25,6 +26,13 @@ export type FirebotInstance = {
             id: string;
             name: string;
             argumentNames: string[];
+        }>;
+        queues: Record<string, {
+            id: string;
+            name: string;
+            type: QueueMode;
+            active: boolean;
+            length: number;
         }>;
     }
 }

@@ -24,6 +24,11 @@ export class CounterAction extends BaseAction<CounterActionSettings> {
 			return;
 		}
 
+		if (!instance.connected) {
+			streamDeck.logger.error(`Not connected to Firebot instance at endpoint: ${settings.endpoint}, refusing to serve stale data.`);
+			return;
+		}
+
 		const dataSourcePayload: DataSourcePayload = {
 			event: "getCounters",
 			items: Object.values(instance.data.counters || {}).map(counter => ({

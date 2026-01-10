@@ -6,6 +6,7 @@ import { CounterAction } from "./actions/counter";
 import { CustomRoleAction } from "./actions/custom-role";
 import { CustomVariableAction } from "./actions/custom-variable";
 import { PresetListAction } from "./actions/preset-effect-list";
+import { QueueAction } from "./actions/queue";
 
 // We can enable "trace" logging so that all messages between the Stream Deck, and the plugin are recorded. When storing sensitive information
 streamDeck.logger.setLevel("trace");
@@ -18,6 +19,7 @@ streamDeck.actions.registerAction(new CounterAction());
 streamDeck.actions.registerAction(new CustomRoleAction());
 streamDeck.actions.registerAction(new CustomVariableAction());
 streamDeck.actions.registerAction(new PresetListAction());
+streamDeck.actions.registerAction(new QueueAction());
 
 // Finally, connect to the Stream Deck.
 await streamDeck.connect();

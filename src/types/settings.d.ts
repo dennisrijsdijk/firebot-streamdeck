@@ -43,3 +43,10 @@ type PresetListActionSettings = {
     label?: string;
     arguments?: Record<string, string>;
 }
+
+type QueueActionSettings = {
+    id?: string;
+    label?: string;
+    action?: "" | "pause" | "resume" | "toggle" | "clear" | "trigger";
+    actionLabel?: string;
+}

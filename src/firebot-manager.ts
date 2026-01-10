@@ -62,7 +62,8 @@ class FirebotManager {
                 customRoles: {},
                 customVariables: {},
                 presetEffectLists: {},
-                queues: {}
+                queues: {},
+                timers: {}
             }
         };
 
@@ -128,6 +129,15 @@ class FirebotManager {
             this.emit("variablesDataUpdated", instance);
         };
 
+        const timerCreatedOrUpdated = (timer: { id: string; name: string; active: boolean; }) => {
+            instance.data.timers[timer.id] = {
+                id: timer.id,
+                name: timer.name,
+                active: timer.active,
+            };
+            this.emit("variablesDataUpdated", instance);
+        };
+
         client.websocket.on("command:created", commandCreatedOrUpdated.bind(this));
         client.websocket.on("command:updated", commandCreatedOrUpdated.bind(this));
         client.websocket.on("command:deleted", (command) => {
@@ -174,6 +184,13 @@ class FirebotManager {
                 instance.data.queues[queueLengthUpdate.id].length = queueLengthUpdate.length;
                 this.emit("variablesDataUpdated", instance);
             }
+        });
+
+        client.websocket.on("timer:created", timerCreatedOrUpdated.bind(this));
+        client.websocket.on("timer:updated", timerCreatedOrUpdated.bind(this));
+        client.websocket.on("timer:deleted", (timer) => {
+            delete instance.data.timers[timer.id];
+            this.emit("variablesDataUpdated", instance);
         });
 
         // ...
@@ -247,7 +264,17 @@ class FirebotManager {
                     length: queue.length,
                 };
             });
-            // ...
+            
+            const timers = await client.timers.getTimers();
+            instance.data.timers = {};
+            timers.forEach(timer => {
+                instance.data.timers[timer.id] = {
+                    id: timer.id,
+                    name: timer.name,
+                    active: timer.active,
+                };
+            });
+
             this.emit("variablesDataUpdated", instance);
         });
         client.websocket.on("disconnected", async ({ code, reason }) => {

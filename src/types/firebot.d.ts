@@ -34,5 +34,10 @@ export type FirebotInstance = {
             active: boolean;
             length: number;
         }>;
+        timers: Record<string, {
+            id: string;
+            name: string;
+            active: boolean;
+        }>;
     }
 }

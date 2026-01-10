@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>Update Timer Settings</title>
+    <meta charset="utf-8" />
+    <script src="sdpi-components.js"></script>
+</head>
+
+<body>
+    <sdpi-item label="Title">
+        <sdpi-textarea setting="title" placeholder="Enter title..." rows="2"></sdpi-textarea>
+    </sdpi-item>
+    <sdpi-item label="Timer">
+        <sdpi-select setting="action.id" label-setting="action.label" datasource="getTimers" loading="Fetching Timers..." placeholder="Select a timer..." show-refresh hot-reload>
+        </sdpi-select>
+    </sdpi-item>
+    <sdpi-item label="Action">
+        <sdpi-select setting="action.action" placeholder="Select an action...">
+            <option value="enable">Enable</option>
+            <option value="disable">Disable</option>
+            <option value="toggle">Toggle</option>
+            <option value="clear">Clear</option>
+        </sdpi-select>
+    </sdpi-item>
+</body>
+
+</html>

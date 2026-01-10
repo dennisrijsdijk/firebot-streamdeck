@@ -49,3 +49,9 @@ type QueueActionSettings = {
     label?: string;
     action?: "" | "pause" | "resume" | "toggle" | "clear" | "trigger";
 }
+
+type TimerActionSettings = {
+    id?: string;
+    label?: string;
+    action?: "enable" | "disable" | "toggle" | "clear";
+}

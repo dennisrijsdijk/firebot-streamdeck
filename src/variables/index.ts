@@ -1,10 +1,14 @@
 import firebotManager from "../firebot-manager";
 import { getCustomVariable, } from "../util";
 import actionVariables from "./actions";
+import literalVariables from "./literal";
+import numberVariables from "./number";
 import { evaluate, LookupMap, VariableMap, VariableEvaluateFnc } from "expressionish";
 
 const variables: Variable[] = [
-    ...actionVariables
+    ...actionVariables,
+    ...literalVariables,
+    ...numberVariables
 ]
 
 const lookups: LookupMap = new Map();
@@ -19,6 +23,9 @@ lookups.set("$", (_, name: string) => ({
 const variableMap: VariableMap = new Map();
 
 for (const variable of variables) {
+    if (!variable.evaluator) {
+        continue;
+    }
     variableMap.set(variable.definition.handle, {
         evaluate: variable.evaluator as VariableEvaluateFnc,
     });

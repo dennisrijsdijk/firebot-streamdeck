@@ -72,6 +72,24 @@
 			]
 		},
 		{
+			"Name": "Display Variables",
+			"SupportedInMultiActions": false,
+			"UUID": "gg.dennis.firebot.display",
+			"Icon": "imgs/actions/display/action",
+			"PropertyInspectorPath": "ui/display.html",
+			"UserTitleEnabled": false,
+			"Tooltip": "Display data from variables on your Stream Deck",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/display/key",
+					"TitleAlignment": "top"
+				}
+			]
+		},
+		{
 			"Name": "Run Preset Effect List",
 			"UUID": "gg.dennis.firebot.presetlist",
 			"Icon": "imgs/actions/preset/action",

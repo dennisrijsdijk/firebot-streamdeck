@@ -13,13 +13,12 @@ const variable: Variable = {
         }
 
         if (!customRoleName) {
-            if (trigger.actionId !== "gg.dennis.firebot.customrole") {
-                return null;
-            }
-
             const customRole = instance.data.customRoles[trigger.settings?.action?.id || ""];
             return customRole ? customRole.count : null;
         }
+
+        const customRole = Object.values(instance.data.customRoles || {}).find(c => c.name.toLowerCase() === customRoleName.toLowerCase());
+        return customRole ? customRole.count : null;
     }
 }
 

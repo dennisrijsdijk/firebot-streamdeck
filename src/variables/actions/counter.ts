@@ -17,10 +17,6 @@ const variable: Variable = {
             return counter ? counter.value : null;
         }
 
-        if (typeof counterName !== "string" || trigger.actionId !== "gg.dennis.firebot.counter") {
-            return null;
-        }
-
         const counter = Object.values(instance.data.counters || {}).find(c => c.name.toLowerCase() === counterName.toLowerCase());
         return counter ? counter.value : null;
     }

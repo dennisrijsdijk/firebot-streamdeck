@@ -16,11 +16,7 @@ const variable: Variable = {
             const timer = instance.data.timers[trigger.settings?.action?.id || ""];
             return timer ? timer.active : false;
         }
-
-        if (typeof timerName !== "string" || trigger.actionId !== "gg.dennis.firebot.timer") {
-            return false;
-        }
-
+        
         const timer = Object.values(instance.data.timers || {}).find(t => t.name.toLowerCase() === timerName.toLowerCase());
         return timer ? timer.active : false;
     }

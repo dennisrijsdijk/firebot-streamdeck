@@ -17,10 +17,6 @@ const variable: Variable = {
             return queue ? queue.length : -1;
         }
 
-        if (typeof queueName !== "string" || trigger.actionId !== "gg.dennis.firebot.queue") {
-            return -1;
-        }
-
         const queue = Object.values(instance.data.queues || {}).find(q => q.name.toLowerCase() === queueName.toLowerCase());
         return queue ? queue.length : -1;
     }

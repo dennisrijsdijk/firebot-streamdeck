@@ -1,4 +1,4 @@
-import streamDeck, { DidReceiveSettingsEvent, SingletonAction, WillAppearEvent, WillDisappearEvent, Action } from "@elgato/streamdeck";
+import streamDeck, { DidReceiveSettingsEvent, SingletonAction, WillAppearEvent, WillDisappearEvent, Action, SendToPluginEvent } from "@elgato/streamdeck";
 import { JsonObject } from "@elgato/utils";
 import firebotManager from "./firebot-manager";
 import { findAndReplaceVariables } from "./variables";
@@ -25,26 +25,12 @@ export class BaseAction<T extends JsonObject> extends SingletonAction<BaseAction
         });
     }
 
+    async instanceChanged(actionId: string, settings: BaseActionSettings<T>) { }
+
     protected async waitUntilReady(): Promise<void> {
         while (!firebotManager.ready) {
             await new Promise(resolve => setTimeout(resolve, 100));
         }
-    }
-
-    protected async populateSettings(ev: WillAppearEvent<BaseActionSettings<T>>, settings: T): Promise<void> {
-        if (Object.keys(ev.payload.settings).length !== 0) {
-            return;
-        }
-
-        await this.waitUntilReady();
-
-        const newSettings: BaseActionSettings<T> = {
-            endpoint: firebotManager.defaultEndpoint,
-            title: "",
-            action: settings,
-        };
-        await ev.action.setSettings(newSettings);
-        await this.saveCachedSettings(ev.action.id, newSettings);
     }
 
     override async onWillAppear(ev: WillAppearEvent<BaseActionSettings<T>>): Promise<void> {
@@ -62,16 +48,13 @@ export class BaseAction<T extends JsonObject> extends SingletonAction<BaseAction
         if (!this.actionsCache[ev.action.id]) {
             return;
         }
+
+        if (this.actionsCache[ev.action.id].settings.endpoint !== ev.payload.settings.endpoint) {
+            await this.instanceChanged(ev.action.id, ev.payload.settings)
+        }
+
         this.actionsCache[ev.action.id].settings = ev.payload.settings;
         return this.update(ev.action);
-    }
-
-    async saveCachedSettings(actionId: string, settings: BaseActionSettings<T>): Promise<void> {
-        if (!this.actionsCache[actionId]) {
-            return;
-        }
-        this.actionsCache[actionId].settings = settings;
-        return this.update(streamDeck.actions.getActionById(actionId));
     }
 
     async update(action?: (Action<BaseActionSettings<T>>)) {

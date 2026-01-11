@@ -1,4 +1,4 @@
-import streamDeck, { Action, action, DidReceiveSettingsEvent, KeyDownEvent, SendToPluginEvent, SingletonAction, WillAppearEvent, WillDisappearEvent } from "@elgato/streamdeck";
+import streamDeck, { Action, action, DidReceiveSettingsEvent, KeyDownEvent, SendToPluginEvent, WillAppearEvent, WillDisappearEvent } from "@elgato/streamdeck";
 import { BaseAction } from "../base-action";
 import { JsonValue } from "@elgato/utils";
 import firebotManager from "../firebot-manager";
@@ -7,11 +7,33 @@ import { FirebotInstance } from "../types/firebot";
 
 const actionQueueCache: Record<string, string> = {};
 
-/**
- * An example action class that displays a count that increments by one each time the button is pressed.
- */
 @action({ UUID: "gg.dennis.firebot.queue" })
 export class QueueAction extends BaseAction<QueueActionSettings> {
+	async sendQueues(instance: FirebotInstance) {
+		const dataSourcePayload: DataSourcePayload = {
+			event: "getEffectQueues",
+			items: Object.values(instance.data.queues || {}).map(queue => ({
+				label: queue.name,
+				value: queue.id,
+			}))
+		}
+		await streamDeck.ui.sendToPropertyInspector(dataSourcePayload);
+	}
+
+	override async instanceChanged(actionId: string, settings: BaseActionSettings<QueueActionSettings>): Promise<void> {
+		let instance: FirebotInstance;
+
+		try {
+			instance = firebotManager.getInstance(settings.endpoint || "");
+		} catch (error) {
+			streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
+			return;
+		}
+
+		await this.sendQueues(instance);
+		await this.sendQueueActions(settings);
+	}
+
 	override async onSendToPlugin(ev: SendToPluginEvent<JsonValue, BaseActionSettings<QueueActionSettings>>): Promise<void> {
 		if (!ev.payload || typeof ev.payload !== "object" || !("event" in ev.payload)) {
 			return;
@@ -36,14 +58,7 @@ export class QueueAction extends BaseAction<QueueActionSettings> {
 		}
 
 		if (ev.payload.event === "getEffectQueues") {
-			const dataSourcePayload: DataSourcePayload = {
-				event: ev.payload.event as string,
-				items: Object.values(instance.data.queues || {}).map(queue => ({
-					label: queue.name,
-					value: queue.id,
-				}))
-			}
-			await streamDeck.ui.sendToPropertyInspector(dataSourcePayload);
+			await this.sendQueues(instance);
 		} else if (ev.payload.event === "getEffectQueueActions") {
 			await this.sendQueueActions(settings);
 		}
@@ -52,20 +67,17 @@ export class QueueAction extends BaseAction<QueueActionSettings> {
 	override async onDidReceiveSettings(ev: DidReceiveSettingsEvent<BaseActionSettings<QueueActionSettings>>): Promise<void> {
 		await super.onDidReceiveSettings(ev);
 
-		if (actionQueueCache[ev.action.id] !== ev.payload.settings.action?.id) {
-			await this.sendQueueActions(ev.payload.settings);
+		if (actionQueueCache[ev.action.id] === ev.payload.settings.action?.id) {
+			return;
 		}
+
+		await this.sendQueueActions(ev.payload.settings);
 
 		actionQueueCache[ev.action.id] = ev.payload.settings.action?.id || "";
 	}
 
 	override async onWillAppear(ev: WillAppearEvent<BaseActionSettings<QueueActionSettings>>): Promise<void> {
 		await super.onWillAppear(ev);
-
-		await this.populateSettings(ev, {
-			id: "",
-			action: "",
-		});
 
 		actionQueueCache[ev.action.id] = ev.payload.settings.action?.id || "";
 	}
@@ -77,8 +89,11 @@ export class QueueAction extends BaseAction<QueueActionSettings> {
 	}
 
 	async sendQueueActions(settings: BaseActionSettings<QueueActionSettings>): Promise<void> {
-		const instance = firebotManager.getInstance(settings.endpoint || "");
-		if (!instance) {
+		let instance: FirebotInstance;
+
+		try {
+			instance = firebotManager.getInstance(settings.endpoint || "");
+		} catch {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
 			return;
 		}
@@ -114,38 +129,38 @@ export class QueueAction extends BaseAction<QueueActionSettings> {
 
 	override async onKeyDown(ev: KeyDownEvent<BaseActionSettings<QueueActionSettings>>): Promise<void> {
 		await this.waitUntilReady();
-		const instance = firebotManager.getInstance(ev.payload.settings.endpoint || "");
-		if (!instance) {
+		let instance: FirebotInstance;
+
+		try {
+			instance = firebotManager.getInstance(ev.payload.settings.endpoint || "");
+		} catch {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${ev.payload.settings.endpoint}`);
-			return;
+			return ev.action.showAlert();
 		}
+
 		const queueId = ev.payload.settings.action?.id || "";
 		const queueAction = ev.payload.settings.action?.action;
 
 		if (queueAction == null || queueAction === "") {
 			streamDeck.logger.warn(`No queue action set for action ${ev.action.id}`);
-			ev.action.showAlert();
-			return;
+			return ev.action.showAlert();
 		}
 
 		const queue = instance.data.queues[queueId];
 
 		if (!queue) {
 			streamDeck.logger.error(`No effect queue found with ID: ${queueId}`);
-			ev.action.showAlert();
-			return;
+			return ev.action.showAlert();
 		}
 
 		if (queue.type !== "manual" && (queueAction === "trigger")) {
 			streamDeck.logger.error(`Cannot trigger next effect on a non-manual queue (ID: ${queueId})`);
-			ev.action.showAlert();
-			return;
+			return ev.action.showAlert();
 		}
 
 		if (queue.type === "manual" && (queueAction === "pause" || queueAction === "resume" || queueAction === "toggle")) {
 			streamDeck.logger.error(`Cannot ${queueAction} a manual queue (ID: ${queueId})`);
-			ev.action.showAlert();
-			return;
+			return ev.action.showAlert();
 		}
 
 		try {

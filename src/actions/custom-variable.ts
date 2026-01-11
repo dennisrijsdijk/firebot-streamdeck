@@ -1,32 +1,29 @@
-import streamDeck, { action, KeyDownEvent, WillAppearEvent } from "@elgato/streamdeck";
+import streamDeck, { action, KeyDownEvent } from "@elgato/streamdeck";
 import { BaseAction } from "../base-action";
 import firebotManager from "../firebot-manager";
 import { setPropertyAtPath } from "../util";
+import { FirebotInstance } from "../types/firebot";
 
-/**
- * An example action class that displays a count that increments by one each time the button is pressed.
- */
 @action({ UUID: "gg.dennis.firebot.customvariable" })
 export class CustomVariableAction extends BaseAction<CustomVariableActionSettings> {
-    override async onWillAppear(ev: WillAppearEvent<BaseActionSettings<CustomVariableActionSettings>>): Promise<void> {
-        await super.onWillAppear(ev);
-
-        await this.populateSettings(ev, {});
-    }
-
     override async onKeyDown(ev: KeyDownEvent<BaseActionSettings<CustomVariableActionSettings>>): Promise<void> {
         await this.waitUntilReady();
-        const instance = firebotManager.getInstance(ev.payload.settings.endpoint || "");
-        if (!instance) {
+
+        let instance: FirebotInstance;
+
+        try {
+            instance = firebotManager.getInstance(ev.payload.settings.endpoint || "");
+        } catch {
             streamDeck.logger.error(`No Firebot instance found for endpoint: ${ev.payload.settings.endpoint}`);
-            return;
+            return ev.action.showAlert();
         }
+
         const variableName = ev.payload.settings.action?.name;
         const variableValue = ev.payload.settings.action?.value || "";
         const propertyPath = ev.payload.settings.action?.propertyPath || "";
         if (!variableName) {
             streamDeck.logger.error(`No custom variable name set for action ${ev.action.id}`);
-            return;
+            return ev.action.showAlert();
         }
 
         let value = variableValue;
@@ -46,8 +43,7 @@ export class CustomVariableAction extends BaseAction<CustomVariableActionSetting
                 );
             } catch (error) {
                 streamDeck.logger.error(`Failed to set property at path ${propertyPath} for custom variable ${variableName} on action ${ev.action.id}`, error);
-                ev.action.showAlert();
-                return;
+                return ev.action.showAlert();
             }
         }
 

@@ -17,12 +17,33 @@ class FirebotManager {
         this._instances = {};
         this._eventEmitter = new EventEmitter();
 
-        streamDeck.settings.onDidReceiveGlobalSettings<GlobalSettings>(async (settings) => {
-            if (settings.settings.defaultEndpoint) {
-                this._defaultEndpoint = settings.settings.defaultEndpoint;
+        streamDeck.ui.onSendToPlugin(async (ev) => {
+            if (ev.payload && typeof ev.payload === "object" && "event" in ev.payload && ev.payload.event === "getInstances") {
+                await this.sendInstancesUpdated();
+            }
+        });
+
+        streamDeck.settings.onDidReceiveGlobalSettings<GlobalSettings>(async (ev) => {
+            if (ev.settings.defaultEndpoint) {
+                this._defaultEndpoint = ev.settings.defaultEndpoint;
             }
 
-            // TODO: Handle added/removed instances.
+            const newInstances = ev.settings.instances.filter((instance) => !this._instances[instance.endpoint]);
+            const removedInstances = Object.keys(this._instances).filter((endpoint) => !ev.settings.instances.find((instance) => instance.endpoint === endpoint));
+
+            for (const instance of newInstances) {
+                await this.createInstance(instance);
+            }
+
+            for (const endpoint of removedInstances) {
+                this._instances[endpoint].discard = true;
+                this._instances[endpoint].client.websocket.disconnect();
+                delete this._instances[endpoint];
+            }
+
+            if (newInstances.length > 0 || removedInstances.length > 0) {
+                await this.sendInstancesUpdated();
+            }
         });
     }
 
@@ -45,6 +66,18 @@ class FirebotManager {
         return this._instances[endpoint];
     }
 
+    private async sendInstancesUpdated(): Promise<void> {
+        const instancesPayload = {
+            event: "getInstances",
+            items: Object.values(this._instances).map(instance => ({
+                label: instance.name || instance.endpoint,
+                value: instance.endpoint,
+            }))
+        };
+
+        await streamDeck.ui.sendToPropertyInspector(instancesPayload);
+    }
+
     public async createInstance(settingsInstance: SettingsInstance): Promise<FirebotInstance> {
         if (this._instances[settingsInstance.endpoint]) {
             throw new Error(`Firebot instance already exists for endpoint: ${settingsInstance.endpoint}`);
@@ -54,6 +87,7 @@ class FirebotManager {
         const instance: FirebotInstance = {
             connected: false,
             client,
+            discard: false,
             endpoint: settingsInstance.endpoint,
             name: settingsInstance.name,
             data: {
@@ -279,7 +313,9 @@ class FirebotManager {
         });
         client.websocket.on("disconnected", async ({ code, reason }) => {
             instance.connected = false;
-            if (code === 4001) {
+            client["_ws"]?.removeAllListeners();
+            client.websocket["_eventEmitter"]?.removeAllListeners();
+            if (code === 4001 || instance.discard) {
                 return;
             }
 

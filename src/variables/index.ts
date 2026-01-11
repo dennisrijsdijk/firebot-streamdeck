@@ -1,4 +1,6 @@
+import streamDeck from "@elgato/streamdeck";
 import firebotManager from "../firebot-manager";
+import { FirebotInstance } from "../types/firebot";
 import { getCustomVariable, } from "../util";
 import actionVariables from "./actions";
 import literalVariables from "./literal";
@@ -15,7 +17,14 @@ const lookups: LookupMap = new Map();
 
 lookups.set("$", (_, name: string) => ({
     evaluate: (trigger: ReplaceVariableTrigger, ...args: unknown[]) => {
-        const instance = firebotManager.getInstance(trigger.settings?.endpoint || "");
+        let instance: FirebotInstance;
+
+        try {
+            instance = firebotManager.getInstance(trigger.settings?.endpoint || "");
+        } catch {
+            streamDeck.logger.error(`No Firebot instance found for endpoint: ${trigger.settings?.endpoint || ""}`);
+            return null;
+        }
         return getCustomVariable(name, instance, args as string[]);
     }
 }));

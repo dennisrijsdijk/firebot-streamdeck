@@ -3,6 +3,7 @@ import { FirebotClient, CommandType, QueueMode } from "@dennisrijsdijk/node-fire
 export type FirebotInstance = {
     connected: boolean;
     client: FirebotClient;
+    discard: boolean;
     endpoint: string;
     name: string;
     data: {

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+
+<head lang="en">
+    <title>Manage Firebot instances</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="legacy-sdpi.css" />
+    <style>
+        body {
+            padding: 20px;
+        }
+
+        .section-header {
+            margin-top: 20px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: #d8d8d8;
+            border-bottom: 1px solid #525252;
+            text-align: center;
+        }
+
+        .section-header:first-child {
+            margin-top: 0;
+        }
+
+        form {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 12px;
+            color: #b8b8b8;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            margin-bottom: 15px;
+            padding: 8px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 13px;
+            background-color: #3a3a3a;
+            border: 1px solid #525252;
+            color: #d8d8d8;
+            border-radius: 3px;
+        }
+
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #6d6d6d;
+        }
+
+        button {
+            margin-top: 10px;
+            padding: 6px 16px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            background-color: #4a4a4a;
+            border: 1px solid #5a5a5a;
+            color: #d8d8d8;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: #555555;
+        }
+
+        button:active:not(:disabled) {
+            background-color: #3a3a3a;
+        }
+
+        button:disabled {
+            background-color: #353535;
+            border-color: #454545;
+            color: #707070;
+            cursor: not-allowed;
+            opacity: 0.75;
+        }
+
+        #add-instance-form button {
+            display: block;
+            margin: 10px auto 0 auto;
+        }
+
+        #manage-instances-select {
+            margin-bottom: 15px;
+        }
+
+        body > div:last-of-type {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="section-header">Add Instance</div>
+    <form id="add-instance-form" onsubmit="return false;">
+        <label for="instance-name">Name</label>
+        <input type="text" id="instance-name" placeholder="My Firebot Instance" oninput="addInstanceFieldChanged()" />
+
+        <label for="instance-endpoint">Endpoint</label>
+        <input type="text" id="instance-endpoint" placeholder="localhost" oninput="addInstanceFieldChanged()" />
+        
+        <button type="button" onclick="window.onAddInstance()" disabled>Add Instance</button>
+    </form>
+
+    <div class="section-header">Manage Instances</div>
+    <select id="manage-instances-select" class="sdpi-item-value select" onchange="window.onManagementInstanceSelectChange()">
+        <option value="" disabled selected>Select an instance...</option>
+    </select>
+    <div>
+        <button id="make-default-instance-button" onclick="window.onChangeDefaultInstance()" disabled>Make Default Instance</button>
+        <button id="delete-instance-button" onclick="window.onDeleteInstance()" disabled>Delete Instance</button>
+    </div>
+</body>
+
+<script>
+    window.addInstanceFieldChanged = function() {
+        const endpoint = document.getElementById("instance-endpoint").value.trim();
+        const name = document.getElementById("instance-name").value.trim();
+        const addButton = document.querySelector("#add-instance-form button");
+        window.opener.console.log("Add Instance fields changed:", { endpoint, name });
+        addButton.disabled = !endpoint || !name;
+    };
+
+    window.refreshInstanceManagementList = async function() {
+        const select = document.getElementById("manage-instances-select");
+        const previousValue = select.value;
+        const previousValueIsDefault = previousValue === window.opener.globalSettings.defaultEndpoint;
+
+        // Clear existing options
+        select.innerHTML = '<option value="" disabled>Select an instance...</option>';
+
+        // Fetch instances from the opener window
+        const instances = await window.opener.globalSettings.instances || [];
+
+        // Populate the select with instances
+        for (const instance of instances) {
+            const option = document.createElement("option");
+            option.value = instance.endpoint;
+            option.disabled = instance.endpoint === window.opener.globalSettings.defaultEndpoint;
+            option.textContent = `${instance.name} (${instance.endpoint})` + (instance.endpoint === window.opener.globalSettings.defaultEndpoint ? " [Default]" : "");
+            select.appendChild(option);
+        }
+
+        if (instances.find(i => i.endpoint === previousValue) && !previousValueIsDefault) {
+            select.value = previousValue;
+        } else {
+            select.value = "";
+        }
+
+        // Update button states
+        window.onManagementInstanceSelectChange();
+    };
+
+    window.onAddInstance = async function() {
+        const endpoint = document.getElementById("instance-endpoint").value.trim();
+        const name = document.getElementById("instance-name").value.trim();
+        
+        try {
+            await window.opener.addInstance(endpoint, name);
+            document.getElementById("instance-endpoint").value = "";
+            document.getElementById("instance-name").value = "";
+            window.addInstanceFieldChanged();
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+
+        // Refresh the instance list in the management select.
+        await window.refreshInstanceManagementList();
+    };
+
+    window.onManagementInstanceSelectChange = async function() {
+        const select = document.getElementById("manage-instances-select");
+        const shouldEnable = select.value.trim() !== "" && select.value !== window.opener.globalSettings.defaultEndpoint;
+        document.getElementById("make-default-instance-button").disabled = !shouldEnable;
+        document.getElementById("delete-instance-button").disabled = !shouldEnable;
+    };
+
+    window.onChangeDefaultInstance = async function() {
+        const endpoint = document.getElementById("manage-instances-select").value;
+        if (!endpoint) {
+            return;
+        }
+
+        try {
+            await window.opener.setDefaultInstance(endpoint);
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+        await window.refreshInstanceManagementList();
+    };
+
+    window.onDeleteInstance = async function() {
+        const endpoint = document.getElementById("manage-instances-select").value;
+        if (!endpoint) {
+            return;
+        }
+
+        try {
+            await window.opener.deleteInstance(endpoint);
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+        await window.refreshInstanceManagementList();
+    };
+
+    window.opener.getGlobalSettings().then(async (settings) => {
+        window.opener.console.log("Loaded global settings in instance management window:", settings);
+        await window.refreshInstanceManagementList();
+    });
+</script>
+
+</html>

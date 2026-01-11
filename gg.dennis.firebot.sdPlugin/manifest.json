@@ -155,6 +155,10 @@
 	"CategoryIcon": "imgs/plugin/category",
 	"CodePath": "bin/plugin.js",
 	"Description": "Control Firebot using Stream Deck",
+	"DefaultWindowSize": [
+		350,
+		500
+	],
 	"Icon": "imgs/plugin/marketplace",
 	"SDKVersion": 3,
 	"Software": {

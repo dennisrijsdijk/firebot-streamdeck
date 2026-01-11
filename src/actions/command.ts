@@ -1,25 +1,19 @@
-import streamDeck, { action, KeyDownEvent, SendToPluginEvent, SingletonAction, WillAppearEvent } from "@elgato/streamdeck";
+import streamDeck, { action, KeyDownEvent, SendToPluginEvent } from "@elgato/streamdeck";
 import { BaseAction } from "../base-action";
 import { JsonValue } from "@elgato/utils";
 import firebotManager from "../firebot-manager";
 import { DataSourcePayload } from "../types/sdpi-components";
+import { FirebotInstance } from "../types/firebot";
 
-/**
- * An example action class that displays a count that increments by one each time the button is pressed.
- */
 @action({ UUID: "gg.dennis.firebot.command" })
 export class CommandAction extends BaseAction<CommandActionSettings> {
-	override async onSendToPlugin(ev: SendToPluginEvent<JsonValue, BaseActionSettings<CommandActionSettings>>): Promise<void> {
-		if (!ev.payload || typeof ev.payload !== "object" || !("event" in ev.payload) || ev.payload.event !== "getCommands") {
-			return;
-		}
-
-		const settings = await ev.action.getSettings();
-
+	async sendCommands(settings: BaseActionSettings<CommandActionSettings>) {
 		await this.waitUntilReady();
 
-		const instance = firebotManager.getInstance(settings.endpoint || "");
-		if (!instance) {
+		let instance: FirebotInstance;
+		try {
+			instance = firebotManager.getInstance(settings.endpoint || "");
+		} catch {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
 			return;
 		}
@@ -40,32 +34,41 @@ export class CommandAction extends BaseAction<CommandActionSettings> {
 		await streamDeck.ui.sendToPropertyInspector(dataSourcePayload);
 	}
 
-	override async onWillAppear(ev: WillAppearEvent<BaseActionSettings<CommandActionSettings>>): Promise<void> {
-		await super.onWillAppear(ev);
+	override async instanceChanged(actionId: string, settings: BaseActionSettings<CommandActionSettings>): Promise<void> {
+		return this.sendCommands(settings);
+	}
 
-		await this.populateSettings(ev, {
-			id: "",
-			args: ""
-		});
+	override async onSendToPlugin(ev: SendToPluginEvent<JsonValue, BaseActionSettings<CommandActionSettings>>): Promise<void> {
+		if (!ev.payload || typeof ev.payload !== "object" || !("event" in ev.payload) || ev.payload.event !== "getCommands") {
+			return;
+		}
+
+		const settings = await ev.action.getSettings();
+
+		return this.sendCommands(settings);
 	}
 
 	override async onKeyDown(ev: KeyDownEvent<BaseActionSettings<CommandActionSettings>>): Promise<void> {
 		await this.waitUntilReady();
-		const instance = firebotManager.getInstance(ev.payload.settings.endpoint || "");
-		if (!instance) {
+		let instance: FirebotInstance;
+
+		try {
+			instance = firebotManager.getInstance(ev.payload.settings.endpoint || "");
+		} catch {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${ev.payload.settings.endpoint}`);
-			return;
+			return ev.action.showAlert();
 		}
+
 		const commandId = ev.payload.settings.action?.id;
 		const args = ev.payload.settings.action?.args || "";
 		if (!commandId) {
 			streamDeck.logger.error(`No command ID set for action ${ev.action.id}`);
-			return;
+			return ev.action.showAlert();
 		}
 		const command = instance.data.commands[commandId];
 		if (!command) {
 			streamDeck.logger.error(`No command found with ID: ${commandId}`);
-			return;
+			return ev.action.showAlert();
 		}
 
 		try {

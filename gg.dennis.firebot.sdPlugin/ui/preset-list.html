@@ -5,6 +5,7 @@
     <title>Increment Counter Settings</title>
     <meta charset="utf-8" />
     <script src="sdpi-components.js"></script>
+    <script src="ui-globals.js"></script>
     <style>
         hr2,
         .sdpi-heading {
@@ -53,17 +54,25 @@
 </head>
 
 <body>
+    <sdpi-item id="instance-select-container" label="Instance" style="display: none;">
+        <sdpi-select id="instance-select" setting="endpoint" datasource="getInstances" loading="Fetching Instances..." placeholder="Select an instance..." hot-reload></sdpi-select>
+    </sdpi-item>
+
     <sdpi-item label="Title">
         <sdpi-textarea setting="title" placeholder="Enter title..." rows="2"></sdpi-textarea>
     </sdpi-item>
     <sdpi-item label="Preset Effect List">
-        <sdpi-select setting="action.id" label-setting="action.label" datasource="getPresetLists"
+        <sdpi-select setting="action.id" datasource="getPresetLists"
             loading="Fetching Preset Effect Lists..." placeholder="Select a preset effect list..." show-refresh
             hot-reload>
         </sdpi-select>
     </sdpi-item>
     <div class="sdpi-heading">Preset List Arguments</div>
     <div id="preset-list-args"></div>
+
+    <sdpi-item>
+        <sdpi-button onclick="openInstanceManagementWindow()">Instances</sdpi-button>
+    </sdpi-item>
 </body>
 
 <script>
@@ -99,6 +108,7 @@
                 }
             }
         });
+        await initializeUiGlobals();
     })();
 </script>
 

@@ -1,30 +1,35 @@
-import streamDeck, { action, DidReceiveSettingsEvent, KeyDownEvent, PropertyInspectorDidAppearEvent, SendToPluginEvent, SingletonAction, WillAppearEvent, WillDisappearEvent } from "@elgato/streamdeck";
+import streamDeck, { action, DidReceiveSettingsEvent, KeyDownEvent, PropertyInspectorDidAppearEvent, SendToPluginEvent, WillAppearEvent, WillDisappearEvent } from "@elgato/streamdeck";
 import { BaseAction } from "../base-action";
 import { JsonValue } from "@elgato/utils";
 import firebotManager from "../firebot-manager";
+import { FirebotInstance } from "../types/firebot";
 
 const actionPresetListsCache: Record<string, string> = {};
 
-/**
- * An example action class that displays a count that increments by one each time the button is pressed.
- */
 @action({ UUID: "gg.dennis.firebot.presetlist" })
 export class PresetListAction extends BaseAction<PresetListActionSettings> {
 	override async onSendToPlugin(ev: SendToPluginEvent<JsonValue, BaseActionSettings<PresetListActionSettings>>): Promise<void> {
-		if (!ev.payload || typeof ev.payload !== "object" || !("event" in ev.payload)) {
-			return;
-		}
-
-		if (ev.payload.event !== "getPresetLists") {
+		if (!ev.payload || typeof ev.payload !== "object" || !("event" in ev.payload) || ev.payload.event !== "getPresetLists") {
 			return;
 		}
 
 		const settings = await ev.action.getSettings();
+		return this.sendPresetLists(settings);
+	}
 
+	override async instanceChanged(actionId: string, settings: BaseActionSettings<PresetListActionSettings>): Promise<void> {
+		await this.sendPresetLists(settings);
+		await this.sendPresetListArgsToPI(actionId);
+	}
+
+	async sendPresetLists(settings: BaseActionSettings<PresetListActionSettings>) {
 		await this.waitUntilReady();
 
-		const instance = firebotManager.getInstance(settings.endpoint || "");
-		if (!instance) {
+		let instance: FirebotInstance;
+
+		try {
+			instance = firebotManager.getInstance(settings.endpoint || "");
+		} catch {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
 			return;
 		}
@@ -59,8 +64,11 @@ export class PresetListAction extends BaseAction<PresetListActionSettings> {
 
 		await this.waitUntilReady();
 
-		const instance = firebotManager.getInstance(settings.endpoint || "");
-		if (!instance) {
+		let instance: FirebotInstance;
+
+		try {
+			instance = firebotManager.getInstance(settings.endpoint || "");
+		} catch {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
 			return;
 		}
@@ -75,10 +83,14 @@ export class PresetListAction extends BaseAction<PresetListActionSettings> {
 			streamDeck.logger.error(`No preset effect list ID set for action ${actionId}`);
 			return;
 		}
-		const presetList = instance.data.presetEffectLists?.[presetListId];
+		let presetList = instance.data.presetEffectLists?.[presetListId];
 		if (!presetList) {
 			streamDeck.logger.error(`No preset effect list found with ID ${presetListId} for action ${actionId}`);
-			return;
+			presetList = {
+				id: "",
+				name: "",
+				argumentNames: []
+			};
 		}
 		const dataSourcePayload: { event: string; items: any[] } = {
 			event: "getPresetListArgs",
@@ -98,36 +110,41 @@ export class PresetListAction extends BaseAction<PresetListActionSettings> {
 	override async onWillAppear(ev: WillAppearEvent<BaseActionSettings<PresetListActionSettings>>): Promise<void> {
 		await super.onWillAppear(ev);
 
-		await this.populateSettings(ev, {
-			id: "",
-			arguments: {}
-		});
-
 		actionPresetListsCache[ev.action.id] = ev.payload.settings.action?.id || "";
+	}
+
+	override async onWillDisappear(ev: WillDisappearEvent<BaseActionSettings<PresetListActionSettings>>): Promise<void> {
+		await super.onWillDisappear(ev);
+
+		delete actionPresetListsCache[ev.action.id];
 	}
 
 	override async onDidReceiveSettings(ev: DidReceiveSettingsEvent<BaseActionSettings<PresetListActionSettings>>): Promise<void> {
 		await super.onDidReceiveSettings(ev);
-
-		if (actionPresetListsCache[ev.action.id] !== ev.payload.settings.action?.id) {
-			actionPresetListsCache[ev.action.id] = ev.payload.settings.action?.id || "";
-			await this.sendPresetListArgsToPI(ev.action.id);
+		if (actionPresetListsCache[ev.action.id] === ev.payload.settings.action?.id) {
+			return;
 		}
+
+		actionPresetListsCache[ev.action.id] = ev.payload.settings.action?.id || "";
+		await this.sendPresetListArgsToPI(ev.action.id);
 	}
 
 	override async onKeyDown(ev: KeyDownEvent<BaseActionSettings<PresetListActionSettings>>): Promise<void> {
 		await this.waitUntilReady();
-		const instance = firebotManager.getInstance(ev.payload.settings.endpoint || "");
-		if (!instance) {
+		let instance: FirebotInstance;
+
+		try {
+			instance = firebotManager.getInstance(ev.payload.settings.endpoint || "");
+		} catch {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${ev.payload.settings.endpoint}`);
-			return;
+			return ev.action.showAlert();
 		}
 
 		const presetListId = ev.payload.settings.action?.id;
 		const presetListArgs = ev.payload.settings.action?.arguments || {};
 		if (!presetListId) {
 			streamDeck.logger.error(`No preset effect list ID set for action ${ev.action.id}`);
-			return;
+			return ev.action.showAlert();
 		}
 
 		instance.client.effects.runPresetEffectList(presetListId, false, presetListArgs).catch((err) => {

@@ -16,20 +16,17 @@ type BaseActionSettings<T> = {
 
 type CommandActionSettings = {
     id?: string;
-    label?: string;
     args?: string;
 }
 
 type CounterActionSettings = {
     id?: string;
-    label?: string;
     value?: number;
     action?: "update" | "set";
 }
 
 type CustomRoleActionSettings = {
     id?: string;
-    label?: string;
 }
 
 type CustomVariableActionSettings = {
@@ -40,18 +37,15 @@ type CustomVariableActionSettings = {
 
 type PresetListActionSettings = {
     id?: string;
-    label?: string;
     arguments?: Record<string, string>;
 }
 
 type QueueActionSettings = {
     id?: string;
-    label?: string;
     action?: "" | "pause" | "resume" | "toggle" | "clear" | "trigger";
 }
 
 type TimerActionSettings = {
     id?: string;
-    label?: string;
     action?: "enable" | "disable" | "toggle" | "clear";
 }

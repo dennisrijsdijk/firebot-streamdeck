@@ -1,25 +1,20 @@
-import streamDeck, { action, KeyDownEvent, SendToPluginEvent, SingletonAction, WillAppearEvent } from "@elgato/streamdeck";
+import streamDeck, { action, KeyDownEvent, SendToPluginEvent } from "@elgato/streamdeck";
 import { BaseAction } from "../base-action";
 import { JsonValue } from "@elgato/utils";
 import firebotManager from "../firebot-manager";
 import { DataSourcePayload } from "../types/sdpi-components";
+import { FirebotInstance } from "../types/firebot";
 
-/**
- * An example action class that displays a count that increments by one each time the button is pressed.
- */
 @action({ UUID: "gg.dennis.firebot.customrole" })
 export class CustomRoleAction extends BaseAction<CustomRoleActionSettings> {
-    override async onSendToPlugin(ev: SendToPluginEvent<JsonValue, BaseActionSettings<CustomRoleActionSettings>>): Promise<void> {
-        if (!ev.payload || typeof ev.payload !== "object" || !("event" in ev.payload) || ev.payload.event !== "getCustomRoles") {
-            return;
-        }
-
-        const settings = await ev.action.getSettings();
-
+    async sendRoles(settings: BaseActionSettings<CustomRoleActionSettings>) {
         await this.waitUntilReady();
 
-        const instance = firebotManager.getInstance(settings.endpoint || "");
-        if (!instance) {
+        let instance: FirebotInstance;
+
+        try {
+            instance = firebotManager.getInstance(settings.endpoint || "");
+        } catch {
             streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
             return;
         }
@@ -40,31 +35,41 @@ export class CustomRoleAction extends BaseAction<CustomRoleActionSettings> {
         await streamDeck.ui.sendToPropertyInspector(dataSourcePayload);
     }
 
-    override async onWillAppear(ev: WillAppearEvent<BaseActionSettings<CustomRoleActionSettings>>): Promise<void> {
-        await super.onWillAppear(ev);
+    override async instanceChanged(actionId: string, settings: BaseActionSettings<CustomRoleActionSettings>): Promise<void> {
+        return this.sendRoles(settings);
+    }
 
-        await this.populateSettings(ev, { id: "" });
+    override async onSendToPlugin(ev: SendToPluginEvent<JsonValue, BaseActionSettings<CustomRoleActionSettings>>): Promise<void> {
+        if (!ev.payload || typeof ev.payload !== "object" || !("event" in ev.payload) || ev.payload.event !== "getCustomRoles") {
+            return;
+        }
+
+        const settings = await ev.action.getSettings();
+        return this.sendRoles(settings);
     }
 
     override async onKeyDown(ev: KeyDownEvent<BaseActionSettings<CustomRoleActionSettings>>): Promise<void> {
         await this.waitUntilReady();
-        const instance = firebotManager.getInstance(ev.payload.settings.endpoint || "");
-        if (!instance) {
+        let instance: FirebotInstance;
+
+        try {
+            instance = firebotManager.getInstance(ev.payload.settings.endpoint || "");
+        } catch {
             streamDeck.logger.error(`No Firebot instance found for endpoint: ${ev.payload.settings.endpoint}`);
-            return;
+            return ev.action.showAlert();
         }
 
         const customRoleId = ev.payload.settings.action?.id;
         if (!customRoleId) {
             streamDeck.logger.error(`No custom role ID set for action ${ev.action.id}`);
-            return;
+            return ev.action.showAlert();
         }
 
         const customRole = instance.data.customRoles[customRoleId];
 
         if (!customRole) {
             streamDeck.logger.error(`No custom role found with ID: ${customRoleId} for action ${ev.action.id}`);
-            return;
+            return ev.action.showAlert();
         }
 
         instance.client.customRoles.clearCustomRoleViewers(customRoleId).catch(error => {

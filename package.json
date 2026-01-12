@@ -1,7 +1,8 @@
 {
     "scripts": {
         "build": "rollup -c",
-        "watch": "rollup -c -w --watch.onEnd=\"streamdeck restart gg.dennis.firebot\""
+        "watch": "rollup -c -w --watch.onEnd=\"streamdeck restart gg.dennis.firebot\"",
+        "pack": "npm run build && sd pack gg.dennis.firebot.sdPlugin -f -o ./dist"
     },
     "type": "module",
     "devDependencies": {

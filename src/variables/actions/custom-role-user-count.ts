@@ -25,6 +25,31 @@ const variable: Variable = {
 
         const customRole = Object.values(instance.data.customRoles || {}).find(c => c.name.toLowerCase() === customRoleName.toLowerCase());
         return customRole ? customRole.count : null;
+    },
+    getSuggestions: async (trigger: ReplaceVariableTrigger) => {
+        let instance: FirebotInstance;
+
+        try {
+            instance = firebotManager.getInstance(trigger.settings?.endpoint || "");
+        } catch {
+            streamDeck.logger.error(`No Firebot instance found for endpoint: ${trigger.settings?.endpoint || ""}`);
+            return [];
+        }
+
+        const usages: VariableUsage[] = [];
+
+        if (trigger.actionId === "gg.dennis.firebot.customrole") {
+            usages.push({
+                usage: "customRoleUserCount",
+                description: "Gets the user count of the custom role associated with this action."
+            });
+        }
+
+        usages.push(...Object.values(instance.data.customRoles || {}).map(customRole => ({
+            usage: `customRoleUserCount[${customRole.name}]`,
+            description: `Gets the user count of the custom role named "${customRole.name}".`
+        })));
+        return usages;
     }
 }
 

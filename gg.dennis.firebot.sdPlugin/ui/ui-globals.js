@@ -70,10 +70,38 @@ window.openInstanceManagementWindow = function() {
     console.log("Created instance management window:", window.instanceManagementWindow);
 }
 
+window.openVariablesExplorerWindow = function() {
+    if (window.variablesExplorerWindow && !window.variablesExplorerWindow.closed) {
+        window.variablesExplorerWindow.focus();
+        console.log("Focused existing variables explorer window:", window.variablesExplorerWindow);
+        return;
+    }
+
+    window.variablesExplorerWindow = window.open("variables-explorer.html");
+    
+    console.log("Created variables explorer window:", window.variablesExplorerWindow);
+}
+
+window.getVariableDefinitions = async function() {
+    return new Promise((resolve) => {
+        const listener = (event) => {
+            if (event.payload.event !== "getVariables") {
+                return;
+            }
+
+            resolve(event.payload.variables);
+            SDPIComponents.streamDeckClient.sendToPropertyInspector.unsubscribe(listener);
+        };
+
+        SDPIComponents.streamDeckClient.sendToPropertyInspector.subscribe(listener);
+
+        SDPIComponents.streamDeckClient.send("sendToPlugin", { event: "getVariables" });
+    });
+}
+
 window.initializeUiGlobals = async function() {
     window.instanceSelect = document.getElementById("instance-select");
     window.instanceSelectContainer = document.getElementById("instance-select-container");
-    //const info = await SDPIComponents.streamDeckClient.getConnectionInfo();
     await window.getGlobalSettings();
 
     window.instancesUpdated();

@@ -25,6 +25,31 @@ const variable: Variable = {
 
         const queue = Object.values(instance.data.queues || {}).find(q => q.name.toLowerCase() === queueName.toLowerCase());
         return queue ? queue.active : false;
+    },
+    getSuggestions: async (trigger: ReplaceVariableTrigger) => {
+        let instance: FirebotInstance;
+
+        try {
+            instance = firebotManager.getInstance(trigger.settings?.endpoint || "");
+        } catch {
+            streamDeck.logger.error(`No Firebot instance found for endpoint: ${trigger.settings?.endpoint || ""}`);
+            return [];
+        }
+
+        const usages: VariableUsage[] = [];
+
+        if (trigger.actionId === "gg.dennis.firebot.queue") {
+            usages.push({
+                usage: "queueActive",
+                description: "Returns true if the queue associated with this action is active, or false if it is paused."
+            });
+        }
+
+        usages.push(...Object.values(instance.data.queues || {}).map(queue => ({
+            usage: `queueActive[${queue.name}]`,
+            description: `Returns true if the queue named "${queue.name}" is active, or false if it is paused.`
+        })));
+        return usages;
     }
 };
 

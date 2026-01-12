@@ -5,13 +5,41 @@ import { getCustomVariable, } from "../util";
 import actionVariables from "./actions";
 import literalVariables from "./literal";
 import numberVariables from "./number";
+import spoofedVariables from "./spoofed";
 import { evaluate, LookupMap, VariableMap, VariableEvaluateFnc } from "expressionish";
 
-const variables: Variable[] = [
+const variables: ReplaceVariable[] = [
     ...actionVariables,
     ...literalVariables,
-    ...numberVariables
-]
+    ...numberVariables,
+    ...spoofedVariables
+];
+
+streamDeck.ui.onSendToPlugin(async (ev) => {
+    if (!ev.payload || typeof ev.payload !== "object" || !("event" in ev.payload) || ev.payload.event !== "getVariables") {
+        return;
+    }
+
+    const frontendVariables: VariableDefinition[] = await Promise.all(variables.map(async (variable) => {
+        const definition = structuredClone(variable.definition);
+
+        if (!definition.examples) {
+            definition.examples = [];
+        }
+
+        if (!variable.getSuggestions) {
+            return definition;
+        }
+
+        const settings = await ev.action.getSettings<BaseActionSettings<{}>>();
+
+        definition.examples.push(...await variable.getSuggestions({ actionId: ev.action.manifestId, settings }));
+
+        return definition;
+    }));
+
+    return streamDeck.ui.sendToPropertyInspector({ event: "getVariables", variables: frontendVariables });
+});
 
 const lookups: LookupMap = new Map();
 

@@ -25,7 +25,10 @@
     </sdpi-item>
 
     <sdpi-item>
-        <sdpi-button onclick="openInstanceManagementWindow()">Instances</sdpi-button>
+        <div style="display: flex; gap: 8px;">
+            <sdpi-button onclick="openInstanceManagementWindow()" style="flex: 1;">Instances</sdpi-button>
+            <sdpi-button onclick="openVariablesExplorerWindow()" style="flex: 1;">Variables</sdpi-button>
+        </div>
     </sdpi-item>
 </body>
 

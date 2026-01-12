@@ -313,8 +313,6 @@ class FirebotManager {
         });
         client.websocket.on("disconnected", async ({ code, reason }) => {
             instance.connected = false;
-            client["_ws"]?.removeAllListeners();
-            client.websocket["_eventEmitter"]?.removeAllListeners();
             if (code === 4001 || instance.discard) {
                 return;
             }

@@ -82,7 +82,7 @@ jobs:
         run: npm run pack
 
       - name: Rename Binary
-        run: mv gg.dennis.firebot.streamDeckPlugin gg.dennis.firebot-v${{ needs.checkversion.outputs.version }}.streamDeckPlugin
+        run: mv dist/gg.dennis.firebot.streamDeckPlugin dist/gg.dennis.firebot-v${{ needs.checkversion.outputs.version }}.streamDeckPlugin
 
       - name: Create Release
         uses: softprops/action-gh-release@v2.5.0
@@ -97,4 +97,4 @@ jobs:
           body: ${{ format(needs.checkversion.outputs.template, needs.checkversion.outputs.version, needs.checkversion.outputs.commits) }}
           generate_release_notes: false
           files: |
-            ./gg.dennis.firebot-v${{ needs.checkversion.outputs.version }}.streamDeckPlugin
+            dist/gg.dennis.firebot-v${{ needs.checkversion.outputs.version }}.streamDeckPlugin

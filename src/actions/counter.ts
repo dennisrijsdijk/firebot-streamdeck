@@ -4,6 +4,7 @@ import { JsonValue } from "@elgato/utils";
 import firebotManager from "../firebot-manager";
 import { DataSourcePayload } from "../types/sdpi-components";
 import { FirebotInstance } from "../types/firebot";
+import { findAndReplaceVariables } from "../variables";
 
 @action({ UUID: "gg.dennis.firebot.counter" })
 export class CounterAction extends BaseAction<CounterActionSettings> {
@@ -60,7 +61,16 @@ export class CounterAction extends BaseAction<CounterActionSettings> {
 		}
 		
 		const counterId = ev.payload.settings.action?.id;
-		const value = ev.payload.settings.action?.value || 1;
+		let value = ev.payload.settings.action?.value || 1;
+
+		if (typeof value !== "number") {
+			value = Number(await findAndReplaceVariables(String(value), { instance, settings: ev.payload.settings, actionId: ev.action.manifestId }));
+			if (isNaN(value)) {
+				streamDeck.logger.error(`Invalid counter value: ${ev.payload.settings.action?.value}`);
+				return ev.action.showAlert();
+			}
+		}
+
 		const overrideValue = ev.payload.settings.action?.action === "set";
 		if (!counterId) {
 			streamDeck.logger.error(`No counter ID set for action ${ev.action.id}`);

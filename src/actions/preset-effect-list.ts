@@ -3,6 +3,7 @@ import { BaseAction } from "../base-action";
 import { JsonValue } from "@elgato/utils";
 import firebotManager from "../firebot-manager";
 import { FirebotInstance } from "../types/firebot";
+import { findAndReplaceVariables } from "../variables";
 
 const actionPresetListsCache: Record<string, string> = {};
 
@@ -146,6 +147,15 @@ export class PresetListAction extends BaseAction<PresetListActionSettings> {
 			streamDeck.logger.error(`No preset effect list ID set for action ${ev.action.id}`);
 			return ev.action.showAlert();
 		}
+
+		Object.entries(presetListArgs).forEach(async ([key, value]) => {
+			if (typeof value !== "string") {
+				return;
+			}
+			
+			const rawValue = await findAndReplaceVariables(value, { instance, settings: ev.payload.settings, actionId: ev.action.manifestId });
+			presetListArgs[key] = typeof rawValue === "string" ? rawValue : JSON.stringify(rawValue);
+		});
 
 		instance.client.effects.runPresetEffectList(presetListId, false, presetListArgs).catch((err) => {
 			streamDeck.logger.error(`Failed to run preset effect list: ${err.message}`);

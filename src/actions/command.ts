@@ -4,6 +4,7 @@ import { JsonValue } from "@elgato/utils";
 import firebotManager from "../firebot-manager";
 import { DataSourcePayload } from "../types/sdpi-components";
 import { FirebotInstance } from "../types/firebot";
+import { findAndReplaceVariables } from "../variables";
 
 @action({ UUID: "gg.dennis.firebot.command" })
 export class CommandAction extends BaseAction<CommandActionSettings> {
@@ -60,7 +61,8 @@ export class CommandAction extends BaseAction<CommandActionSettings> {
 		}
 
 		const commandId = ev.payload.settings.action?.id;
-		const args = ev.payload.settings.action?.args || "";
+		const rawArgs = await findAndReplaceVariables(ev.payload.settings.action?.args || "", { instance, settings: ev.payload.settings, actionId: ev.action.manifestId });
+		const args = typeof rawArgs === "string" ? rawArgs : JSON.stringify(rawArgs);
 		if (!commandId) {
 			streamDeck.logger.error(`No command ID set for action ${ev.action.id}`);
 			return ev.action.showAlert();

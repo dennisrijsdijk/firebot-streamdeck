@@ -21,7 +21,7 @@ type CommandActionSettings = {
 
 type CounterActionSettings = {
     id?: string;
-    value?: number;
+    value?: string | number;
     action?: "update" | "set";
 }
 

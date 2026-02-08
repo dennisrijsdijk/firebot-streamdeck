@@ -3,6 +3,7 @@ import { BaseAction } from "../base-action";
 import firebotManager from "../firebot-manager";
 import { setPropertyAtPath } from "../util";
 import { FirebotInstance } from "../types/firebot";
+import { findAndReplaceVariables } from "../variables";
 
 @action({ UUID: "gg.dennis.firebot.customvariable" })
 export class CustomVariableAction extends BaseAction<CustomVariableActionSettings> {
@@ -26,13 +27,18 @@ export class CustomVariableAction extends BaseAction<CustomVariableActionSetting
             return ev.action.showAlert();
         }
 
-        let value = variableValue;
+        let value: any = variableValue;
 
         try {
             value = JSON.parse(variableValue);
-        } catch {
-            // Ignore JSON parse errors, just use the string value
-        }
+        } catch { }
+
+        try {
+            value = await findAndReplaceVariables(value, { instance, settings: ev.payload.settings, actionId: ev.action.manifestId });
+            if (typeof value === "string") {
+                value = JSON.parse(value);
+            }
+        } catch { }
 
         if (propertyPath && propertyPath.trim() !== "") {
             try {

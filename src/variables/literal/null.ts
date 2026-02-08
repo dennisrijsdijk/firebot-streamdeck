@@ -1,3 +1,5 @@
+import { Variable } from "../../types/replace-variables";
+
 const variable: Variable = {
     definition: {
         handle: "null",

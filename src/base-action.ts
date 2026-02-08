@@ -2,6 +2,8 @@ import streamDeck, { DidReceiveSettingsEvent, SingletonAction, WillAppearEvent, 
 import { JsonObject } from "@elgato/utils";
 import firebotManager from "./firebot-manager";
 import { findAndReplaceVariables } from "./variables";
+import { ReplaceVariableTrigger } from "./types/replace-variables";
+import { FirebotInstance } from "./types/firebot";
 
 type CachedAction<T> = {
     settings: BaseActionSettings<T>;
@@ -69,12 +71,22 @@ export class BaseAction<T extends JsonObject> extends SingletonAction<BaseAction
 
         streamDeck.logger.info(`Received update for action ${action.manifestId} (${action.id}) with settings: ${JSON.stringify(cachedAction.settings)}`);
 
+        await this.waitUntilReady();
+
+        let instance: FirebotInstance;
+
+        try {
+            instance = firebotManager.getInstance(cachedAction.settings.endpoint || "");
+        } catch {
+            streamDeck.logger.warn(`No Firebot instance found for action ${action.manifestId} (${action.id}) with endpoint: ${cachedAction.settings.endpoint}`);
+            return;
+        }
+
         const meta: ReplaceVariableTrigger<T> = {
             actionId: action.manifestId,
             settings: cachedAction.settings,
+            instance
         }
-
-        await this.waitUntilReady();
 
         let title: string | object = cachedAction.settings.title || "";
 

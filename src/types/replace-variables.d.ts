@@ -1,30 +1,34 @@
-type VariableUsage = {
+import { FirebotInstance } from "./firebot";
+
+export type VariableUsage = {
     usage: string;
     description?: string;
 };
 
-type VariableDefinition = {
+export type VariableDefinition = {
     handle: string;
     usage?: string;
     description: string;
     examples?: VariableUsage[];
 }
 
-type ReplaceVariableTrigger<TActionSettings = unknown> = {
-    actionId?: string;
-    settings?: BaseActionSettings<TActionSettings>;
+export type ReplaceVariableTrigger<TActionSettings = unknown> = {
+    /** The Manifest ID of the action */
+    actionId: string;
+    settings: BaseActionSettings<TActionSettings>;
+    instance: FirebotInstance;
 };
 
-type Variable = {
+export type Variable = {
     definition: VariableDefinition;
     getSuggestions?: (trigger: ReplaceVariableTrigger) => Promise<VariableUsage[]>;
     evaluator(trigger: ReplaceVariableTrigger, ...args: unknown[]): Promise<unknown>;
 };
 
-type SpoofedVariable = {
+export type SpoofedVariable = {
     definition: VariableDefinition;
     getSuggestions?: (trigger: ReplaceVariableTrigger) => Promise<VariableUsage[]>;
     evaluator?: never;
 };
 
-type ReplaceVariable = Variable | SpoofedVariable;
+export type ReplaceVariable = Variable | SpoofedVariable;

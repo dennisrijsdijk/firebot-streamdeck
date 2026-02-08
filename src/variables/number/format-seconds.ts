@@ -1,3 +1,5 @@
+import { Variable } from "../../types/replace-variables";
+
 function stringify(num: number) {
     return num.toString().padStart(2, '0');
 }

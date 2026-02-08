@@ -7,6 +7,7 @@ import literalVariables from "./literal";
 import numberVariables from "./number";
 import spoofedVariables from "./spoofed";
 import { evaluate, LookupMap, VariableMap, VariableEvaluateFnc } from "expressionish";
+import { ReplaceVariable, ReplaceVariableTrigger, VariableDefinition } from "../types/replace-variables";
 
 const variables: ReplaceVariable[] = [
     ...actionVariables,
@@ -17,6 +18,18 @@ const variables: ReplaceVariable[] = [
 
 streamDeck.ui.onSendToPlugin(async (ev) => {
     if (!ev.payload || typeof ev.payload !== "object" || !("event" in ev.payload) || ev.payload.event !== "getVariables") {
+        return;
+    }
+
+    let instance: FirebotInstance;
+    
+    const action = streamDeck.actions.getActionById(ev.action.id);
+    const settings = await action?.getSettings<BaseActionSettings<{}>>();
+    
+    try {
+        instance = firebotManager.getInstance(settings?.endpoint || "");
+    } catch {
+        streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings?.endpoint || ""}`);
         return;
     }
 
@@ -33,7 +46,7 @@ streamDeck.ui.onSendToPlugin(async (ev) => {
 
         const settings = await ev.action.getSettings<BaseActionSettings<{}>>();
 
-        definition.examples.push(...await variable.getSuggestions({ actionId: ev.action.manifestId, settings }));
+        definition.examples.push(...await variable.getSuggestions({ actionId: ev.action.manifestId, settings, instance }));
 
         return definition;
     }));
@@ -43,17 +56,10 @@ streamDeck.ui.onSendToPlugin(async (ev) => {
 
 const lookups: LookupMap = new Map();
 
+// @ts-expect-error
 lookups.set("$", (_, name: string) => ({
     evaluate: (trigger: ReplaceVariableTrigger, ...args: unknown[]) => {
-        let instance: FirebotInstance;
-
-        try {
-            instance = firebotManager.getInstance(trigger.settings?.endpoint || "");
-        } catch {
-            streamDeck.logger.error(`No Firebot instance found for endpoint: ${trigger.settings?.endpoint || ""}`);
-            return null;
-        }
-        return getCustomVariable(name, instance, args as string[]);
+        return getCustomVariable(name, trigger.instance, args as string[]);
     }
 }));
 

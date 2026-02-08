@@ -1,3 +1,5 @@
+import { SpoofedVariable } from "../../types/replace-variables";
+
 const variable: SpoofedVariable = {
     definition: {
         handle: "NAND",

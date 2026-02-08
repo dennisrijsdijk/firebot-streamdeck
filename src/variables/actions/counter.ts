@@ -1,6 +1,4 @@
-import streamDeck from "@elgato/streamdeck";
-import firebotManager from "../../firebot-manager";
-import { FirebotInstance } from "../../types/firebot";
+import { ReplaceVariableTrigger, Variable, VariableUsage } from "../../types/replace-variables";
 
 const variable: Variable = {
     definition: {
@@ -9,33 +7,15 @@ const variable: Variable = {
         usage: "counter[name]"
     },
     evaluator: async (trigger: ReplaceVariableTrigger<CounterActionSettings>, counterName?: string) => {
-        let instance: FirebotInstance;
-
-        try {
-            instance = firebotManager.getInstance(trigger.settings?.endpoint || "");
-        } catch {
-            streamDeck.logger.error(`No Firebot instance found for endpoint: ${trigger.settings?.endpoint || ""}`);
-            return null;
-        }
-
         if (!counterName) {
-            const counter = instance.data.counters[trigger.settings?.action?.id || ""];
+            const counter = trigger.instance.data.counters[trigger.settings?.action?.id || ""];
             return counter ? counter.value : null;
         }
 
-        const counter = Object.values(instance.data.counters || {}).find(c => c.name.toLowerCase() === counterName.toLowerCase());
+        const counter = Object.values(trigger.instance.data.counters || {}).find(c => c.name.toLowerCase() === counterName.toLowerCase());
         return counter ? counter.value : null;
     },
     getSuggestions: async (trigger: ReplaceVariableTrigger) => {
-        let instance: FirebotInstance;
-
-        try {
-            instance = firebotManager.getInstance(trigger.settings?.endpoint || "");
-        } catch {
-            streamDeck.logger.error(`No Firebot instance found for endpoint: ${trigger.settings?.endpoint || ""}`);
-            return [];
-        }
-
         const usages: VariableUsage[] = [];
 
         if (trigger.actionId === "gg.dennis.firebot.counter") {
@@ -45,7 +25,7 @@ const variable: Variable = {
             });
         }
 
-        usages.push(...Object.values(instance.data.counters || {}).map(counter => ({
+        usages.push(...Object.values(trigger.instance.data.counters || {}).map(counter => ({
             usage: `counter[${counter.name}]`,
             description: `Gets the value of the counter named "${counter.name}".`
         })));

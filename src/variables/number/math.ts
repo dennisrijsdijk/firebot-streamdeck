@@ -1,4 +1,5 @@
 import { evaluate } from "mathjs";
+import { Variable } from "../../types/replace-variables";
 
 const variable: Variable = {
     definition: {

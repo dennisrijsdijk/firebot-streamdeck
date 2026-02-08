@@ -1,6 +1,5 @@
-import streamDeck from "@elgato/streamdeck";
-import firebotManager from "../../firebot-manager";
-import { FirebotInstance } from "../../types/firebot";
+import { VariableUsage } from "@dennisrijsdijk/node-firebot";
+import { ReplaceVariableTrigger, Variable } from "../../types/replace-variables";
 
 const variable: Variable = {
     definition: {
@@ -9,33 +8,15 @@ const variable: Variable = {
         usage: "queueLength[name]"
     },
     evaluator: async (trigger: ReplaceVariableTrigger<QueueActionSettings>, queueName?: string) => {
-        let instance: FirebotInstance;
-
-        try {
-            instance = firebotManager.getInstance(trigger.settings?.endpoint || "");
-        } catch {
-            streamDeck.logger.error(`No Firebot instance found for endpoint: ${trigger.settings?.endpoint || ""}`);
-            return -1;
-        }
-
         if (!queueName) {
-            const queue = instance.data.queues[trigger.settings?.action?.id || ""];
+            const queue = trigger.instance.data.queues[trigger.settings?.action?.id || ""];
             return queue ? queue.length : -1;
         }
 
-        const queue = Object.values(instance.data.queues || {}).find(q => q.name.toLowerCase() === queueName.toLowerCase());
+        const queue = Object.values(trigger.instance.data.queues || {}).find(q => q.name.toLowerCase() === queueName.toLowerCase());
         return queue ? queue.length : -1;
     },
     getSuggestions: async (trigger: ReplaceVariableTrigger) => {
-        let instance: FirebotInstance;
-
-        try {
-            instance = firebotManager.getInstance(trigger.settings?.endpoint || "");
-        } catch {
-            streamDeck.logger.error(`No Firebot instance found for endpoint: ${trigger.settings?.endpoint || ""}`);
-            return [];
-        }
-
         const usages: VariableUsage[] = [];
 
         if (trigger.actionId === "gg.dennis.firebot.queue") {
@@ -45,7 +26,7 @@ const variable: Variable = {
             });
         }
 
-        usages.push(...Object.values(instance.data.queues || {}).map(queue => ({
+        usages.push(...Object.values(trigger.instance.data.queues || {}).map(queue => ({
             usage: `queueLength[${queue.name}]`,
             description: `Gets the length of the queue named "${queue.name}".`
         })));

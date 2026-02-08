@@ -6,7 +6,7 @@
     },
     "type": "module",
     "devDependencies": {
-        "@elgato/cli": "^1.6.0",
+        "@elgato/cli": "^1.7.0",
         "@rollup/plugin-commonjs": "^28.0.0",
         "@rollup/plugin-node-resolve": "^15.2.2",
         "@rollup/plugin-terser": "^0.4.4",
@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "@dennisrijsdijk/node-firebot": "^0.1.0",
-        "@elgato/streamdeck": "^2.0.0",
+        "@elgato/streamdeck": "^2.0.1",
         "expressionish": "^0.1.3",
         "mathjs": "^15.1.0"
     }

@@ -12,10 +12,10 @@ const variable: Variable = {
             },
             {
                 usage: "defaultValue[, 10]",
-                description: "Returns 10 because the provided value is an empty string and matchEmptyString defaults to true."
+                description: "Returns 10 because the provided value is null."
             },
             {
-                usage: "defaultValue[, 10, false]",
+                usage: "defaultValue[\"\", 10, false]",
                 description: "Returns an empty string because the provided value is an empty string but matchEmptyString is set to false."
             }
         ]

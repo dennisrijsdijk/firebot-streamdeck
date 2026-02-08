@@ -14,7 +14,6 @@ export function setPropertyAtPath(obj: any, path: string[], value: any): any {
     const lastPart = path[path.length - 1];
     const target = path.reduce((o, p, i, a) => {
         if (!o[p]) {
-
             o[p] = !isNaN(Number(a[i + 1])) ? [] : {};
         }
         return i === a.length - 1 ? o : o[p];
@@ -30,7 +29,7 @@ export function setPropertyAtPath(obj: any, path: string[], value: any): any {
     // Follow Firebot behavior, if the target is an array, append to it instead of overwriting
     } else if (Array.isArray(target[lastPart])) {
         target[lastPart].push(value);
-    } else if (target[lastPart] != null && typeof target[lastPart] === 'object') {
+    } else if (target != null && typeof target === 'object') {
         target[lastPart] = value;
     }
 

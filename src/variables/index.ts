@@ -4,16 +4,16 @@ import { FirebotInstance } from "../types/firebot";
 import { getCustomVariable, } from "../util";
 import actionVariables from "./actions";
 import literalVariables from "./literal";
-import numberVariables from "./number";
 import spoofedVariables from "./spoofed";
+import utilityVariables from "./utility";
 import { evaluate, LookupMap, VariableMap, VariableEvaluateFnc } from "expressionish";
 import { ReplaceVariable, ReplaceVariableTrigger, VariableDefinition } from "../types/replace-variables";
 
 const variables: ReplaceVariable[] = [
     ...actionVariables,
     ...literalVariables,
-    ...numberVariables,
-    ...spoofedVariables
+    ...spoofedVariables,
+    ...utilityVariables
 ];
 
 streamDeck.ui.onSendToPlugin(async (ev) => {

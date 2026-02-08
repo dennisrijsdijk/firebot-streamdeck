@@ -67,7 +67,7 @@
             hot-reload>
         </sdpi-select>
     </sdpi-item>
-    <div class="sdpi-heading">Preset List Arguments</div>
+    <div id="preset-list-arg-header" style="display: none;" class="sdpi-heading">Preset List Arguments</div>
     <div id="preset-list-args"></div>
 
     <sdpi-item>
@@ -83,6 +83,7 @@
         SDPIComponents.streamDeckClient.sendToPropertyInspector.subscribe((ev) => {
             if (ev.payload.event === "getPresetListArgs") {
                 const argumentsList = ev.payload.items;
+                const header = document.getElementById("preset-list-arg-header");
                 const argsContainer = document.getElementById("preset-list-args");
                 const existingItems = new Set(Array.from(argsContainer.querySelectorAll("sdpi-item")).map(item => item.getAttribute("label")));
 
@@ -108,6 +109,12 @@
                         item.appendChild(textField);
                         argsContainer.appendChild(item);
                     }
+                }
+
+                if (argumentsList.length > 0) {
+                    header.style.display = "flex";
+                } else {
+                    header.style.display = "none";
                 }
             }
         });

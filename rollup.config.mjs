@@ -2,7 +2,6 @@ import commonjs from "@rollup/plugin-commonjs";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import terser from "@rollup/plugin-terser";
 import typescript from "@rollup/plugin-typescript";
-import circularDependencies from 'rollup-plugin-circular-dependencies';
 import path from "node:path";
 import url from "node:url";
 
@@ -22,7 +21,6 @@ const config = {
 		}
 	},
 	plugins: [
-		circularDependencies(),
 		{
 			name: "watch-externals",
 			buildStart: function () {

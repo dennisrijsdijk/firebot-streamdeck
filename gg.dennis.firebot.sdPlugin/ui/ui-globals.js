@@ -102,6 +102,13 @@ window.getVariableDefinitions = async function() {
 window.initializeUiGlobals = async function() {
     window.instanceSelect = document.getElementById("instance-select");
     window.instanceSelectContainer = document.getElementById("instance-select-container");
+
+    const connectionInfo = await SDPIComponents.streamDeckClient.getConnectionInfo();
+
+    if (connectionInfo.actionInfo.payload.isInMultiAction) {
+        document.getElementById("action-title").style.display = "none";
+    }
+
     await window.getGlobalSettings();
 
     window.instancesUpdated();

@@ -24,7 +24,7 @@ streamDeck.ui.onSendToPlugin(async (ev) => {
     let instance: FirebotInstance;
     
     const action = streamDeck.actions.getActionById(ev.action.id);
-    const settings = await action?.getSettings<BaseActionSettings<{}>>();
+    const settings = await action?.getSettings<BaseActionSettings<{}>>() as BaseActionSettings<unknown>;
     
     try {
         instance = firebotManager.getInstance(settings?.endpoint || "");
@@ -33,23 +33,30 @@ streamDeck.ui.onSendToPlugin(async (ev) => {
         return;
     }
 
-    const frontendVariables: VariableDefinition[] = await Promise.all(variables.map(async (variable) => {
+    const trigger = { actionId: ev.action.manifestId, settings, instance };
+
+    const frontendVariables: VariableDefinition[] = [];
+
+    for (const variable of variables) {
+        if (variable.hide) {
+            const hideResult = await variable.hide(trigger);
+            if (hideResult) {
+                continue;
+            }
+        }
+
         const definition = structuredClone(variable.definition);
 
         if (!definition.examples) {
             definition.examples = [];
         }
 
-        if (!variable.getSuggestions) {
-            return definition;
+        if (variable.getSuggestions) {
+            definition.examples.push(...await variable.getSuggestions(trigger));
         }
 
-        const settings = await ev.action.getSettings<BaseActionSettings<{}>>();
-
-        definition.examples.push(...await variable.getSuggestions({ actionId: ev.action.manifestId, settings, instance }));
-
-        return definition;
-    }));
+        frontendVariables.push(definition);
+    }
 
     return streamDeck.ui.sendToPropertyInspector({ event: "getVariables", variables: frontendVariables });
 });

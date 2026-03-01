@@ -128,6 +128,8 @@ class FirebotManager {
                 trigger: command.trigger,
                 type: command.type,
             };
+
+            this.emit("variablesDataUpdated", instance);
         }
 
         const counterCreatedOrUpdated = (counter: Counter) => {
@@ -161,6 +163,8 @@ class FirebotManager {
                 name: presetEffectList.name,
                 argumentNames: presetEffectList.args.map(arg => arg.name),
             };
+
+            this.emit("variablesDataUpdated", instance);
         };
 
         const queueCreatedOrUpdated = (queue: EffectQueueConfig) => {
@@ -191,6 +195,7 @@ class FirebotManager {
                 return;
             }
             delete instance.data.commands[command.id];
+            this.emit("variablesDataUpdated", instance);
         });
 
         client.websocket.on("counter:created", counterCreatedOrUpdated.bind(this));
@@ -204,6 +209,7 @@ class FirebotManager {
         client.websocket.on("custom-role:updated", customRoleCreatedOrUpdated.bind(this));
         client.websocket.on("custom-role:deleted", (customRole) => {
             delete instance.data.customRoles[customRole.id];
+            this.emit("variablesDataUpdated", instance);
         });
 
         client.websocket.on("custom-variable:created", customVariableCreatedOrUpdated.bind(this));
@@ -217,12 +223,14 @@ class FirebotManager {
         client.websocket.on("preset-effect-list:updated", presetEffectListCreatedOrUpdated.bind(this));
         client.websocket.on("preset-effect-list:deleted", (presetEffectList) => {
             delete instance.data.presetEffectLists[presetEffectList.id];
+            this.emit("variablesDataUpdated", instance);
         });
 
         client.websocket.on("effect-queue:created", queueCreatedOrUpdated.bind(this));
         client.websocket.on("effect-queue:updated", queueCreatedOrUpdated.bind(this));
         client.websocket.on("effect-queue:deleted", (queue) => {
             delete instance.data.queues[queue.id];
+            this.emit("variablesDataUpdated", instance);
         });
         client.websocket.on("effect-queue:length-updated", (queueLengthUpdate) => {
             if (instance.data.queues[queueLengthUpdate.id]) {

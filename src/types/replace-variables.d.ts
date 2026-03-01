@@ -22,12 +22,14 @@ export type ReplaceVariableTrigger<TActionSettings = unknown> = {
 export type Variable = {
     definition: VariableDefinition;
     getSuggestions?: (trigger: ReplaceVariableTrigger) => Promise<VariableUsage[]>;
+    hide?: (trigger: ReplaceVariableTrigger) => Promise<boolean>;
     evaluator(trigger: ReplaceVariableTrigger, ...args: unknown[]): Promise<unknown>;
 };
 
 export type SpoofedVariable = {
     definition: VariableDefinition;
     getSuggestions?: (trigger: ReplaceVariableTrigger) => Promise<VariableUsage[]>;
+    hide?: (trigger: ReplaceVariableTrigger) => Promise<boolean>;
     evaluator?: never;
 };
 

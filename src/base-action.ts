@@ -1,4 +1,4 @@
-import streamDeck, { DidReceiveSettingsEvent, SingletonAction, WillAppearEvent, WillDisappearEvent, Action, SendToPluginEvent } from "@elgato/streamdeck";
+import streamDeck, { DidReceiveSettingsEvent, SingletonAction, WillAppearEvent, WillDisappearEvent, Action } from "@elgato/streamdeck";
 import { JsonObject } from "@elgato/utils";
 import firebotManager from "./firebot-manager";
 import { findAndReplaceVariables } from "./variables";
@@ -60,7 +60,7 @@ export class BaseAction<T extends JsonObject> extends SingletonAction<BaseAction
     }
 
     async update(action?: (Action<BaseActionSettings<T>>)) {
-        if (!action || !action.isKey()) {
+        if (!action || !action.isKey() || action.isInMultiAction()) {
             return;
         }
 

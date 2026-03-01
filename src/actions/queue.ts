@@ -9,10 +9,10 @@ const actionQueueCache: Record<string, string> = {};
 
 @action({ UUID: "gg.dennis.firebot.queue" })
 export class QueueAction extends BaseAction<QueueActionSettings> {
-	async sendQueues(instance: FirebotInstance) {
+	async sendQueues(instance: FirebotInstance | null) {
 		const dataSourcePayload: DataSourcePayload = {
 			event: "getEffectQueues",
-			items: Object.values(instance.data.queues || {}).map(queue => ({
+			items: Object.values(instance?.connected ? instance.data.queues || {} : {}).map(queue => ({
 				label: queue.name,
 				value: queue.id,
 			}))
@@ -21,6 +21,7 @@ export class QueueAction extends BaseAction<QueueActionSettings> {
 	}
 
 	override async instanceChanged(actionId: string, settings: BaseActionSettings<QueueActionSettings>): Promise<void> {
+		await super.instanceChanged(actionId, settings);
 		let instance: FirebotInstance;
 
 		try {
@@ -43,25 +44,18 @@ export class QueueAction extends BaseAction<QueueActionSettings> {
 
 		await this.waitUntilReady();
 
-		let instance: FirebotInstance;
+		let instance: FirebotInstance | null = null;
 
 		try {
 			instance = firebotManager.getInstance(settings.endpoint || "");
 		} catch (error) {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
-			return;
-		}
-
-		if (!instance.connected) {
-			streamDeck.logger.error(`Not connected to Firebot instance at endpoint: ${settings.endpoint}, refusing to serve stale data.`);
-			return;
 		}
 
 		if (ev.payload.event === "getEffectQueues") {
 			await this.sendQueues(instance);
-		} else if (ev.payload.event === "getEffectQueueActions") {
-			await this.sendQueueActions(settings);
 		}
+		await this.sendQueueActions(settings);
 	}
 
 	override async onDidReceiveSettings(ev: DidReceiveSettingsEvent<BaseActionSettings<QueueActionSettings>>): Promise<void> {
@@ -89,21 +83,19 @@ export class QueueAction extends BaseAction<QueueActionSettings> {
 	}
 
 	async sendQueueActions(settings: BaseActionSettings<QueueActionSettings>): Promise<void> {
-		let instance: FirebotInstance;
+		let instance: FirebotInstance | null = null;
 
 		try {
 			instance = firebotManager.getInstance(settings.endpoint || "");
 		} catch {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
-			return;
 		}
 
-		if (!instance.connected) {
-			streamDeck.logger.error(`Not connected to Firebot instance at endpoint: ${settings.endpoint}, refusing to serve stale data.`);
-			return;
+		if (!instance?.connected) {
+			return streamDeck.ui.sendToPropertyInspector({ event: "getEffectQueueActions", items: [] });
 		}
 
-		const queue = instance.data.queues[settings.action?.id || ""];
+		const queue = instance?.data.queues[settings.action?.id || ""];
 		if (!queue) {
 			return;
 		}

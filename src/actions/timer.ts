@@ -10,23 +10,17 @@ export class TimerAction extends BaseAction<TimerActionSettings> {
 	async sendTimers(settings: BaseActionSettings<TimerActionSettings>) {
 		await this.waitUntilReady();
 
-		let instance: FirebotInstance;
+		let instance: FirebotInstance | null = null;
 
 		try {
 			instance = firebotManager.getInstance(settings.endpoint || "");
 		} catch (error) {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
-			return;
-		}
-
-		if (!instance.connected) {
-			streamDeck.logger.error(`Not connected to Firebot instance at endpoint: ${settings.endpoint}, refusing to serve stale data.`);
-			return;
 		}
 
 		const dataSourcePayload: DataSourcePayload = {
 			event: "getTimers",
-			items: Object.values(instance.data.timers || {}).map(timer => ({
+			items: Object.values(instance?.connected ? instance.data.timers || {} : {}).map(timer => ({
 				label: timer.name,
 				value: timer.id,
 			}))
@@ -35,6 +29,7 @@ export class TimerAction extends BaseAction<TimerActionSettings> {
 	}
 
 	override async instanceChanged(actionId: string, settings: BaseActionSettings<TimerActionSettings>): Promise<void> {
+		await super.instanceChanged(actionId, settings);
 		return this.sendTimers(settings);
 	}
 

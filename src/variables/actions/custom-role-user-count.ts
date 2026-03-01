@@ -7,6 +7,10 @@ const variable: Variable = {
         usage: "customRoleUserCount[name]"
     },
     evaluator: async (trigger: ReplaceVariableTrigger<CustomRoleActionSettings>, customRoleName?: string) => {
+        if (!trigger.instance.connected) {
+            return null;
+        }
+
         if (!customRoleName) {
             const customRole = trigger.instance.data.customRoles[trigger.settings?.action?.id || ""];
             return customRole ? customRole.count : null;

@@ -99,13 +99,57 @@ window.getVariableDefinitions = async function() {
     });
 }
 
+window.handleConnectionStateChanged = function(event) {
+    if (event.payload.event !== "connectionStateChanged") {
+        return;
+    }
+
+    if (event.payload.endpoint !== window.instanceSelect.value) {
+        return;
+    }
+
+    document.getElementById("instance-not-connected-warning").style.display = event.payload.connected ? "none" : "block";
+    document.getElementById("instance-not-connected-name").textContent = event.payload.name;
+
+    let sendToPluginTarget;
+
+    switch (window.connectionInfo.actionInfo.action) {
+        case "gg.dennis.firebot.command":
+            sendToPluginTarget = "getCommands";
+            break;
+        case "gg.dennis.firebot.counter":
+            sendToPluginTarget = "getCounters";
+            break;
+        case "gg.dennis.firebot.customrole":
+            sendToPluginTarget = "getCustomRoles";
+            break;
+        case "gg.dennis.firebot.presetlist":
+            sendToPluginTarget = "getPresetLists";
+            break;
+        case "gg.dennis.firebot.queue":
+            sendToPluginTarget = "getEffectQueues";
+            break;
+        case "gg.dennis.firebot.timer":
+            sendToPluginTarget = "getTimers";
+            break;
+    }
+
+    if (sendToPluginTarget) {
+        SDPIComponents.streamDeckClient.send("sendToPlugin", { event: sendToPluginTarget });
+    }
+}
+
 window.initializeUiGlobals = async function() {
     window.instanceSelect = document.getElementById("instance-select");
     window.instanceSelectContainer = document.getElementById("instance-select-container");
 
-    const connectionInfo = await SDPIComponents.streamDeckClient.getConnectionInfo();
+    window.connectionInfo = await SDPIComponents.streamDeckClient.getConnectionInfo();
 
-    if (connectionInfo.actionInfo.payload.isInMultiAction) {
+    SDPIComponents.streamDeckClient.sendToPropertyInspector.subscribe(window.handleConnectionStateChanged);
+
+    SDPIComponents.streamDeckClient.send("sendToPlugin", { event: "getInstanceConnectionState", endpoint: window.connectionInfo.actionInfo.payload.settings.endpoint });
+
+    if (window.connectionInfo.actionInfo.payload.isInMultiAction) {
         document.getElementById("action-title").style.display = "none";
     }
 

@@ -1,5 +1,5 @@
-import streamDeck, { DidReceiveSettingsEvent, SingletonAction, WillAppearEvent, WillDisappearEvent, Action } from "@elgato/streamdeck";
-import { JsonObject } from "@elgato/utils";
+import streamDeck, { DidReceiveSettingsEvent, SingletonAction, WillAppearEvent, WillDisappearEvent, Action, SendToPluginEvent } from "@elgato/streamdeck";
+import { JsonObject, JsonValue } from "@elgato/utils";
 import firebotManager from "./firebot-manager";
 import { findAndReplaceVariables } from "./variables";
 import { ReplaceVariableTrigger } from "./types/replace-variables";
@@ -27,11 +27,34 @@ export class BaseAction<T extends JsonObject> extends SingletonAction<BaseAction
         });
     }
 
-    async instanceChanged(actionId: string, settings: BaseActionSettings<T>) { }
+    async instanceChanged(actionId: string, settings: BaseActionSettings<T>) {
+        try {
+            const instance = firebotManager.getInstance(settings.endpoint || "");
+            await firebotManager.sendConnectionStateUpdated(instance);
+        } catch (error) {
+            streamDeck.logger.error(`Failed to send connection state for action ${actionId} on instance change: ${error}`);
+        }
+    }
 
     protected async waitUntilReady(): Promise<void> {
         while (!firebotManager.ready) {
             await new Promise(resolve => setTimeout(resolve, 100));
+        }
+    }
+
+    override async onSendToPlugin(ev: SendToPluginEvent<JsonValue, BaseActionSettings<T>>): Promise<void> {
+        if (ev.payload == null || typeof ev.payload !== "object" || Array.isArray(ev.payload)) {
+            return;
+        }
+        if (ev.payload?.event !== "getInstanceConnectionState") {
+            return;
+        }
+
+        try {
+            const instance = firebotManager.getInstance(this.actionsCache[ev.action.id]?.settings.endpoint || "");
+            await firebotManager.sendConnectionStateUpdated(instance);
+        } catch (error) {
+            streamDeck.logger.error(`Failed to send connection state for action ${ev.action.id}: ${error}`);
         }
     }
 

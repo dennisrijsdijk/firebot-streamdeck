@@ -6,7 +6,12 @@ const variable: Variable = {
         description: "Returns true when a timer is active or false when paused.",
         usage: "timerActive[name]"
     },
-    evaluator: async (trigger: ReplaceVariableTrigger<TimerActionSettings>, timerName?: string) => {if (!timerName) {
+    evaluator: async (trigger: ReplaceVariableTrigger<TimerActionSettings>, timerName?: string) => {
+        if (!trigger.instance.connected) {
+            return null;
+        }
+
+        if (!timerName) {
             const timer = trigger.instance.data.timers[trigger.settings?.action?.id || ""];
             return timer ? timer.active : false;
         }

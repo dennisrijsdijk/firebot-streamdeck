@@ -78,6 +78,17 @@ class FirebotManager {
         await streamDeck.ui.sendToPropertyInspector(instancesPayload);
     }
 
+    public async sendConnectionStateUpdated(instance: FirebotInstance): Promise<void> {
+        const connectionStatePayload = {
+            event: "connectionStateChanged",
+            name: instance.name,
+            endpoint: instance.endpoint,
+            connected: instance.connected,
+        };
+
+        await streamDeck.ui.sendToPropertyInspector(connectionStatePayload);
+    }
+
     public async createInstance(settingsInstance: SettingsInstance): Promise<FirebotInstance> {
         if (this._instances[settingsInstance.endpoint]) {
             throw new Error(`Firebot instance already exists for endpoint: ${settingsInstance.endpoint}`);
@@ -309,10 +320,13 @@ class FirebotManager {
                 };
             });
 
+            this.sendConnectionStateUpdated(instance);
             this.emit("variablesDataUpdated", instance);
         });
         client.websocket.on("disconnected", async ({ code, reason }) => {
             instance.connected = false;
+            this.sendConnectionStateUpdated(instance);
+            this.emit("variablesDataUpdated", instance);
             if (code === 4001 || instance.discard) {
                 return;
             }

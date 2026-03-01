@@ -7,6 +7,10 @@ const variable: Variable = {
         usage: "counter[name]"
     },
     evaluator: async (trigger: ReplaceVariableTrigger<CounterActionSettings>, counterName?: string) => {
+        if (!trigger.instance.connected) {
+            return null;
+        }
+        
         if (!counterName) {
             const counter = trigger.instance.data.counters[trigger.settings?.action?.id || ""];
             return counter ? counter.value : null;

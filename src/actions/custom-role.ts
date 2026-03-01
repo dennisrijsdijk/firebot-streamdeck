@@ -10,23 +10,17 @@ export class CustomRoleAction extends BaseAction<CustomRoleActionSettings> {
     async sendRoles(settings: BaseActionSettings<CustomRoleActionSettings>) {
         await this.waitUntilReady();
 
-        let instance: FirebotInstance;
+        let instance: FirebotInstance | null = null;
 
         try {
             instance = firebotManager.getInstance(settings.endpoint || "");
         } catch {
             streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
-            return;
-        }
-
-        if (!instance.connected) {
-            streamDeck.logger.error(`Not connected to Firebot instance at endpoint: ${settings.endpoint}, refusing to serve stale data.`);
-            return;
         }
 
         const dataSourcePayload: DataSourcePayload = {
             event: "getCustomRoles",
-            items: Object.values(instance.data.customRoles || {}).map(customRole => ({
+            items: Object.values(instance?.connected ? instance.data.customRoles || {} : {}).map(customRole => ({
                 label: customRole.name,
                 value: customRole.id,
             }))
@@ -36,6 +30,7 @@ export class CustomRoleAction extends BaseAction<CustomRoleActionSettings> {
     }
 
     override async instanceChanged(actionId: string, settings: BaseActionSettings<CustomRoleActionSettings>): Promise<void> {
+        await super.instanceChanged(actionId, settings);
         return this.sendRoles(settings);
     }
 

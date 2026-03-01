@@ -12,6 +12,13 @@
     <sdpi-item id="instance-select-container" label="Instance" style="display: none;">
         <sdpi-select id="instance-select" setting="endpoint" datasource="getInstances" loading="Fetching Instances..." placeholder="Select an instance..." hot-reload></sdpi-select>
     </sdpi-item>
+
+    <sdpi-item id="instance-not-connected-warning" style="display: none">
+        <div
+            style="border: solid red 2px; border-radius: 5px; color: white; padding: 8px; margin-bottom: 8px; text-align: center;">
+            Not connected to instance <span id="instance-not-connected-name"></span>
+        </div>
+    </sdpi-item>
     
     <sdpi-item id="action-title" label="Title">
         <sdpi-textarea setting="title" placeholder="Enter title..." rows="4"></sdpi-textarea>

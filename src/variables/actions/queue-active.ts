@@ -7,6 +7,10 @@ const variable: Variable = {
         usage: "queueActive[name]"
     },
     evaluator: async (trigger: ReplaceVariableTrigger<QueueActionSettings>, queueName?: string) => {
+        if (!trigger.instance.connected) {
+            return null;
+        }
+
         if (!queueName) {
             const queue = trigger.instance.data.queues[trigger.settings?.action?.id || ""];
             return queue ? queue.active : false;

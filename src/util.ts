@@ -37,9 +37,10 @@ export function setPropertyAtPath(obj: any, path: string[], value: any): any {
 }
 
 export function getCustomVariable(name: string, instance?: FirebotInstance, propertyPath?: string | string[]): unknown {
-    if (!instance || !name || name.trim() === "") {
+    if (!instance || !instance.connected || !name || name.trim() === "") {
         return null;
     }
+
     const pathParts = Array.isArray(propertyPath) ? propertyPath : propertyPath?.split('.') ?? [];
     let variable = instance.data.customVariables[name];
     if (variable == null) {

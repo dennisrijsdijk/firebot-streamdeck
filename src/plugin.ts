@@ -48,3 +48,20 @@ for (const instance of globalSettings.instances) {
 }
 
 firebotManager.ready = true;
+
+streamDeck.ui.onSendToPlugin(async (ev) => {
+    if (ev.payload == null || typeof ev.payload !== "object" || Array.isArray(ev.payload)) {
+        return;
+    }
+
+    if (ev.payload.event !== "getInstanceConnectionState") {
+        return;
+    }
+
+    try {
+        const instance = firebotManager.getInstance(ev.payload.endpoint as string || "");
+        await firebotManager.sendConnectionStateUpdated(instance);
+    } catch (error) {
+        streamDeck.logger.error(`Failed to send connection state for instance ${ev.payload.endpoint}: ${error}`);
+    }
+});

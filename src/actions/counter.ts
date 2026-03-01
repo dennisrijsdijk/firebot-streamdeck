@@ -11,23 +11,17 @@ export class CounterAction extends BaseAction<CounterActionSettings> {
 	async sendCounters(settings: BaseActionSettings<CounterActionSettings>) {
 		await this.waitUntilReady();
 
-		let instance: FirebotInstance;
+		let instance: FirebotInstance | null = null;
 
 		try {
 			instance = firebotManager.getInstance(settings.endpoint || "");
 		} catch {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
-			return;
-		}
-
-		if (!instance.connected) {
-			streamDeck.logger.error(`Not connected to Firebot instance at endpoint: ${settings.endpoint}, refusing to serve stale data.`);
-			return;
 		}
 
 		const dataSourcePayload: DataSourcePayload = {
 			event: "getCounters",
-			items: Object.values(instance.data.counters || {}).map(counter => ({
+			items: Object.values(instance?.connected ? instance.data.counters || {} : {}).map(counter => ({
 				label: counter.name,
 				value: counter.id,
 			}))
@@ -37,6 +31,7 @@ export class CounterAction extends BaseAction<CounterActionSettings> {
 	}
 
 	override async instanceChanged(actionId: string, settings: BaseActionSettings<CounterActionSettings>): Promise<void> {
+		await super.instanceChanged(actionId, settings);
 		return this.sendCounters(settings);
 	}
 

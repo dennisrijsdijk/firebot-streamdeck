@@ -11,22 +11,16 @@ export class CommandAction extends BaseAction<CommandActionSettings> {
 	async sendCommands(settings: BaseActionSettings<CommandActionSettings>) {
 		await this.waitUntilReady();
 
-		let instance: FirebotInstance;
+		let instance: FirebotInstance | null = null;
 		try {
 			instance = firebotManager.getInstance(settings.endpoint || "");
 		} catch {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
-			return;
-		}
-
-		if (!instance.connected) {
-			streamDeck.logger.error(`Not connected to Firebot instance at endpoint: ${settings.endpoint}, refusing to serve stale data.`);
-			return;
 		}
 
 		const dataSourcePayload: DataSourcePayload = {
 			event: "getCommands",
-			items: Object.values(instance.data.commands || {}).map(command => ({
+			items: Object.values(instance?.connected ? instance.data.commands || {} : {}).map(command => ({
 				label: command.trigger,
 				value: command.id,
 			}))
@@ -36,6 +30,7 @@ export class CommandAction extends BaseAction<CommandActionSettings> {
 	}
 
 	override async instanceChanged(actionId: string, settings: BaseActionSettings<CommandActionSettings>): Promise<void> {
+		await super.instanceChanged(actionId, settings);
 		return this.sendCommands(settings);
 	}
 

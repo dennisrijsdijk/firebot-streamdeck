@@ -15,10 +15,12 @@ export class PresetListAction extends BaseAction<PresetListActionSettings> {
 		}
 
 		const settings = await ev.action.getSettings();
-		return this.sendPresetLists(settings);
+		await this.sendPresetLists(settings);
+		return this.sendPresetListArgsToPI(ev.action.id);
 	}
 
 	override async instanceChanged(actionId: string, settings: BaseActionSettings<PresetListActionSettings>): Promise<void> {
+		await super.instanceChanged(actionId, settings);
 		await this.sendPresetLists(settings);
 		await this.sendPresetListArgsToPI(actionId);
 	}
@@ -26,25 +28,19 @@ export class PresetListAction extends BaseAction<PresetListActionSettings> {
 	async sendPresetLists(settings: BaseActionSettings<PresetListActionSettings>) {
 		await this.waitUntilReady();
 
-		let instance: FirebotInstance;
+		let instance: FirebotInstance | null = null;
 
 		try {
 			instance = firebotManager.getInstance(settings.endpoint || "");
 		} catch {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
-			return;
-		}
-
-		if (!instance.connected) {
-			streamDeck.logger.error(`Not connected to Firebot instance at endpoint: ${settings.endpoint}, refusing to serve stale data.`);
-			return;
 		}
 
 		let dataSourcePayload: { event: string; items: any[] };
 
 		dataSourcePayload = {
 			event: "getPresetLists",
-			items: Object.values(instance.data.presetEffectLists || {}).map(presetList => ({
+			items: Object.values(instance?.connected ? instance.data.presetEffectLists || {} : {}).map(presetList => ({
 				label: presetList.name,
 				value: presetList.id,
 			}))
@@ -58,35 +54,25 @@ export class PresetListAction extends BaseAction<PresetListActionSettings> {
 
 		if (!action) {
 			streamDeck.logger.error(`No action found with ID: ${actionId}`);
-			return;
+			return streamDeck.ui.sendToPropertyInspector({ event: "getPresetListArgs", items: [] });
 		}
 
 		const settings = await action.getSettings<BaseActionSettings<PresetListActionSettings>>();
 
 		await this.waitUntilReady();
 
-		let instance: FirebotInstance;
+		let instance: FirebotInstance | null = null;
 
 		try {
 			instance = firebotManager.getInstance(settings.endpoint || "");
 		} catch {
 			streamDeck.logger.error(`No Firebot instance found for endpoint: ${settings.endpoint}`);
-			return;
 		}
 
-		if (!instance.connected) {
-			streamDeck.logger.error(`Not connected to Firebot instance at endpoint: ${settings.endpoint}, refusing to serve stale data.`);
-			return;
-		}
+		const presetListId = (instance?.connected ? settings.action?.id : "") || "";
 
-		const presetListId = settings.action?.id;
-		if (!presetListId) {
-			streamDeck.logger.error(`No preset effect list ID set for action ${actionId}`);
-			return;
-		}
-		let presetList = instance.data.presetEffectLists?.[presetListId];
+		let presetList = instance?.data.presetEffectLists?.[presetListId];
 		if (!presetList) {
-			streamDeck.logger.error(`No preset effect list found with ID ${presetListId} for action ${actionId}`);
 			presetList = {
 				id: "",
 				name: "",

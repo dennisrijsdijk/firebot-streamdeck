@@ -33,6 +33,7 @@ type CustomVariableActionSettings = {
     name?: string;
     value?: string;
     propertyPath?: string;
+    duration?: number | string;
 }
 
 type PresetListActionSettings = {

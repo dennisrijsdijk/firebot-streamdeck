@@ -53,7 +53,16 @@ export class CustomVariableAction extends BaseAction<CustomVariableActionSetting
             }
         }
 
-        instance.client.customVariables.setCustomVariable(variableName, value).catch((err) => {
+        let ttl = await findAndReplaceVariables(ev.payload.settings.action?.duration?.toString() || "", { instance, settings: ev.payload.settings, actionId: ev.action.manifestId }) as string | number;
+
+        if (ttl) {
+            ttl = Number(ttl);
+            if (isNaN(ttl) || ttl < 0) {
+                ttl = 0;
+            }
+        }
+
+        instance.client.customVariables.setCustomVariable(variableName, value, ttl as number).catch((err) => {
             streamDeck.logger.error(`Failed to set custom variable ${variableName} on action ${ev.action.id}: ${err}`);
             ev.action.showAlert();
         });

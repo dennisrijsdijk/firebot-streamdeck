@@ -22,5 +22,8 @@
         "@elgato/streamdeck": "^2.0.1",
         "expressionish": "^0.1.3",
         "mathjs": "^15.1.0"
+    },
+    "overrides": {
+        "serialize-javascript": "7.0.3"
     }
 }

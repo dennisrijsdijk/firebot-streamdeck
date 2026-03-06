@@ -78,10 +78,22 @@ jobs:
       - name: Install Project Dependencies
         run: npm ci
 
-      - name: Build And Pack
+      - name: Build Debug Plugin
+        run: npm run build:dev
+
+      - name: Pack Debug Plugin
         run: npm run pack
 
-      - name: Rename Binary
+      - name: Rename Debug Plugin
+        run: mv dist/gg.dennis.firebot.streamDeckPlugin dist/gg.dennis.firebot-v${{ needs.checkversion.outputs.version }}-DEBUG.streamDeckPlugin
+
+      - name: Build Release Plugin
+        run: npm run build
+
+      - name: Pack Release Plugin
+        run: npm run pack
+      
+      - name: Rename Release Plugin
         run: mv dist/gg.dennis.firebot.streamDeckPlugin dist/gg.dennis.firebot-v${{ needs.checkversion.outputs.version }}.streamDeckPlugin
 
       - name: Create Release
@@ -98,3 +110,4 @@ jobs:
           generate_release_notes: false
           files: |
             dist/gg.dennis.firebot-v${{ needs.checkversion.outputs.version }}.streamDeckPlugin
+            dist/gg.dennis.firebot-v${{ needs.checkversion.outputs.version }}-DEBUG.streamDeckPlugin

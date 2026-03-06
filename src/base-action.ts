@@ -92,7 +92,7 @@ export class BaseAction<T extends JsonObject> extends SingletonAction<BaseAction
             return;
         }
 
-        streamDeck.logger.info(`Received update for action ${action.manifestId} (${action.id}) with settings: ${JSON.stringify(cachedAction.settings)}`);
+        streamDeck.logger.trace(`Received update for action ${action.manifestId} (${action.id}) with settings: ${JSON.stringify(cachedAction.settings)}`);
 
         await this.waitUntilReady();
 
@@ -118,14 +118,12 @@ export class BaseAction<T extends JsonObject> extends SingletonAction<BaseAction
         } catch (error) {
             streamDeck.logger.error(`Failed to replace variables in title for action ${action.manifestId} (${action.id}): ${error}`);
         }
-
-        streamDeck.logger.info(`Generated title for action ${action.manifestId} (${action.id}): ${title}`);
         
         if (cachedAction.title === title) {
             return;
         }
 
-        streamDeck.logger.info(`Updating title for action ${action.manifestId} (${action.id}) to: ${title}`);
+        streamDeck.logger.trace(`Updating title for action ${action.manifestId} (${action.id}) to: ${title}`);
 
         cachedAction.title = typeof title === "string" ? title : JSON.stringify(title);
         return action.setTitle(cachedAction.title);

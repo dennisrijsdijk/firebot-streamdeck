@@ -32,10 +32,11 @@ class FirebotManager {
             const removedInstances = Object.keys(this._instances).filter((endpoint) => !ev.settings.instances.find((instance) => instance.endpoint === endpoint));
 
             for (const instance of newInstances) {
-                await this.createInstance(instance);
+                await this.createInstance(instance, true);
             }
 
             for (const endpoint of removedInstances) {
+                streamDeck.logger.info(`Removing Firebot instance for endpoint: ${endpoint}`);
                 this._instances[endpoint].discard = true;
                 this._instances[endpoint].client.websocket.disconnect();
                 delete this._instances[endpoint];
@@ -89,7 +90,13 @@ class FirebotManager {
         await streamDeck.ui.sendToPropertyInspector(connectionStatePayload);
     }
 
-    public async createInstance(settingsInstance: SettingsInstance): Promise<FirebotInstance> {
+    public async createInstance(settingsInstance: SettingsInstance, isNewInstance: boolean): Promise<FirebotInstance> {
+        if (isNewInstance) {
+            streamDeck.logger.info(`Creating new Firebot instance for endpoint: ${settingsInstance.endpoint}`);
+        } else {
+            streamDeck.logger.debug(`Loading Firebot instance for endpoint: ${settingsInstance.endpoint}`);
+        }
+
         if (this._instances[settingsInstance.endpoint]) {
             throw new Error(`Firebot instance already exists for endpoint: ${settingsInstance.endpoint}`);
         }
@@ -97,6 +104,7 @@ class FirebotManager {
         const client = new FirebotClient(settingsInstance.endpoint);
         const instance: FirebotInstance = {
             connected: false,
+            notifyDisconnect: true,
             client,
             discard: false,
             endpoint: settingsInstance.endpoint,
@@ -317,7 +325,7 @@ class FirebotManager {
                     length: queue.length,
                 };
             });
-            
+
             const timers = await client.timers.getTimers();
             instance.data.timers = {};
             timers.forEach(timer => {
@@ -332,14 +340,19 @@ class FirebotManager {
             this.emit("variablesDataUpdated", instance);
         });
         client.websocket.on("disconnected", async ({ code, reason }) => {
+            instance.notifyDisconnect = instance.notifyDisconnect || instance.connected;
             instance.connected = false;
-            this.sendConnectionStateUpdated(instance);
-            this.emit("variablesDataUpdated", instance);
+            if (instance.notifyDisconnect) {
+                instance.notifyDisconnect = false;
+                this.sendConnectionStateUpdated(instance);
+                this.emit("variablesDataUpdated", instance);
+
+                streamDeck.logger.warn(`Disconnected from Firebot instance at ${settingsInstance.endpoint} (code: ${code}, reason: ${reason || "no reason provided"}). Retrying silently in the background...`);
+            }
+
             if (code === 4001 || instance.discard) {
                 return;
             }
-
-            streamDeck.logger.warn(`Disconnected from Firebot instance at ${settingsInstance.endpoint} (code: ${code}, reason: ${reason || "no reason provided"})`);
 
             await new Promise(resolve => setTimeout(resolve, 5000));
 
@@ -351,7 +364,9 @@ class FirebotManager {
         });
 
         client.websocket.on("error", async (err) => {
-            streamDeck.logger.error(`WebSocket error for Firebot instance at ${settingsInstance.endpoint}: ${err}`);
+            if (instance.connected) {
+                streamDeck.logger.error(`WebSocket error for Firebot instance at ${settingsInstance.endpoint}: ${err}`);
+            }
         });
 
         try {

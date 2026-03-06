@@ -11,7 +11,7 @@ import { QueueAction } from "./actions/queue";
 import { TimerAction } from "./actions/timer";
 
 // We can enable "trace" logging so that all messages between the Stream Deck, and the plugin are recorded. When storing sensitive information
-streamDeck.logger.setLevel("trace");
+streamDeck.logger.setLevel(process.env.NODE_ENV === "development" ? "trace" : "info");
 
 streamDeck.settings.useExperimentalMessageIdentifiers = true;
 
@@ -44,7 +44,7 @@ if (globalSettings && Object.keys(globalSettings).length === 0) {
 }
 
 for (const instance of globalSettings.instances) {
-    firebotManager.createInstance(instance);
+    firebotManager.createInstance(instance, false);
 }
 
 firebotManager.ready = true;

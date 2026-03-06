@@ -6,7 +6,7 @@ const variable: Variable = {
         description: "Returns the name of the preset list associated with this action",
         usage: "presetListName"
     },
-    hide: async (trigger: ReplaceVariableTrigger) => trigger.actionId !== "gg.dennis.firebot.presetList",
+    hide: async (trigger: ReplaceVariableTrigger) => trigger.actionId !== "gg.dennis.firebot.presetlist",
     evaluator: async (trigger: ReplaceVariableTrigger<PresetListActionSettings>) => {
         if (!trigger.instance.connected) {
             return null;
